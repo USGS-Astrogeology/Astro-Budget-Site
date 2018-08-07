@@ -4,7 +4,7 @@
      {% if (remote_user[0].admin == 't') or (remote_user[0].peopleid == proposals[0].peopleid) %}
 ["<a href='javascript:void(0)' onclick=\"staffingEdit({{ task.taskid }}, 'new')\">{{ task.taskname }}</a>",
      {% else %}
-["{{ task.taskname }}",
+     ["{{ task.taskname }}",
      {% endif %}
 "N/A", 0, "$0.00", "", ""]
   {% endif %}
@@ -12,17 +12,23 @@
   {% set current_staff = task.staffing[0].peopleid %}
   {% set cost_total = 0 %}
   { "Task": "{{task.taskname}}", "taskid": {{ task.taskid }},
-  "Staffing": {{ task.staffing[0].peopleid }},
+  "Staffing": {{ task.staffing[0].peopleid }}
+
+  {% if task.staffing|length == 0 %}
+    "None"}
+  {% else %}
+    ,
+  {% endif %}
 
   {% for staff in task.staffing %}
     {% if staff.peopleid != current_staff%}
       "Cost": "${{ cost_total|number_format(2,'.',',') }}"}, { "Task": "{{ task.taskname }}",
-      "taskid": {{ task.taskid }}, "Staffing": {{ staff.peopleid }},
+      "taskid": {{ task.taskid }}, "Staffing": {{ staff.peopleid }}
       {% set current_staff = staff.peopleid %}
       {% set cost_total = 0 %}
     {% endif %}
-    "{{staff.FY}}staffingid": {{ staff.staffingid }},
-    "{{staff.FY}}": {{ staff.q1hours + staff.q2hours + staff.q3hours + staff.q4hours + staff.flexhours }},
+    "{{ staff.FY }}staffingid": {{ staff.staffingid }},
+    "{{ staff.FY }}": {{ staff.q1hours + staff.q2hours + staff.q3hours + staff.q4hours + staff.flexhours }},
     {% set cost_total = cost_total + staff.staffcosts%}
     {% if loop.last %}
       "Cost": "${{ cost_total|number_format(2,'.',',') }}"}

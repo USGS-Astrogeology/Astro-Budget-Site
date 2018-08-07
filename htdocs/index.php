@@ -986,10 +986,14 @@ function costsSummaryView ($pbdb, $templateArgs) {
     }
 
     $templateArgs['costs'][$i]['overhead'] = "Overhead ";
-    foreach ($templateArgs['budgets'][$i]['FYs'] as $budgetFy) {
-      $templateArgs['costs'][$i]['overhead'] .= " - $budgetFy " .
-        money_format('%.2n', $templateArgs['budgets'][$i]['FY'][$budgetFy]['overhead']);
+
+    if (count($templateArgs['budgets'][$i]['FYs']) > 0) {
+      foreach ($templateArgs['budgets'][$i]['FYs'] as $budgetFy) {
+        $templateArgs['costs'][$i]['overhead'] .= " - $budgetFy " .
+          money_format('%.2n', $templateArgs['budgets'][$i]['FY'][$budgetFy]['overhead']);
+      }
     }
+    
     $templateArgs['costs'][$i]['overhead'] .= " - Total " .
         money_format('%.2n', $templateArgs['budgets'][$i]['FY']['ALL']['overhead']);
   }

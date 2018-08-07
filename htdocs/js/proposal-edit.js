@@ -123,6 +123,11 @@ function loadTasksTable (reload, proposalid) {
 
   $new_fields = Array.from(new Set($new_array)).sort();
 
+  if ($new_fields.length == 0) {
+    let date = new Date();
+    $new_fields.push("FY" + date.getFullYear().toString().substr(2,));
+  }
+
   // Pushes static values for Task, Staffing, and Cost
   $fields.push({
     name: "Task",
@@ -217,6 +222,7 @@ function loadTasksTable (reload, proposalid) {
           });
         }
       });
+      figureCosts(proposalid);
     },
     onItemUpdated: function(args) {
       $entry = args.item;
@@ -269,6 +275,7 @@ function loadTasksTable (reload, proposalid) {
           });
         }
       });
+      figureCosts(proposalid);
     },
     onItemDeleted: function(args) {
       $entry = args.item;
@@ -288,6 +295,7 @@ function loadTasksTable (reload, proposalid) {
         async: true,
         cache: false
       });
+      figureCosts(proposalid);
     }
   });
 }
