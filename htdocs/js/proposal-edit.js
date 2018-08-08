@@ -111,6 +111,8 @@ function loadTasksTable (reload, proposalid) {
 
   $task_res = $.ajax('index.php?view=tasks-list-json&proposalid=' + proposalid, {dataType: "json", async: false});
   $people_res = $.ajax('index.php?view=people-dropdown-list-json', {dataType: "json", async: false});
+  $task_dd_res = $.ajax('index.php?view=tasks-dropdown-json&proposalid=' + proposalid, {dataType: "json", async: false});
+  $task_dd_list = $task_dd_res.responseJSON['data'];
   $task_json = $task_res.responseJSON['data'];
 
   $fields = [];
@@ -131,8 +133,12 @@ function loadTasksTable (reload, proposalid) {
   // Pushes static values for Task, Staffing, and Cost
   $fields.push({
     name: "Task",
-    type: "text",
-    width: 100
+    type: "select",
+    width: 100,
+
+    items: $task_dd_list,
+    valueField: "name",
+    textField: "name"
   });
   $fields.push({
     name: "Staffing",
@@ -302,10 +308,7 @@ function loadTasksTable (reload, proposalid) {
 
 // Custom method for adding columns to jsGrid
 function AddColumn(proposalid) {
-  $task_res = $.ajax('index.php?view=tasks-list-json&proposalid=' + proposalid, {dataType: "json", async: false});
-  $people_res = $.ajax('index.php?view=people-dropdown-list-json', {dataType: "json", async: false});
-  $task_json = $task_res.responseJSON['data'];
-
+  $task_json = $("#tasksTableDiv").jsGrid("option", "data");
   $fields = $("#tasksTableDiv").jsGrid("option", "fields");
 
   let field_names = [];
@@ -319,7 +322,7 @@ function AddColumn(proposalid) {
     return;
   }
 
-  let temp = $fields.pop()
+  let temp = $fields.pop();
 
   // Pushes user defined column
   $fields.push({
@@ -329,15 +332,13 @@ function AddColumn(proposalid) {
   });
 
   // Pushes static jsGrid value back onto the array
-  $fields.push({
-    type: "control"
-  });
+  $fields.push(temp);
 
   // Retintializes the grid to allow for row and column editing
   $("#tasksTableDiv").jsGrid({
     width: "100%",
     height: "400px",
-    inserting: true,
+    inserting: false,
     editing: true,
     sorting: true,
     paging: true,
