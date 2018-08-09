@@ -1,6 +1,7 @@
 {"draw":0,"recordsTotal":{{ tasks|length }},"recordsFiltered":{{ tasks|length }},"data":[
+"",
 {% for task in proposals[0].tasks %}
-  {"name": "{{ task.taskname }}"}
+  "{{ task.taskname }}"
   {% if not loop.last %}, {% endif %}
 {% endfor %}
 ]}
