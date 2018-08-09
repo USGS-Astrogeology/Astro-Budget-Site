@@ -109,6 +109,17 @@ function loadTasksTable (reload, proposalid) {
     $('#tasksTableDiv').jsGrid("destroy");
   }
 
+  var CopyField = function(config) {
+      jsGrid.Field.call(this, config);
+  };
+
+  CopyField.prototype = new jsGrid.Field({
+
+      css: "copy-field",           // redefine general property 'css'
+      align: "center",              // redefine general property 'align'
+
+  });
+
   $task_res = $.ajax('index.php?view=tasks-list-json&proposalid=' + proposalid, {dataType: "json", async: false});
   $task_json = $task_res.responseJSON['data'];
 
@@ -186,8 +197,18 @@ function loadTasksTable (reload, proposalid) {
   // jsGrid static value pushed on the fields array last
   $fields.push({
     type: "control",
+    width: 100,
 
-    headercss: css_classes
+    headercss: css_classes,
+    itemTemplate: function(value, item) {
+      $result = jsGrid.fields.control.prototype.itemTemplate.apply(this, arguments);
+      $customButton = $("<button id=\"dupeButton\" class=\"jsgrid-button\" title=\"Duplicate\">" + "</button>").click(function(e) {
+        var copy = $.extend({}, item, {Task: item.Task});
+        $("#tasksTableDiv").jsGrid("insertItem", copy);
+        e.stopPropagation();
+      });
+      return $result.add($customButton);
+    }
   });
 
   // Intializes the grid using the fields array and JSON data
@@ -331,7 +352,8 @@ function addColumn(proposalid) {
     field_names.push(field['name']);
   });
 
-  let name = document.getElementById("column_id").value;
+  let name = document.getElementById("validfiscalyearsdd");
+  let name_text = name.selectedOptions[0].text;
 
   if (field_names.includes(name)) {
     return;
@@ -342,7 +364,7 @@ function addColumn(proposalid) {
 
   // Pushes user defined column
   $fields.push({
-    name: name,
+    name: name_text,
     type: "number",
     width: 75,
 
