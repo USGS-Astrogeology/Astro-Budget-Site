@@ -1,13 +1,5 @@
 {"draw":0,"recordsTotal":{{ tasks|length }},"recordsFiltered":{{ tasks|length }},"data":[
 {% for task in proposals[0].tasks %}
-  {% if task.staffing is empty %}
-     {% if (remote_user[0].admin == 't') or (remote_user[0].peopleid == proposals[0].peopleid) %}
-["<a href='javascript:void(0)' onclick=\"staffingEdit({{ task.taskid }}, 'new')\">{{ task.taskname }}</a>",
-     {% else %}
-     ["{{ task.taskname }}",
-     {% endif %}
-"N/A", 0, "$0.00", "", ""]
-  {% endif %}
 
   {% set current_staff = task.staffing[0].peopleid %}
   {% set cost_total = 0 %}

@@ -298,20 +298,31 @@ function loadTasksTable (reload, proposalid) {
             staffingid = 'new';
           }
 
-          $.ajax({
-            type:'post',
-            url: 'index.php?',
-            success: function() {
-              loadTasksTable(true, proposalid);
-            },
-            data: {
+          if ($entry[key] === 0) {
+            $data = {
+              view: 'staffing-delete',
+              staffingid: staffingid,
+              proposalid: proposalid
+            }
+          }
+          else {
+            $data = {
               view: 'staffing-save',
               taskid: $entry['taskid'],
               staffingid: staffingid,
               staffingpeopleid: $entry['Staffing'],
               fiscalyear: fiscalyear,
               flexhours: $entry[key]
+            }
+          }
+
+          $.ajax({
+            type:'post',
+            url: 'index.php?',
+            success: function() {
+              loadTasksTable(true, proposalid);
             },
+            data: $data,
             async: true,
             cache: false
           });
@@ -352,8 +363,7 @@ function addColumn(proposalid) {
     field_names.push(field['name']);
   });
 
-  let name = document.getElementById("validfiscalyearsdd");
-  let name_text = name.selectedOptions[0].text;
+  let name = $('#validfiscalyearsdd :selected').text();
 
   if (field_names.includes(name)) {
     return;
@@ -364,7 +374,7 @@ function addColumn(proposalid) {
 
   // Pushes user defined column
   $fields.push({
-    name: name_text,
+    name: name,
     type: "number",
     width: 75,
 
@@ -396,7 +406,8 @@ function addTask() {
     $tasks.push(task['name']);
   });
 
-  let new_task = document.getElementById("taskField").value;
+  let new_task = $("#taskField").val();
+  $("#taskField").val('');
 
   if ($tasks.includes(new_task)) {
     return;
@@ -405,8 +416,6 @@ function addTask() {
   $task_items.push({"name": new_task});
 
   $("#tasksTableDiv").jsGrid("fieldOption", "Task", "items", $task_items);
-
-  $('#doc_title').attr("value") = "";
 }
 
 function loadConferencesTable (reload, proposalid) {

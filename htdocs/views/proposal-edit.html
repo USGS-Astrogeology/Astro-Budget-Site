@@ -66,7 +66,7 @@
                        </td>
                   <th>Ending</th>
                   <td><input type='text' id='proposalperfperiodend' name='perfperiodend'
-                       value='{{ proposals[0].perfperiodend }}' updateDropdown("proposalperfperiodend");'/>
+                       value='{{ proposals[0].perfperiodend }}' onchange='updateDropdown("proposalperfperiodend");'/>
                 {% include 'fiscalyear-dropdown.html' with {'dropdown_name': 'perfperiodend',
                                                         'dropdown_id': 'proposalperfperiodend',
                                                         'selected_fy': proposals[0].perfperiodend } %}
@@ -108,12 +108,20 @@
             </div>
           <h3 id='tasksTitle' >Tasks</h3>
             <div id='tasksdiv'>
-              <button class='ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only' value='Add Column' id='AddColumn' onclick='AddColumn({{ proposalid }})' >Add Column</button>
-              {% include 'fiscalyear-dropdown.html' with {'dropdown_name': 'perfperiodstart',
-                                                      'dropdown_id': 'validfiscalyears',
-                                                      'selected_fy': proposals[0].perfperiodstart } %}
-              <input type='button' value='Add Task' id='addTaskButton' onclick='addTask()' >
-              <input type='text' value="" id='taskField' >
+              <div>
+                <button type='button' class='ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only' id='AddColumn' onclick='addColumn({{ proposalid }})' >
+                  Add Column
+                </button>
+                {% include 'fiscalyear-dropdown.html' with {'dropdown_name': 'validfiscalyears',
+                                                        'dropdown_id': 'validfiscalyears',
+                                                        'selected_fy': proposals[0].perfperiodstart} %}
+              </div>
+              <div>
+                <button type='button' class='ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only' id='addTaskButton' onclick='addTask()'>
+                  Add Task
+                </button>
+                <input type='text' value="" id='taskField'/>
+              </div>
               <div id="tasksTableDiv">
               </div>
             </div>
@@ -173,21 +181,17 @@
     </body>
 
     <style>
-
-      .button {
-    background-color: DodgerBlue;
-    border: none;
-    color: black;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    margin: 4px 2px;
-    cursor: pointer;
-    border-radius: 16px;
-  }
-
-
-    .button1 {border-radius: 50%;}
+      #AddColumn, #addTaskButton {
+        background-color: DodgerBlue;
+        display: block;
+        border-radius: 5%;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 16px;
+      }
     </style>
 </html>
