@@ -121,8 +121,16 @@ function loadTasksTable (reload, proposalid) {
   });
 
   $task_res = $.ajax('index.php?view=tasks-list-json&proposalid=' + proposalid, {dataType: "json", async: false});
-  $people_res = $.ajax('index.php?view=people-dropdown-list-json', {dataType: "json", async: false});
   $task_json = $task_res.responseJSON['data'];
+
+  $people_res = $.ajax('index.php?view=people-dropdown-list-json', {dataType: "json", async: false});
+
+  $task_dd_res = $.ajax('index.php?view=tasks-dropdown-json&proposalid=' + proposalid, {dataType: "json", async: false});
+  $filtered_task_list = new Set($task_dd_res.responseJSON['data']);
+  $task_dd_list = [];
+  $filtered_task_list.forEach(function(task){
+    $task_dd_list.push({name: task});
+  });
 
   $fields = [];
   $new_array = [];
@@ -134,11 +142,23 @@ function loadTasksTable (reload, proposalid) {
 
   $new_fields = Array.from(new Set($new_array)).sort();
 
+  if ($new_fields.length == 0) {
+    let date = new Date();
+    $new_fields.push("FY" + date.getFullYear().toString().substr(2,));
+  }
+
+  let css_classes = "sorting ui-state-default DataTables_sort_wrapper";
+
   // Pushes static values for Task, Staffing, and Cost
   $fields.push({
     name: "Task",
-    type: "text",
-    width: 100
+    type: "select",
+    width: 100,
+
+    items: $task_dd_list,
+    valueField: "name",
+    textField: "name",
+    headercss: css_classes
   });
   $fields.push({
     name: "Staffing",
@@ -150,7 +170,8 @@ function loadTasksTable (reload, proposalid) {
     valueField: "peopleid",
     textField: "name",
 
-    selectedIndex: 0
+    selectedIndex: 0,
+    headercss: css_classes
   });
   $fields.push({
     name: "Cost",
@@ -158,7 +179,8 @@ function loadTasksTable (reload, proposalid) {
     width: 100,
 
     editing: false,
-    inserting: false
+    inserting: false,
+    headercss: css_classes
   });
   // Iterates through parsed JSON data and inserts them into the fields array
   $new_fields.forEach(function(element){
@@ -166,7 +188,9 @@ function loadTasksTable (reload, proposalid) {
       $fields.push({
         name: element,
         type: "number",
-        width: 75
+        width: 75,
+
+        headercss: css_classes
       });
     };
   });
@@ -174,6 +198,8 @@ function loadTasksTable (reload, proposalid) {
   $fields.push({
     type: "control",
     width: 100,
+
+    headercss: css_classes,
     itemTemplate: function(value, item) {
       $result = jsGrid.fields.control.prototype.itemTemplate.apply(this, arguments);
       $customButton = $("<button id=\"dupeButton\" class=\"jsgrid-button\" title=\"Duplicate\">" + "</button>").click(function(e) {
@@ -238,6 +264,7 @@ function loadTasksTable (reload, proposalid) {
           });
         }
       });
+      figureCosts(proposalid);
     },
     onItemUpdated: function(args) {
       $entry = args.item;
@@ -271,25 +298,37 @@ function loadTasksTable (reload, proposalid) {
             staffingid = 'new';
           }
 
-          $.ajax({
-            type:'post',
-            url: 'index.php?',
-            success: function() {
-              loadTasksTable(true, proposalid);
-            },
-            data: {
+          if ($entry[key] === 0) {
+            $data = {
+              view: 'staffing-delete',
+              staffingid: staffingid,
+              proposalid: proposalid
+            }
+          }
+          else {
+            $data = {
               view: 'staffing-save',
               taskid: $entry['taskid'],
               staffingid: staffingid,
               staffingpeopleid: $entry['Staffing'],
               fiscalyear: fiscalyear,
               flexhours: $entry[key]
+            }
+          }
+
+          $.ajax({
+            type:'post',
+            url: 'index.php?',
+            success: function() {
+              loadTasksTable(true, proposalid);
             },
+            data: $data,
             async: true,
             cache: false
           });
         }
       });
+      figureCosts(proposalid);
     },
     onItemDeleted: function(args) {
       $entry = args.item;
@@ -309,16 +348,14 @@ function loadTasksTable (reload, proposalid) {
         async: true,
         cache: false
       });
+      figureCosts(proposalid);
     }
   });
 }
 
 // Custom method for adding columns to jsGrid
-function AddColumn(proposalid) {
-  $task_res = $.ajax('index.php?view=tasks-list-json&proposalid=' + proposalid, {dataType: "json", async: false});
-  $people_res = $.ajax('index.php?view=people-dropdown-list-json', {dataType: "json", async: false});
-  $task_json = $task_res.responseJSON['data'];
-
+function addColumn(proposalid) {
+  $task_json = $("#tasksTableDiv").jsGrid("option", "data");
   $fields = $("#tasksTableDiv").jsGrid("option", "fields");
 
   let field_names = [];
@@ -326,21 +363,22 @@ function AddColumn(proposalid) {
     field_names.push(field['name']);
   });
 
-  let name = document.getElementById("validfiscalyearsdd");
-  let name_text = name.selectedOptions[0].text;
-
+  let name = $('#validfiscalyearsdd :selected').text();
 
   if (field_names.includes(name)) {
     return;
   }
 
+  let css_classes = "sorting ui-state-default DataTables_sort_wrapper";
   let temp = $fields.pop();
 
   // Pushes user defined column
   $fields.push({
-    name: name_text,
+    name: name,
     type: "number",
-    width: 75
+    width: 75,
+
+    headercss: css_classes
   });
 
   // Pushes static jsGrid value back onto the array
@@ -358,6 +396,26 @@ function AddColumn(proposalid) {
     data: $task_json,
     fields: $fields,
   });
+}
+
+function addTask() {
+  $task_items = $("#tasksTableDiv").jsGrid("fieldOption", "Task", "items");
+
+  $tasks = [];
+  $task_items.forEach(function(task) {
+    $tasks.push(task['name']);
+  });
+
+  let new_task = $("#taskField").val();
+  $("#taskField").val('');
+
+  if ($tasks.includes(new_task)) {
+    return;
+  }
+
+  $task_items.push({"name": new_task});
+
+  $("#tasksTableDiv").jsGrid("fieldOption", "Task", "items", $task_items);
 }
 
 function loadConferencesTable (reload, proposalid) {

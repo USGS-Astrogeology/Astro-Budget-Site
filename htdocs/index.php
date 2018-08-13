@@ -313,6 +313,12 @@ if (true) {
       $templateArgs['view'] = 'tasks-list-ajax.json';
       $view = $templateArgs['view'];
       break;
+    case 'tasks-dropdown-json':
+      $templateArgs = proposalView($pbdb, $templateArgs);
+      $templateArgs = tasksView($pbdb, $templateArgs);
+      $templateArgs['view'] = 'tasks-dropdown-ajax.json';
+      $view = $templateArgs['view'];
+      break;
     case 'tasks-list-csv':
       $templateArgs = staffingCsvView($pbdb, $templateArgs);
       serveCsv ($templateArgs);
@@ -986,10 +992,14 @@ function costsSummaryView ($pbdb, $templateArgs) {
     }
 
     $templateArgs['costs'][$i]['overhead'] = "Overhead ";
-    foreach ($templateArgs['budgets'][$i]['FYs'] as $budgetFy) {
-      $templateArgs['costs'][$i]['overhead'] .= " - $budgetFy " .
-        money_format('%.2n', $templateArgs['budgets'][$i]['FY'][$budgetFy]['overhead']);
+
+    if (count($templateArgs['budgets'][$i]['FYs']) > 0) {
+      foreach ($templateArgs['budgets'][$i]['FYs'] as $budgetFy) {
+        $templateArgs['costs'][$i]['overhead'] .= " - $budgetFy " .
+          money_format('%.2n', $templateArgs['budgets'][$i]['FY'][$budgetFy]['overhead']);
+      }
     }
+
     $templateArgs['costs'][$i]['overhead'] .= " - Total " .
         money_format('%.2n', $templateArgs['budgets'][$i]['FY']['ALL']['overhead']);
   }

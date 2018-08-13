@@ -1,5 +1,7 @@
 FROM php:7.0-apache
 
+ADD ./php.ini /usr/local/etc/php/
+
 RUN a2enmod speling && \
         a2enmod rewrite && \
         a2enmod proxy && \
