@@ -2,6 +2,7 @@
 <html>
     <head>
         <title>Proposal Budget People Listing</title>
+        <script src="js/row_setting.js"></script>
         {% include 'menu-header.html' %}
     </head>
     {% for error in debug %}
@@ -12,7 +13,14 @@
       <div class="container">
         <div id="title">
           <h2>List of People
-          <a href='javascript:void(0)' onClick="editUserDialog('new')" id='newButton'>New</a></h2>
+          <a href='javascript:void(0)' onClick="editUserDialog('new')" id='newButton'>New</a>
+          
+          <br>
+
+          <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#peopleTable').DataTable())">Save Row Preference</button>
+
+        </h2>
+
         </div>
         <div id="warningDiv" class="ui-corner-all ui-state-highlight" style="width=100px;align=right;"></div>
         <div id="editDialog" class="ui-widget"></div>
@@ -49,14 +57,14 @@
           loadPeopleTable(true);
 
           dialog.dialog("close");
-          $("#warningDiv").html("<p>Updated [" + $("#peopleid").val() + "] " + $("#name").val() + 
+          $("#warningDiv").html("<p>Updated [" + $("#peopleid").val() + "] " + $("#name").val() +
                                 " (" + $("#username").val() +")</p>");
           $("#warningDiv").show();
         }
 
         function loadPeopleTable (reload) {
         if (reload) { $('#peopleTable').dataTable().fnDestroy(); }
-          
+
           $("#peopleTableDiv").html('<table id="peopleTable" class="display" cellspacing="0" width="100%">' +
             '<thead><tr><th>Name</th><th>Title</th><th>Pay Plan</th><th>Username</th></tr></thead></table>');
 
@@ -65,8 +73,14 @@
             "serverSide": false,
             "autoWidth": false,
             "ajax": "index.php?view=people-list-json",
-            "lengthMenu": [[20, 50, 100, -1], [20, 50, 100, "All"]]
+            "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]]
           } );
+
+          if (!reload)
+          {
+            check_row_preference($('#peopleTable').DataTable());
+          }
+
         }
 
         $(document).ready(function() {

@@ -2,6 +2,7 @@
 <html>
     <head>
         <title>Proposal Budget Conferences Listing</title>
+        <script src="js/row_setting.js"></script>
         {% include 'menu-header.html' %}
     </head>
     {% for error in debug %}
@@ -15,6 +16,10 @@
           {% if remote_user[0].admin == 't' %}
             <a href='javascript:void(0)' onClick="editConferenceDialog('new')" id='newButton'>New</a>
           {% endif %}
+            <br>
+
+            <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#conferencesTable').DataTable())">Save Row Preference</button>
+
           </h2>
         </div>
         <div id="warningDiv" class="ui-corner-all ui-state-highlight" style="width=100px;align=right;"></div>
@@ -45,7 +50,7 @@
           });
 
           dialog.dialog("open");
-        
+
         }
 
         function loadConferencesTable (reload) {
@@ -61,8 +66,14 @@
             "processing": true,
             "serverSide": false,
             "ajax": "index.php?view=conferences-list-json",
-            "lengthMenu": [[20, 40, 100, -1], [20, 40, 100, "All"]]
+            "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]]
           } );
+
+          if (!reload)
+          {
+            check_row_preference($('#conferencesTable').DataTable());
+          }
+
         }
 
         function saveConference() {
