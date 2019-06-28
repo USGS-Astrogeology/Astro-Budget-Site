@@ -1,0 +1,6 @@
+<select name='{{ dropdown_name }}' id='{{ dropdown_id }}'>
+{% for code in statuscodes %}
+  <option value='{{ loop.index0 }}' {% if loop.index0 == selected_status %}selected {% endif %}>
+    {{ code }}</option>
+{% endfor %}
+</select>

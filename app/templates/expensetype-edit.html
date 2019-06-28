@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Editing Expense Types</title>
+    </head>
+    <body>
+    <div>
+          <form id="expensetypeForm" action="index.php" method="GET">
+            <input type="hidden" name="act" value="save"/>
+            <input type="hidden" name="view" value="expensetype-save"/>
+            <input type="hidden" id="expensetypeid" name="expensetypeid" 
+            {% if expensetypes[0] is empty %} value="new"/>
+            {% else %} value="{{ expensetypes[0].expensetypeid }}"/>
+            {% endif %}
+            <table><tr><th align="left">Expense Description</th></tr>
+            <tr><td><input type="text" name="description" id="desciption" value="{{ expensetypes[0].description }}" size="40"/></td></tr>
+            </table>
+          </form>
+    </div>
+
+    </body>
+</html>

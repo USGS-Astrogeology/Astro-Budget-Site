@@ -1,0 +1,5 @@
+{"draw":0,"recordsTotal":{{ conferencerates|length }},"recordsFiltered":{{ conferencerates|length }},"data":[
+{% for rate in conferencerates %}
+["<a href='javascript:void(0)' onclick='rateEdit({{ rate.conferencerateid }})'>Edit</a>", "${{ rate.perdiem|number_format(2,'.',',') }}", "${{ rate.lodging|number_format(2,'.',',') }}", "${{ rate.registration|number_format(2,'.',',') }}", "${{ rate.groundtransport|number_format(2,'.',',') }}", "${{ rate.airfare|number_format(2,'.',',') }}", "{{ rate.city }}", "{{ rate.state }}", "{{ rate.country }}", "{{ rate.effectivedate|date("m/d/Y") }}"]{% if loop.last != true %},{% endif %}
+{% endfor %}
+]}

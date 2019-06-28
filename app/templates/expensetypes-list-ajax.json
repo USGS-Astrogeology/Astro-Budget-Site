@@ -1,0 +1,10 @@
+{"draw":0,"recordsTotal":{{ expensetypes|length }},"recordsFiltered":{{ expensetypes|length }},"data":[
+{% for expensetype in expensetypes %}
+  {% if remote_user[0].admin == 't' %}
+["<a href='javascript:void(0)' onclick='editExpenseTypeDialog({{ expensetype.expensetypeid }})'>{{ expensetype.description }}</a>"]
+  {% else %}
+["{{ expensetype.description }}"]
+  {% endif %}
+{% if loop.last != true %},{% endif %}
+{% endfor %}
+]}

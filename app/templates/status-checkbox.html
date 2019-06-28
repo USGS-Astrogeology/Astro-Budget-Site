@@ -1,0 +1,3 @@
+{% for code in statuscodes %}
+  <input type="checkbox" name="statuses[]" value='{{ loop.index0 }}'/>{{ code }}&nbsp;
+{% endfor %}

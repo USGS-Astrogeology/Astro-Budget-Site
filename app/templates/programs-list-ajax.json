@@ -1,0 +1,10 @@
+{"draw":0,"recordsTotal":{{ programs|length }},"recordsFiltered":{{ programs|length }},"data":[
+{% for program in programs %}
+  {% if remote_user[0].admin == 't' %}
+["<a href='javascript:void(0)' onclick='editProgramDialog({{ program.programid }})'>{{ program.programname }}</a>",
+  {% else %}
+["{{ program.programname }}",
+  {% endif %}
+"{{ program.agency }}","{{ program.pocname }}","{{ program.pocemail }}", "{{ program.startdate }}", "{{ program.enddate }}"]{% if loop.last != true %},{% endif %}
+{% endfor %}
+]}

@@ -1,0 +1,10 @@
+{"draw":0,"recordsTotal":{{ proposals[0].expenses|length }},"recordsFiltered":{{ proposals[0].expenses|length }},"data":[
+{% for expense in proposals[0].expenses %}
+[
+  "<a href='javascript:void(0)' onclick='editExpenseDialog({{ expense.expenseid }}, {{ proposals[0].proposalid }})'>{{ expense.description }}</a>", 
+  "{{ expense.type }}", 
+  "${{ expense.amount|number_format(2,'.',',') }}", 
+  "{{ expense.FY }}", 
+  "<a href='javascript:void(0)' onclick='deleteExpenseDialog({{ expense.expenseid}}, {{ proposals[0].proposalid }})'><img src='images/trash-2-32.png'></a>"]{% if loop.last !=true %},{% endif %}
+{% endfor %}
+]}

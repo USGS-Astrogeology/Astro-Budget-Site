@@ -13,24 +13,25 @@ class People(db.Model):
   name     = Column(String(128))
   username = Column(String(32))
   admin    = Column(Boolean)
+  row_preference = Column(Integer)
 
   def __repr__(self):
     return "<People(name='%s', username='%s')>" % (self.name, self.username)
- 
+
 class Salaries(db.Model):
   __tablename__ = 'salaries'
 
   salaryid      = Column (Integer, Sequence('salaries_salaryid_seq'), primary_key=True)
   peopleid      = Column (Integer, ForeignKey("people.peopleid"), nullable=False)
   effectivedate = Column (DateTime)
-  payplan       = Column (String)
-  title         = Column (String)
-  appttype      = Column (String)
-  authhours     = Column (Float)
+  payplan       = Column (String(32))
+  title         = Column (String(128))
+  appttype      = Column (String(8))
+  authhours     = Column (REAL)
   estsalary     = Column (Float)
   estbenefits   = Column (Float)
-  leavecategory = Column (Float)
-  laf           = Column (Float)
+  leavecategory = Column (REAL)
+  laf           = Column (REAL)
 
   def __repr__(self):
     return "<Salaries(peopleid='%d', payplan='%s', title='%s')>" % (self.peopleid, self.payplan, self.title)
@@ -39,10 +40,10 @@ class FundingPrograms(db.Model):
   __tablename__ = 'fundingprograms'
 
   programid   = Column (Integer, Sequence('fundingprograms_programid_seq'), primary_key=True)
-  programname = Column (String)
-  agency      = Column (String)
-  pocname     = Column (String)
-  procemail   = Column (String)
+  programname = Column (String(256))
+  agency      = Column (String(32))
+  pocname     = Column (String(128))
+  procemail   = Column (String(128))
   startdate   = Column (DateTime)
   enddate     = Column (DateTime)
 
@@ -54,12 +55,13 @@ class Proposals(db.Model):
 
   proposalid      = Column (Integer, Sequence('proposals_proposalid_seq'), primary_key=True)
   peopleid        = Column (Integer, ForeignKey("people.peopleid"), nullable=False)
+  projectname     = Column (String(256))
+  proposalnumber  = Column (String(128))
+  awardnumber     = Column (String(128))
   programid       = Column (Integer, ForeignKey("fundingprograms.programid"), nullable=False)
-  projectname     = Column (String)
-  proposalnumber  = Column (String)
-  awardnumber     = Column (String)
   perfperiodstart = Column (DateTime)
   perfperiodend   = Column (DateTime)
+  status = Column (Integer)
 
   def __repr__(self):
     return "<Proposals(project='%s', proposalnumber='%s', awardnumber='%s')>" % (self.projectname, self.proposalnumber, self.awardnumber)
@@ -68,8 +70,8 @@ class FBMSAccounts(db.Model):
   __tablename__ = 'fbmsaccounts'
 
   fbmsid     = Column (Integer, Sequence('fbmsaccounts_fbmsid_seq'), primary_key=True)
+  accountno  = Column (String(128))
   proposalid = Column (Integer, ForeignKey("proposals.proposalid"), nullable=False)
-  accountno  = Column (String)
 
   def __repr__(self):
     return "<FBMS Account(accountno='%s')>" % (self.accountno)
@@ -109,9 +111,12 @@ class ConferenceAttendee(db.Model):
   conferenceattendeeid = Column (Integer, Sequence('conferenceattendee_conferenceattendeeid_seq'), primary_key=True)
   conferenceid         = Column (Integer, ForeignKey("conferences.conferenceid"), nullable=False)
   proposalid           = Column (Integer, ForeignKey("proposals.proposalid"), nullable=False)
-  peopleid             = Column (Integer, ForeignKey("people.peopleid"), nullable=False)
-  meetindays           = Column (Integer)
+  #peopleid             = Column (Integer, ForeignKey("people.peopleid"), nullable=False)
+  meetingdays          = Column (Integer)
   traveldays           = Column (Integer)
+  startdate = Column(DateTime)
+  travelers = Column(Integer)
+  rentalcars = Column(Integer)
 
   def __repr__(self):
     return "<ConferenceAttendee(meetingdays='%d', traveldays='%d')>" % (self.meetingdays, self.traveldays)
@@ -121,7 +126,7 @@ class Tasks(db.Model):
 
   taskid     = Column (Integer, Sequence('tasks_taskid_seq'), primary_key=True)
   proposalid = Column (Integer, ForeignKey("proposals.proposalid"), nullable=False)
-  taskname   = Column (String)
+  taskname   = Column (String(1024))
 
   def __repr__(self):
     return "<Tasks(taskname='%s')>" % (self.taskname)
@@ -130,13 +135,14 @@ class Staffing(db.Model):
   __tablename__ = 'staffing'
 
   staffingid = Column (Integer, Sequence('staffing_staffingid_seq'), primary_key=True)
+  taskid     = Column (Integer)
   peopleid   = Column (Integer, ForeignKey("people.peopleid"), nullable=False)
-  fiscalyear = Column (String)
-  q1hours    = Column (Float)
-  q2hours    = Column (Float)
-  q3hours    = Column (Float)
-  q4hours    = Column (Float)
-  flexhours  = Column (Float)
+  q1hours    = Column (REAL)
+  q2hours    = Column (REAL)
+  q3hours    = Column (REAL)
+  q4hours    = Column (REAL)
+  flexhours  = Column (REAL)
+  fiscalyear = Column (DateTime)
 
   def __repr__(self):
     return "<Staffing(FY='%s', q1='%d', q2='%d', q3='%d', q4='%d', flex='%d')>" % (self.fiscalyear, self.q1hours, self.q2hours,
@@ -146,7 +152,7 @@ class ExpenseTypes(db.Model):
   __tablename__ = 'expensetypes'
 
   expensetypeid = Column (Integer, Sequence('expensetypes_expensetypeid_seq'), primary_key=True)
-  description   = Column (String)
+  description   = Column (String(256))
 
   def __repr__(self):
     return "<ExpenseTypes(description='%s')>" % (self.description)
@@ -157,9 +163,9 @@ class Expenses(db.Model):
   expenseid = Column (Integer, Sequence('expenses_expenseid_seq'), primary_key=True)
   proposalid = Column (Integer, ForeignKey("proposals.proposalid"), nullable=False)
   expensetypeid = Column (Integer, ForeignKey("expensetypes.expensetypeid"), nullable=False)
-  description = Column (String)
+  description = Column (String(256))
   amount = Column (Float)
-  fiscalyear = Column (String)
+  fiscalyear = Column (DateTime)
 
   def __repr__(self):
     return "<Expenses(description='%s')>" % (self.description)

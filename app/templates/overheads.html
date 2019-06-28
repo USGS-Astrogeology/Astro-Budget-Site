@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Proposal Budget Overhead Rates</title>
+        {% include 'menu-header.html' %}
+        <script src="js/proposal-edit.js"></script>
+        <script src="js/date-tools.js"></script>
+        <script src="js/row_setting.js"></script>
+    </head>
+    {% for error in debug %}
+      <pre>error.msg</pre>
+    {% endfor %}
+    <body>
+        {% include 'menu-tags.html' %}
+      <div class="container">
+        <div id="title">
+          <h2>List of Overhead Rates</h2>
+          {% if remote_user[0].admin == 't' %}
+            <a href='javascript:void(0)' onClick="editOverheadDialog('new', 'null')" id='newButton'>New</a><p/>
+          {% endif %}
+          <br>
+
+          <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#overheadTable').DataTable())">Save Row Preference</button>
+
+          </h2>
+        </div>
+        <div id="warningDiv" class="ui-corner-all ui-state-highlight" style="width=100px;align=right;"></div>
+        <div id="editDialog" class="ui-widget"></div>
+        <div id="overheadTableDiv">
+           <table id='overheadTable' class='display' cellspacing='0' width='100%'>
+              <thead><tr><th>Rate</th><th>Description</th><th>Fiscal Year</th></tr>
+           </table>
+        </div>
+      </div>
+
+      <script type="text/javascript" charset="utf-8">
+        $(document).ready(function() {
+          $("#newButton").button();
+          $("#warningDiv").hide();
+
+          loadOverheadTable(false, 'null');
+        } );
+      </script>
+    </body>
+</html>

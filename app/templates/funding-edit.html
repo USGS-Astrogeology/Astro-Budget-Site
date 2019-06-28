@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Editing Funding</title>
+        <script src="js/date-tools.js"></script>
+    </head>
+    <body>
+    <div id="fundingeditdiv">
+       <form id="fundingForm" action="index.php" method="GET">
+            <input type="hidden" name="act" value="save"/>
+            <input type="hidden" name="view" value="funding-save"/>
+            <input type="hidden" id="proposalid" name="proposalid" value="{{ proposals[0].proposalid }}"/>
+            <input type="hidden" id="fundingid" name="fundingid" value="{{ fundingid }}"/>
+
+            <table>
+            <tr><th>Fiscal Year</th>
+            <td><input type="text" name="fiscalyear" id="fiscalyear" size="12" 
+                value="{{ proposals[0].funding[0].fiscalyear }}" onchange="updateDropdown('fiscalyear');"/>
+                {% include 'fiscalyear-dropdown.html' with {'dropdown_name': 'fiscalyear',
+                                                        'dropdown_id': 'fiscalyear',
+                                                        'selected_fy': proposals[0].funding[0].fiscalyear } %}
+                </td></tr>
+            <tr><th>New Funding</th>
+            <td><input type="text" name="newfunding" id="newfunding" size="12" value="${{ proposals[0].funding[0].newfunding|number_format(2,'.',',') }}"/></td></tr>
+            <tr><th>Carryover</th>
+            <td><input type="text" name="carryover" id="carryover" size="12" value="${{ proposals[0].funding[0].carryover|number_format(2,'.',',') }}"/></td></tr>
+       </form>
+    </div>
+
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $("#fiscalyear").datepicker();
+        updateDropdown('fiscalyear');
+      });
+    </script>
+    </body>
+</html>
