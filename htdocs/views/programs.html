@@ -2,6 +2,7 @@
 <html>
     <head>
         <title>Funding Programs Listing</title>
+        <script src="js/row_setting.js"></script>
         {% include 'menu-header.html' %}
     </head>
     {% for error in debug %}
@@ -15,6 +16,9 @@
           {% if remote_user[0].admin == 't' %}
           <a href='javascript:void(0)' onClick="editProgramDialog('new')" id='newButton'>New</a>
           {% endif %}
+          <br>
+
+          <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#programsTable').DataTable())">Save Row Preference</button>
           </h2>
         </div>
         <div id="warningDiv" class="ui-corner-all ui-state-highlight" style="width=100px;align=right;"></div>
@@ -41,8 +45,14 @@
             "serverSide": false,
             "autoWidth": false,
             "ajax": "index.php?view=programs-list-json",
-            "lengthMenu": [[20, 50, 100, -1], [20, 50, 100, "All"]]
+            "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]]
           } );
+
+          if (!reload)
+          {
+            check_row_preference($('#programsTable').DataTable());
+          }
+
         }
 
         function editProgramDialog(programid) {
@@ -62,7 +72,7 @@
           });
 
           dialog.dialog("open");
-        
+
         }
 
         function saveProgram() {
@@ -70,7 +80,7 @@
             .always( function () {
               loadProgramTable (true);
               dialog.dialog("close");
-              $("#warningDiv").html("<p>Updated [" + $("#programid").val() + "] " + $("#programname").val() + 
+              $("#warningDiv").html("<p>Updated [" + $("#programid").val() + "] " + $("#programname").val() +
                                     " (" + $("#agency").val() +")</p>");
               $("#warningDiv").show();
             });

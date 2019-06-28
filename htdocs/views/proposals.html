@@ -4,6 +4,7 @@
         <title>Proposal Budget Listing</title>
         {% include 'menu-header.html' %}
         <script src="js/date-tools.js"></script>
+        <script src="js/row_setting.js"></script>
     </head>
     {% for error in debug %}
       <pre>error.msg</pre>
@@ -62,6 +63,11 @@
         </div>
 
          <a href='javascript:void(0)' onClick="editProjectDialog()" id='newProjectButton'>New</a><p/>
+
+         <br>
+
+         <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#proposalsTable').DataTable())">Save Row Preference</button>
+
         <div id="proposalsTableDiv">
         <table id="proposalsTable" class="display" cellspacing="0" width="100%">
           <thead><tr><th>Proposal</th><th>Reports</th><th>PI</th><th>Program</th><th>Status</th><th>Start</th><th>End</th><th></th></tr></thead>
@@ -95,8 +101,15 @@
             "processing": true,
             "serverSide": false,
             "ajax": "index.php?view=proposal-list-json",
-            "lengthMenu": [[10, 20, 50, -1], [10, 20, 50, "All"]]
+            "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]]
           } );
+
+
+          if (!reload)
+          {
+            check_row_preference($('#proposalsTable').DataTable());
+          }
+
         }
 
         function editProjectDialog() {
@@ -135,7 +148,7 @@
             budgetstatus = data.data[0][4];
             if ((budgetstatus == 'Active') || (budgetstatus == 'Save')) {
               $("#editDialog").html("<html><head><title>Active or Saved Project</title></head>" +
-                                "<body><h2>The project <p/>'" + description + 
+                                "<body><h2>The project <p/>'" + description +
                                 "' <p/>has a status of Active or Save and cannot be deleted</h2></body></html>");
               dialog = $("#editDialog").dialog({
                 autoOpen: false,
@@ -152,7 +165,7 @@
             }
             else {
               $("#editDialog").html("<html><head><title>Confirm Deletion</title></head>" +
-                                "<body><h2>Are you sure you want to delete the project <p/>'" + description + 
+                                "<body><h2>Are you sure you want to delete the project <p/>'" + description +
                                 "'?</h2></body></html>");
               dialog = $("#editDialog").dialog({
                 autoOpen: false,
@@ -169,8 +182,8 @@
               dialog.dialog("open");
             }
           });
-        
-        
+
+
         }
 
         function deleteProposal(proposalid) {
@@ -179,12 +192,12 @@
               dialog.dialog("close");
               $("#warningDiv").html("<p>Deleted [" + proposalid + "]</p>");
               $("#warningDiv").show();
-        
+
               loadProposalsTable(true);
             });
         }
-        
-        
+
+
       </script>
     </body>
 </html>

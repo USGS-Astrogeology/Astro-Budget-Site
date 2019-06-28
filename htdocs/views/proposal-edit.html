@@ -6,6 +6,7 @@
         {% include 'graphs-header.html' %}
         <script src="js/proposal-edit.js"></script>
         <script src="js/date-tools.js"></script>
+        <script src="js/row_setting.js"></script>
     </head>
     {% for error in debug %}
       <pre>error.msg</pre>
@@ -82,6 +83,9 @@
           <h3 id='fundingTitle' >Funding</h3>
             <div id='fundingDiv' style='height: 400px;'>
               <a href='javascript:void(0)' onClick="editFundingDialog('new', {{ proposals[0].proposalid }})" id='newFundingButton'>New</a><p/>
+              <br>
+
+              <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#fundingTable').DataTable())">Save Row Preference</button>
               <div id="fundingTableDiv">
               <table id='fundingTable' class='display' cellspacing='0' width='100%'>
                 <thead><tr><th>FY</th><th>New Funding</th><th>Carryover</th></tr></thead>
@@ -91,6 +95,9 @@
           <h3 id='fbmsTitle' >FMBS Accounts</h3>
             <div id='accountingDiv' style='height: 400px;'>
               <a href='javascript:void(0)' onClick="editFBMSDialog('new', {{ proposals[0].proposalid }})" id='newFBMSButton'>New</a><p/>
+              <br>
+
+              <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#fbmsTable').DataTable())">Save Row Preference</button>
               <div id="fbmsTableDiv">
               <table id='fbmsTable' class='display' cellspacing='0' width='100%'>
                 <thead><tr><th>Account No.</th></tr></thead>
@@ -100,6 +107,10 @@
           <h3 id='overheadTitle'>Overhead Rates</h3>
             <div id='overheadDiv' style='height: 400px;'>
               <a href='javascript:void(0)' onClick="editOverheadDialog('new', {{ proposals[0].proposalid }})" id='newOverheadButton'>New</a><p/>
+              <br>
+
+              <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#overheadTable').DataTable())">Save Row Preference</button>
+
               <div id="overheadTableDiv">
               <table id='overheadTable' class='display' cellspacing='0' width='100%'>
                 <thead><tr><th>Rate</th><th>Description</th><th>Fiscal Year</th></tr>
@@ -129,6 +140,11 @@
           <h3 id='conferencesTitle'>Conferences/Meetings/Travel</h3>
             <div>
               <a href='javascript:void(0)' onClick="editAttendeeDialog({{ proposals[0].proposalid }}, 'new')" id='newConferenceButton'>New</a><p/>
+
+              <br>
+
+              <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#conferencesTable').DataTable())">Save Row Preference</button>
+
               <div id="conferencesTableDiv">
               <table id='conferencesTable' class='display' cellspace='0' width='100%'>
                 <thead><tr><th>Meeting</th><th>Number<br/>Travelers</th><th>Starting</th><th>FY</th><th>Meeting<br/>Days</th><th>Travel<br/>Days</th><th>Airfare</th><th>Ground<br/>Transport</th><th>Registration<br/>and Other</th><th>per diem</th><th>Lodging</th><th>Total</th></tr></thead>
@@ -138,6 +154,10 @@
           <h3 id='expensesTitle'>Expenses</h3>
             <div>
               <a href='javascript:void(0)' onClick="editExpenseDialog('new', {{ proposals[0].proposalid }})" id='newExpenseButton'>New</a><p/>
+              <br>
+
+              <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#expensesTable').DataTable())">Save Row Preference</button>
+
               <div id="expensesTableDiv">
               <table id='expensesTable' class='display' cellspace='0' width='100%'>
                 <thead><tr><th>Expense</th><th>Type</th><th>Amount</th><th>Fiscal</th></tr></thead>

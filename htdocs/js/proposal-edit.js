@@ -68,6 +68,12 @@ function loadFundingTable (reload, proposalid) {
     'ajax': 'index.php?view=funding-list-json&proposalid=' + proposalid,
     'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
   });
+
+  if (!reload)
+  {
+    check_row_preference($('#fundingTable').DataTable());
+  }
+
 }
 
 function loadFbmsTable (reload, proposalid) {
@@ -85,6 +91,12 @@ function loadFbmsTable (reload, proposalid) {
     'ajax': 'index.php?view=fbms-list-json&proposalid=' + proposalid,
     'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
   } );
+
+  if (!reload)
+  {
+    check_row_preference($('#fbmsTable').DataTable());
+  }
+
 }
 
 function loadOverheadTable (reload, proposalid) {
@@ -102,6 +114,12 @@ function loadOverheadTable (reload, proposalid) {
     'ajax': 'index.php?view=overhead-list-json&proposalid=' + proposalid,
     'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
   } );
+
+  if (!reload)
+  {
+    check_row_preference($('#overheadTable').DataTable());
+  }
+
 }
 
 function loadTasksTable (reload, proposalid) {
@@ -433,8 +451,14 @@ function loadConferencesTable (reload, proposalid) {
     'serverSide': false,
     'autoWidth': false,
     'ajax': 'index.php?view=conference-attendee-list-json&proposalid=' + proposalid,
-    // 'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
+    'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
   } );
+
+  if (!reload)
+  {
+    check_row_preference($('#conferencesTable').DataTable());
+  }
+
 }
 
 function loadExpensesTable (reload, proposalid) {
@@ -450,8 +474,14 @@ function loadExpensesTable (reload, proposalid) {
     'serverSide': false,
     'autoWidth': false,
     'ajax': 'index.php?view=expense-list-json&proposalid=' + proposalid,
-    // 'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
+    'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
   } );
+
+  if (!reload)
+  {
+    check_row_preference($('#expensesTable').DataTable());
+  }
+
 }
 
 function saveProposal() {
