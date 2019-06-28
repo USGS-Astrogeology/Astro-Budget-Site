@@ -1,20 +1,3 @@
-/*
-
-'ajax': 'index.php?view=funding-list-json&proposalid=' + proposalid,
-
-
-'#fundingTable'
-
-
-$('#fundingTableDiv').html("<table id='fundingTable' class='display' cellspacing='0' width='100%'>" +
-  "<thead><tr><th>FY</th><th>New Funding</th><th>Carryover</th><th>&nbsp;</th></tr></thead></table>");
-*/
-
-//  take in those as parameters
-
-// ajax, so ajax call can be made, the stuff for setting up the table, and the table name/div name?
-
-
 // this will work even if the value chosen is not on the dropdown menu
 // if this is null, the code will choose the first available option for size on the dropdown menu
 var user_preference = 10;
