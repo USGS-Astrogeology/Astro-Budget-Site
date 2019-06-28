@@ -1,0 +1,4 @@
+flask
+flask-cas-ng
+flask-sqlalchemy
+psycopg2

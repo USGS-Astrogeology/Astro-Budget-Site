@@ -1,0 +1,71 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui.min.css') }}"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui.theme.min.css') }}"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dataTables.jqueryui.css') }}"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/jsgrid-theme.min.css') }}"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/jsgrid.min.css') }}"/>
+<script src="{{ url_for('static', filename='js/jquery-1.10.2.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jsgrid.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery-ui-1.11.2.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery.dataTables-1.10.4.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dataTables.jqueryui.js') }}"></script>
+
+<script>
+  $(document).ready( function() {
+    $('.menu-button').each( function() {
+      $(this).button();
+    });
+  });
+</script>
+
+<style>
+  * {
+    font-family: Lucida Grande,Lucida Sans,Arial,sans-serif;
+    font-size: 100%;
+  }
+
+  h1 {
+    font-size: 1.5em;
+  }
+
+/
+  .ui-menu:after {
+    content: ".";
+    display: block;
+    clear: both;
+    visibility: hidden;
+    line-height: 0;
+    height: 0;
+  }
+  .ui-menu .ui-menu-item {
+    display: inline-block;
+    float: left;
+    margin: 0;
+    padding: 5;
+    width: auto;
+  }
+
+  #menubar {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+  }
+
+  .menu-user {
+    display: flex;
+    align-items: center;
+    font-size: 1.25rem;
+    margin:
+  }
+
+  .sub-table {
+    font-size: .85em;
+  }
+  #dupeButton {
+    background: url('/images/copy-32.png') no-repeat;
+    background-size: cover;
+    width: 16px;
+    height: 16px;
+  }
+
+
+</style>
