@@ -15,7 +15,6 @@ function save_row_preference(table)
 }
 
 
-//function check_row_preference(table, table_creation, ajax_link)
 function check_row_preference(table)
 {
 
