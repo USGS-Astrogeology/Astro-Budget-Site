@@ -2,15 +2,15 @@
 <html>
     <head>
         <title>Editing Conferences</title>
-        <script src="js/date-tools.js"></script>
+        <script src="{{ url_for('static', filename='js/date-tools.js') }}"></script>
     </head>
     <body>
     <div id="conferenceedittabs">
       <ul>
         <li><a href="#conferencetab">Conference</a></li>
-    {% if remote_user[0].admin == 't' %}
-        <li><a href="#ratetab">Rates</a></li>
-    {% endif %}
+        {% if g.user.admin %}
+          <li><a href="#ratetab">Rates</a></li>
+        {% endif %}
       </ul>
 
       <div id='conferencetab'>
@@ -18,12 +18,12 @@
             <input type="hidden" name="act" value="save"/>
             <input type="hidden" name="view" value="conference-save"/>
             <input type="hidden" id="conferenceid" name="conferenceid" 
-            {% if conferences[0] is empty %} value="new"/>
-            {% else %} value="{{ conferences[0].conferenceid }}"/>
+            {% if not conference %} value="new"/>
+            {% else %} value="{{ conference.conferenceid }}"/>
             {% endif %}
             <table>
             <tr><th align="left">Conference/Meeting/Travel</th></tr>
-            <tr><td><input type="text" name="meeting" id="meeting" value="{{ conferences[0].meeting }}" size="40"/></td></tr>
+            <tr><td><input type="text" name="meeting" id="meeting" value="{{ conference.meeting }}" size="40"/></td></tr>
             <tr><td><a href='javascript:void(0)' onClick="rateEdit('new')" id='newRateButton'>New Rate</a></td><td></td></tr>
 
             </table>
@@ -35,12 +35,12 @@
         </table>
         </div>
       </div>
-        {% if remote_user[0].admin == 't' %}
+        {% if g.user.admin %}
         <div id="ratetab">
           <form id="rateForm" action="index.php" method="GET">
             <input type="hidden" name="act" value="save"/>
             <input type="hidden" name="view" value="conference-rate-save"/>
-            <input type="hidden" id="conferenceid" name="conferenceid" value="{{ conferences[0].conferenceid }}"/>
+            <input type="hidden" id="conferenceid" name="conferenceid" value="{{ conference.conferenceid }}"/>
             <input type="hidden" id="conferencerateid" name="conferencerateid" value=""/>
             <table>
               <tr><th>Per Diem</th><td><input type="text" id="perdiem" name="perdiem" size="12"/></td>
@@ -54,9 +54,11 @@
               <tr><th>Country</th><td><input type="text" id="country" name="country" size="20"</td>
                   <th>Effective Date</th><td><input type="text" id="effectivedate" name="effectivedate" size="12"
                       onchange="updateDropdown('effectivedate');"/>
-                      {% include 'fiscalyear-dropdown.html' with {'dropdown_name': 'effectivedate',
-                                                        'dropdown_id': 'effectivedate',
-                                                        'selected_fy': '' } %}
+                      {% with dropdown_name = 'effectivedate',
+                              dropdown_id = 'effectivedate',
+                              selected_fy = '' %}
+                        {% include 'fiscalyear-dropdown.html' %}
+                      {% endwith %}
                       </td></tr>
               <tr><th></th><td></td>
                   <th></th><td><a href='javascript:void(0)' onClick="conferenceRateSave()" id='rateSaveButton'>Save Rate</a></td></tr>
@@ -78,7 +80,7 @@
           "processing": true,
           "serverSide": false,
           'autoWidth': false,
-          "ajax": "index.php?view=conference-rate-list-json&conferenceid={{ conferences[0].conferenceid }}"
+          "ajax": "/ajax/get/conferencerates/" + {{ conference.conferenceid|tojson }}
         } );
       }
 
@@ -96,7 +98,7 @@
         $("#conferenceedittabs").tabs( "option", "active", 1 );
         $("#conferencerateid").val(conferencerateid);
         if (conferencerateid == 'new') {
-          $("#conferenceid").val({{ conferences[0].conferenceid }});
+          $("#conferenceid").val({{ conference.conferenceid|tojson }});
           $("#perdiem").val('');
           $("#lodging").val('');
           $("#registration").val('');
@@ -108,9 +110,7 @@
           $("#effectivedate").val(Date());
         }
         else {
-          $.getJSON( "index.php?view=conference-rate-edit-json&conferenceid={{ conferences[0].conferenceid }}&conferencerateid=" + conferencerateid, function( data ) {
-          console.log ("Rateid " + data.data[0][0]);
-          console.log ("Lodging " + data.data[0][3]);
+          $.getJSON( "/conferencerates/edit/" + conferencerateid, function( data ) {
             $("#conferencerateid").val(data.data[0][0]);
             $("#conferenceid").val(data.data[0][1]);
             $("#perdiem").val(data.data[0][2]);

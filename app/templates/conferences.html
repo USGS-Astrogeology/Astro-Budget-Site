@@ -2,7 +2,7 @@
 <html>
     <head>
         <title>Proposal Budget Conferences Listing</title>
-        <script src="js/row_setting.js"></script>
+        <script src="{{ url_for('static', filename='js/row_setting.js') }}"></script>
         {% include 'menu-header.html' %}
     </head>
     {% for error in debug %}
@@ -13,7 +13,7 @@
       <div class="container">
         <div id="title">
           <h2>List of Conferences/Meetings/Travel
-          {% if user.admin %}
+          {% if g.user.admin %}
             <a href='javascript:void(0)' onClick="editConferenceDialog('new')" id='newButton'>New</a>
           {% endif %}
             <br>
@@ -35,6 +35,8 @@
       <script type="text/javascript" charset="utf-8">
         function editConferenceDialog(conferenceid) {
           $("#editDialog").load("/conferences/edit/" + conferenceid);
+
+          console.log(conferenceid);
 
           dialog = $("#editDialog").dialog({
             autoOpen: false,
@@ -65,7 +67,7 @@
           $('#conferencesTable').dataTable( {
             "processing": true,
             "serverSide": false,
-            "ajax": "/conferences/list",
+            "ajax": "/ajax/get/conferences",
             "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]]
           } );
 

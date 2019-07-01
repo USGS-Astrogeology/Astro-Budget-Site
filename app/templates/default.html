@@ -13,7 +13,7 @@
 
     <script type="text/javascript" charset="utf-8">
       var statusCodes=['Submitted', 'Selected', 'Active'];
-      $.getJSON( "index.php?view=proposal-costs-json", function( data ) {
+      $.getJSON( "/ajax/get/proposalcosts", function( data ) {
         for (i=0; i < data.data.length; i++) {
           for (s=0; s < statusCodes.length; s++) {
             if (data.data[i].status === statusCodes[s]) {

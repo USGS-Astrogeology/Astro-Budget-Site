@@ -1,2 +1,14 @@
 # Configuration
 app/config.py
+
+# Local Tests
+app/templates/json_local/*
+
+# Editor Files
+.vscode*
+
+# Virtual Environments
+venv/*
+
+# Caching
+app/__pycache__/*

@@ -6,7 +6,24 @@ from sqlalchemy.dialects.postgresql import REAL, NUMERIC, SMALLINT, BIGINT
 
 db = SQLAlchemy()
 
-class People(db.Model):
+class Base(db.Model):
+  __abstract__ = True
+
+  @classmethod
+  def get_one(cls, filters=[False]):
+      return cls.query.filter(db.and_(*filters)).first()
+
+  @classmethod
+  def get_many(cls, joins=[False], filters=[False], orders=[False]):
+      return cls.query.outerjoin(*joins)\
+                      .filter(db.and_(*filters))\
+                      .order_by(*orders).all()
+
+  @classmethod
+  def get_all(cls, orders=[False]):
+      return cls.query.order_by(*orders).all()
+
+class People(Base):
   __tablename__ = 'people'
 
   peopleid       = Column(Integer, Sequence('people_peopleid_seq'), primary_key=True)
@@ -21,7 +38,7 @@ class People(db.Model):
   def __repr__(self):
     return "<People(name='%s', username='%s')>" % (self.name, self.username)
 
-class Salaries(db.Model):
+class Salaries(Base):
   __tablename__ = 'salaries'
 
   salaryid      = Column(Integer, Sequence('salaries_salaryid_seq'), primary_key=True)
@@ -39,7 +56,7 @@ class Salaries(db.Model):
   def __repr__(self):
     return "<Salaries(peopleid='%d', payplan='%s', title='%s')>" % (self.peopleid, self.payplan, self.title)
 
-class FundingPrograms(db.Model):
+class FundingPrograms(Base):
   __tablename__ = 'fundingprograms'
 
   programid   = Column(Integer, Sequence('fundingprograms_programid_seq'), primary_key=True)
@@ -54,7 +71,7 @@ class FundingPrograms(db.Model):
   def __repr__(self):
     return "<Funding Program(name='%s', agency='%s')>" % (self.programname, self.agency)
 
-class Proposals(db.Model):
+class Proposals(Base):
   __tablename__ = 'proposals'
 
   proposalid          = Column(Integer, Sequence('proposals_proposalid_seq'), primary_key=True)
@@ -74,7 +91,7 @@ class Proposals(db.Model):
   def __repr__(self):
     return "<Proposals(project='%s', proposalnumber='%s', awardnumber='%s')>" % (self.projectname, self.proposalnumber, self.awardnumber)
 
-class FBMSAccounts(db.Model):
+class FBMSAccounts(Base):
   __tablename__ = 'fbmsaccounts'
 
   fbmsid     = Column(Integer, Sequence('fbmsaccounts_fbmsid_seq'), primary_key=True)
@@ -84,7 +101,7 @@ class FBMSAccounts(db.Model):
   def __repr__(self):
     return "<FBMS Account(accountno='%s')>" % (self.accountno)
 
-class Conferences(db.Model):
+class Conferences(Base):
   __tablename__ = 'conferences'
 
   conferenceid        = Column(Integer, Sequence('conferences_conferenceid_seq'), primary_key=True)
@@ -95,7 +112,7 @@ class Conferences(db.Model):
   def __repr__(self):
     return "<Conference(meeting='%s', location='%s')>" % (self.meeting, self.location)
 
-class ConferenceRates(db.Model):
+class ConferenceRates(Base):
   __tablename__ = 'conferencerates'
 
   conferencerateid = Column(Integer, Sequence('conferencerates_conferencerateid_seq'), primary_key=True)
@@ -113,7 +130,7 @@ class ConferenceRates(db.Model):
   def __repr__(self):
     return "<ConferenceRates(perdiem='%d', registration='%s')>" % (self.perdiem, self.registration)
 
-class ConferenceAttendee(db.Model):
+class ConferenceAttendee(Base):
   __tablename__ = 'conferenceattendee'
 
   conferenceattendeeid = Column(Integer, Sequence('conferenceattendee_conferenceattendeeid_seq'), primary_key=True)
@@ -128,7 +145,7 @@ class ConferenceAttendee(db.Model):
   def __repr__(self):
     return "<ConferenceAttendee(meetingdays='%d', traveldays='%d')>" % (self.meetingdays, self.traveldays)
 
-class Tasks(db.Model):
+class Tasks(Base):
   __tablename__ = 'tasks'
 
   taskid     = Column(BIGINT, Sequence('tasks_taskid_seq'), primary_key=True)
@@ -139,7 +156,7 @@ class Tasks(db.Model):
   def __repr__(self):
     return "<Tasks(taskname='%s')>" % (self.taskname)
 
-class Staffing(db.Model):
+class Staffing(Base):
   __tablename__ = 'staffing'
 
   staffingid = Column(BIGINT, Sequence('staffing_staffingid_seq'), primary_key=True)
@@ -156,7 +173,7 @@ class Staffing(db.Model):
     return "<Staffing(FY='%s', q1='%d', q2='%d', q3='%d', q4='%d', flex='%d')>" % (self.fiscalyear, self.q1hours, self.q2hours,
     self.q3hours, self.q4hours, self.flexhours)
 
-class ExpenseTypes(db.Model):
+class ExpenseTypes(Base):
   __tablename__ = 'expensetypes'
 
   expensetypeid = Column(Integer, Sequence('expensetypes_expensetypeid_seq'), primary_key=True)
@@ -166,7 +183,7 @@ class ExpenseTypes(db.Model):
   def __repr__(self):
     return "<ExpenseTypes(description='%s')>" % (self.description)
 
-class Expenses(db.Model):
+class Expenses(Base):
   __tablename__ = 'expenses'
 
   expenseid     = Column(BIGINT, Sequence('expenses_expenseid_seq'), primary_key=True)
