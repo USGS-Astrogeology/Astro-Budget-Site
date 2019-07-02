@@ -22,7 +22,7 @@ db.init_app(app)
 def check_login():
 	if cas.username:
 		g.user = People.get_one(filters = [People.username == cas.username])
-	
+
 @app.route('/')
 @login_required
 def main():
@@ -70,9 +70,9 @@ def get_conferencerates(path):
 	if request.args.get('conferencerateid'):
 		filters.append(ConferenceRates.conferencerateid == request.args.get('conferencerateid'))
 	if request.args.get('effectivedate'):
-		filters.append(ConferenceRates.effectivedate < request.args.get('effectivedate'))	
-	conferencerates = ConferenceRates.get_many(joins = [], 
-											   filters = filters, 
+		filters.append(ConferenceRates.effectivedate < request.args.get('effectivedate'))
+	conferencerates = ConferenceRates.get_many(joins = [],
+											   filters = filters,
 											   orders = [ConferenceRates.effectivedate.desc()])
 
 	if path == 'edit':
@@ -95,8 +95,8 @@ def get_conferenceattendees(path):
 		filters.append(ConferenceAttendee.travelers == request.args.get('travelers'))
 	if request.args.get('proposalid'):
 		filters.append(ConferenceAttendee.proposalid == request.args.get('proposalid'))
-	
-	conferenceattendees = ConferenceAttendee.get_many(joins = []
+
+	conferenceattendees = ConferenceAttendee.get_many(joins = [],
 													  filters = filters,
 													  orders = [])
 
@@ -115,6 +115,25 @@ def proposals():
 @login_required
 def get_proposals():
 	return render_template('proposal-list-ajax.json')
+
+# people
+@app.route('/people', methods=['GET'])
+@login_required
+def people():
+	return render_template('people.html')
+
+@app.route('/people/ajax/<path:path>', methods=['POST', 'GET'])
+@login_required
+def get_people(path):
+	people = People.get_all()
+	#people = People.get_many(joins = [Salaries])
+	#						 filters = [People.name == name, People.title = title, People.])
+
+	if path == 'edit':
+		return render_template('people-edit.html')
+	elif path == 'get':
+		return render_template('people-list-ajax.json', people = people)
+
 
 if __name__ == "__main__":
 	app.run(host = '0.0.0.0', port = 5000)
