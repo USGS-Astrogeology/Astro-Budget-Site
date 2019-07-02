@@ -13,9 +13,9 @@
       <div class="container">
         <div id="title">
           <h2>List of Conferences/Meetings/Travel
-          {% if g.user.admin %}
-            <a href='javascript:void(0)' onClick="editConferenceDialog('new')" id='newButton'>New</a>
-          {% endif %}
+            {% if g.user.admin %}
+              <a href='javascript:void(0)' onClick="editConferenceDialog('new')" id='newButton'>New</a>
+            {% endif %}
             <br>
 
             <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#conferencesTable').DataTable())">Save Row Preference</button>
@@ -34,7 +34,7 @@
 
       <script type="text/javascript" charset="utf-8">
         function editConferenceDialog(conferenceid) {
-          $("#editDialog").load("/conferences/edit/" + conferenceid);
+          $("#editDialog").load("/conferences/ajax/edit?conferenceid=" + conferenceid);
 
           console.log(conferenceid);
 
@@ -67,7 +67,7 @@
           $('#conferencesTable').dataTable( {
             "processing": true,
             "serverSide": false,
-            "ajax": "/ajax/get/conferences",
+            "ajax": "/conferences/ajax/get",
             "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]]
           } );
 

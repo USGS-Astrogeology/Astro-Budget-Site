@@ -1,6 +1,6 @@
-from flask import Flask, render_template, redirect, url_for, g, session
+from flask import Flask, render_template, url_for, g, request, abort
 from flask_cas import CAS, login_required, login
-from database import db, Conferences, ConferenceRates, People
+from database import db, Conferences, ConferenceRates, People, ConferenceAttendee
 
 def currencyformat(value):
 	if value is None:
@@ -30,50 +30,91 @@ def main():
 
 
 # CONFERENCES
-@app.route('/conferences', methods=['GET'])
+@app.route('/conferences')
 @login_required
 def conferences():
 	return render_template('conferences.html')
 
-@app.route('/conferences/edit/<int:conferenceid>', methods=['POST', 'GET'])
-@login_required
-def edit_conference(conferenceid):
-	conference = Conferences.get_one(filters = [Conferences.conferenceid == conferenceid])
-	dd_fiscalyears = ['FY13', 'FY14', 'FY15', 'FY16', 'FY17', 'FY18', 'FY19', 'FY20', 'FY21']
-	dd_startdates = ['10/01/2012', '10/01/2013', '10/01/2014', '10/01/2015', '10/01/2016',
-				'10/01/2017', '10/01/2018', '10/01/2019', '10/01/2020']
-	return render_template('conference-edit.html', conference = conference, 
-												   dd_fiscalyears = dd_fiscalyears,
-												   dd_startdates = dd_startdates)
 
-@app.route('/ajax/get/conferences', methods=['POST', 'GET'])
+@app.route('/conferences/ajax/<path:path>')
 @login_required
-def get_conferences():
-	conferences = Conferences.get_all()
-	return render_template('conferences-list-ajax.json', conferences = conferences)
+def get_conferences(path):
+	filters = []
+	if request.args.get('conferenceid'):
+		filters.append(Conferences.conferenceid == request.args.get('conferenceid'))
+	if request.args.get('meeting'):
+		filters.append(Conferences.meeting == request.args.get('meeting'))
+
+	conferences = Conferences.get_many(joins = [],
+									   filters = filters,
+									   orders = [])
+
+	if path == 'edit':
+		return render_template('conference-edit.html', conferences = conferences,
+													   dd_fiscalyears = ['FY13', 'FY14', 'FY15', 'FY16', 'FY17', 'FY18', 'FY19', 'FY20', 'FY21'],
+													   dd_startdates = ['10/01/2012', '10/01/2013', '10/01/2014', '10/01/2015', '10/01/2016',
+					  													'10/01/2017', '10/01/2018', '10/01/2019', '10/01/2020'])
+	elif path == 'get':
+		return render_template('conferences-list-ajax.json', conferences = conferences)
+	else:
+		abort(404)
 
 
 # CONFERENCE RATES
-@app.route('/conferencerates/edit/<int:conferencerateid>', methods=['POST', 'GET'])
+@app.route('/conferencerates/ajax/<path:path>')
 @login_required
-def edit_conferencerate(conferencerateid):
-	conferencerates = [ConferenceRates.get_one(filters = [ConferenceRates.conferencerateid == conferencerateid])]
-	return render_template('conference-rate-edit-ajax.json', conferencerates = conferencerates)
-
-@app.route('/ajax/get/conferencerates/<int:conferenceid>', methods=['POST', 'GET'])
-@login_required
-def get_conferencerates(conferenceid):
+def get_conferencerates(path):
+	filters = []
+	if request.args.get('conferenceid'):
+		filters.append(ConferenceRates.conferenceid == request.args.get('conferenceid'))
+	if request.args.get('conferencerateid'):
+		filters.append(ConferenceRates.conferencerateid == request.args.get('conferencerateid'))
+	if request.args.get('effectivedate'):
+		filters.append(ConferenceRates.effectivedate < request.args.get('effectivedate'))	
 	conferencerates = ConferenceRates.get_many(joins = [], 
-											   filters = [ConferenceRates.conferenceid == conferenceid], 
+											   filters = filters, 
 											   orders = [ConferenceRates.effectivedate.desc()])
-	return render_template('conference-rate-list-ajax.json', conferencerates = conferencerates)
+
+	if path == 'edit':
+		return render_template('conference-rate-edit-ajax.json', conferencerates = conferencerates)
+	elif path == 'get':
+		return render_template('conference-rate-list-ajax.json', conferencerates = conferencerates)
+	else:
+		abort(404)
 
 # CONFERENCE ATTENDEES
-@app.route('/ajax/get/conferenceattendees/<int:conferenceid>', methods=['POST', 'GET'])
+@app.route('/conferenceattendees/ajax/<path:path>')
 @login_required
-def get_conferenceattendees():
-	pass
+def get_conferenceattendees(path):
+	filters = []
+	if request.args.get('conferenceattendeeid'):
+		filters.append(ConferenceAttendee.conferenceattendeeid == request.args.get('conferenceattendeeid'))
+	if request.args.get('conferenceid'):
+		filters.append(ConferenceAttendee.conferenceid == request.args.get('conferenceid'))
+	if request.args.get('travelers'):
+		filters.append(ConferenceAttendee.travelers == request.args.get('travelers'))
+	if request.args.get('proposalid'):
+		filters.append(ConferenceAttendee.proposalid == request.args.get('proposalid'))
+	
+	conferenceattendees = ConferenceAttendee.get_many(joins = []
+													  filters = filters,
+													  orders = [])
 
+	if path == 'edit':
+		return render_template('conference-attendee-edit.html')
+	elif path == 'get':
+		return render_template('conference-attendee-list-ajax.json')
+
+# PROPOSALS
+@app.route('/proposals', methods=['GET', 'POST'])
+@login_required
+def proposals():
+	return render_template('proposals.html')
+
+@app.route('/proposals/ajax/<path:path>')
+@login_required
+def get_proposals():
+	return render_template('proposal-list-ajax.json')
 
 if __name__ == "__main__":
 	app.run(host = '0.0.0.0', port = 5000)

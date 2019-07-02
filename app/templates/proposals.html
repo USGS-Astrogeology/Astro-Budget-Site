@@ -3,8 +3,8 @@
     <head>
         <title>Proposal Budget Listing</title>
         {% include 'menu-header.html' %}
-        <script src="js/date-tools.js"></script>
-        <script src="js/row_setting.js"></script>
+        <script src="{{ url_for('static', filename='js/date-tools.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/row_setting.js') }}"></script>
     </head>
     {% for error in debug %}
       <pre>error.msg</pre>
@@ -25,37 +25,47 @@
               <td colspan="3"><input type='text' name='projectname' size="70" value=''/></td></tr>
             <tr><th>Principal Investigator</th>
               <td colspan="3">
-            {% include 'people-dropdown.html' with {'dropdown_name': 'peopleid',
-                                                    'dropdown_id': 'proposalpeopledropdown',
-                                                    'selected_peopleid': remote_user[0].peopleid } %}
-              </td></tr>
-            <tr><th>Funding Program</th><td colspan="3">
-            {% include 'programs-dropdown.html' with {'dropdown_name': 'programid',
-                                                      'dropdown_id': 'programiddropdown',
-                                                      'selected_programid': 0 } %}
-              </td></tr>
-            <tr><th>Status</th><td colspan="3">
-            {% include 'status-dropdown.html' with {'dropdown_name': 'status',
-                                                    'dropdown_id': 'statusdropdown',
-                                                    'selected_status': 0 } %}
-              </td></tr>
+                {% with dropdown_name = 'peopleid', dropdown_id = 'proposalpeopledropdown',
+                        selected_peopleid = g.user.peopleid %}
+                  {% include 'people-dropdown.html'}
+                {% endwith %}            
+              </td>
+            </tr>
+            <tr><th>Funding Program</th>
+              <td colspan="3">
+                {% with dropdown_name = 'programid', dropdown_id = 'programiddropdown',
+                        selected_programid = 0 %}
+                  {% include 'programs-dropdown.html' %}
+                {% endwith %}
+              </td>
+            </tr>
+            <tr><th>Status</th>
+              <td colspan="3">
+                {% with dropdown_name = 'status', dropdown_id = 'statusdropdown',
+                        selected_status = 0 %}
+                  {% include 'status-dropdown.html' %}
+                {% endwith %}
+              </td>
+            </tr>
             <tr><th>Proposal Number</th>
               <td><input type='text' name='proposalnumber' value=''/></td>
               <th>Award Number</th>
               <td><input type='text' name='awardnumber' value=''/></td></tr>
             <tr><th>Starting</th>
               <td><input type='text' id='proposalperfperiodstart' name='perfperiodstart' value=''
-                  onchange="updateDropDown('proposalperfperiodstart');"/>
-                {% include 'fiscalyear-dropdown.html' with {'dropdown_name': 'perfperiodstart',
-                                                        'dropdown_id': 'proposalperfperiodstart',
-                                                        'selected_fy': '' } %}
+                    onchange="updateDropDown('proposalperfperiodstart');"/>
+                  {% with dropdown_name = 'perfperiodstart', dropdown_id = 'proposalperfperiodstart',
+                          selected_fy = '' %}
+                   {% include 'fiscalyear-dropdown.html' %}
+                  {% endwith %}
               </td>
               <th>Ending</th>
               <td><input type='text' id='proposalperfperiodend' name='perfperiodend' value=''
-                  onchange="updateDropDown('proposalperfperiodend');"/>
-                {% include 'fiscalyear-dropdown.html' with {'dropdown_name': 'perfperiodend',
-                                                        'dropdown_id': 'proposalperfperiodend',
-                                                        'selected_fy': '' } %}
+                    onchange="updateDropDown('proposalperfperiodend');"/>
+                  {% with dropdown_name = 'perfperiodend', dropdown_id = 'proposalperfperiodend',
+                          selected_fy = '' %}                          
+                    {% include 'fiscalyear-dropdown.html' %}
+                  {% endwith %}
               </td></tr>
             </tr>
           </table>
@@ -100,7 +110,7 @@
           $('#proposalsTable').dataTable( {
             "processing": true,
             "serverSide": false,
-            "ajax": "index.php?view=proposal-list-json",
+            "ajax": "/proposals/ajax/get",
             "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]]
           } );
 
