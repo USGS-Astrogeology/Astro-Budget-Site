@@ -95,11 +95,7 @@ def get_conferenceattendees(path):
 		filters.append(ConferenceAttendee.travelers == request.args.get('travelers'))
 	if request.args.get('proposalid'):
 		filters.append(ConferenceAttendee.proposalid == request.args.get('proposalid'))
-<<<<<<< HEAD
 	
-=======
-
->>>>>>> c3a157894727d15aa32e909dc6b0268063f0718b
 	conferenceattendees = ConferenceAttendee.get_many(joins = [],
 													  filters = filters,
 													  orders = [])
