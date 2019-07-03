@@ -1,6 +1,6 @@
 from flask import Flask, render_template, url_for, g, request, abort
 from flask_cas import CAS, login_required, login
-from database import db, Conferences, ConferenceRates, People, ConferenceAttendee
+from database import db, Conferences, ConferenceRates, People, ConferenceAttendee, Proposals, FundingPrograms, ExpenseTypes
 
 def currencyformat(value):
 	if value is None:
@@ -34,7 +34,6 @@ def main():
 @login_required
 def conferences():
 	return render_template('conferences.html')
-
 
 @app.route('/conferences/ajax/<path:path>')
 @login_required
@@ -82,6 +81,7 @@ def get_conferencerates(path):
 	else:
 		abort(404)
 
+
 # CONFERENCE ATTENDEES
 @app.route('/conferenceattendees/ajax/<path:path>')
 @login_required
@@ -96,7 +96,7 @@ def get_conferenceattendees(path):
 	if request.args.get('proposalid'):
 		filters.append(ConferenceAttendee.proposalid == request.args.get('proposalid'))
 	
-	conferenceattendees = ConferenceAttendee.get_many(joins = []
+	conferenceattendees = ConferenceAttendee.get_many(joins = [],
 													  filters = filters,
 													  orders = [])
 
@@ -104,17 +104,74 @@ def get_conferenceattendees(path):
 		return render_template('conference-attendee-edit.html')
 	elif path == 'get':
 		return render_template('conference-attendee-list-ajax.json')
+	else:
+		abort(404)
+
+# EXPENSE TYPES
+@app.route('/expensetypes')
+@login_required
+def expensetypes():
+	return render_template('expensetypes.html')
+
+@app.route('/expensetypes/ajax/<path:path>')
+@login_required
+def get_expensetypes(path):
+	filters = []
+	if request.args.get('expensetypeid'):
+		filters.append(ExpenseTypes.expensetypeid == request.args.get('expensetypeid'))
+	
+	expensetypes = ExpenseTypes.get_many(joins = [], filters = filters, orders = [])
+
+	if path == 'edit':
+		return render_template('expensetype-edit.html', expensetypes = expensetypes)
+	elif path == 'get':
+		return render_template('expensetypes-list-ajax.json', expensetypes = expensetypes)
+	else:
+		abort(404)
+
+# PROGRAMS
+@app.route('/programs')
+@login_required
+def programs():
+	return render_template('programs.html')
+
+@app.route('/programs/ajax/<path:path>')
+@login_required
+def get_programs(path):
+	filters = []
+	if request.args.get('programid'):
+		filters.append(FundingPrograms.programid == request.args.get('programid'))
+
+	programs = FundingPrograms.get_many(joins = [], filters = filters, orders = [])
+
+	if path == 'edit':
+		return render_template('programs-edit.html', programs = programs,
+													 dd_fiscalyears = ['FY13', 'FY14', 'FY15', 'FY16', 'FY17', 'FY18', 'FY19', 'FY20', 'FY21'],
+													 dd_startdates = ['10/01/2012', '10/01/2013', '10/01/2014', '10/01/2015', '10/01/2016',
+					  													'10/01/2017', '10/01/2018', '10/01/2019', '10/01/2020'])
+	elif path == 'get':
+		return render_template('programs-list-ajax.json', programs = programs)
+	else:
+		abort(404)
+
 
 # PROPOSALS
-@app.route('/proposals', methods=['GET', 'POST'])
+@app.route('/proposals')
 @login_required
 def proposals():
 	return render_template('proposals.html')
 
 @app.route('/proposals/ajax/<path:path>')
 @login_required
-def get_proposals():
-	return render_template('proposal-list-ajax.json')
+def get_proposals(path):
+	filters = []
+
+	proposals = Proposals.get_many(joins = [], filters = filters, orders = [])
+
+	if path == 'get':
+		return render_template('proposal-list-ajax.json', proposals = proposals)
+	else:
+		abort(404)
 
 if __name__ == "__main__":
 	app.run(host = '0.0.0.0', port = 5000)

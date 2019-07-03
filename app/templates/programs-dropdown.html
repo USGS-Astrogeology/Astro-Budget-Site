@@ -1,7 +1,7 @@
 <select name='{{ dropdown_name }}' id='{{ dropdown_id }}'>
 {% if search %}<option value='ALL'>ALL Programs</option>{% endif %}
 {% for program in programs %}
-  <option value='{{ program.programid }}' {% if program.programid == selected_programid %}selected {% endif %}>
+  <option value='{{ program.programid }}' {% if program.programid == selected_programid %} selected {% endif %}>
     {{ program.programname }}</option>
 {% endfor %}
 </select>

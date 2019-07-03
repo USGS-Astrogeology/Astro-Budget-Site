@@ -63,7 +63,7 @@ class FundingPrograms(Base):
   programname = Column(String(256))
   agency      = Column(String(32))
   pocname     = Column(String(128))
-  procemail   = Column(String(128))
+  pocemail   = Column(String(128))
   startdate   = Column(DateTime(timezone=False))
   enddate     = Column(DateTime(timezone=False))
   proposals   = relationship('Proposals', backref='fundingprogram')

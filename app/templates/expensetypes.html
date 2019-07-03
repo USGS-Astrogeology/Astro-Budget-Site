@@ -2,7 +2,6 @@
 <html>
     <head>
         <title>Proposal Budget Expense Type Listing</title>
-        <script src="js/row_setting.js"></script>
         {% include 'menu-header.html' %}
     </head>
     {% for error in debug %}
@@ -13,8 +12,8 @@
       <div class="container">
         <div id="title">
           <h2>List of Expense Types
-          {% if remote_user[0].admin == 't' %}
-          <a href='javascript:void(0)' onClick="editExpenseTypeDialog('new')" id='newButton'>New</a>
+          {% if g.user.admin %}
+            <a href='javascript:void(0)' onClick="editExpenseTypeDialog()" id='newButton'>New</a>
           {% endif %}
           <br>
 
@@ -44,7 +43,7 @@
             "processing": true,
             "serverSide": false,
             "autowidth": false,
-            "ajax": "index.php?view=expensetypes-list-json",
+            "ajax": "/expensetypes/ajax/get",
             "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]]
           } );
 
@@ -56,13 +55,13 @@
         }
 
 
-        function editExpenseTypeDialog(expensetypeid) {
-          $("#editDialog").load("index.php?view=expensetype-edit&expensetypeid=" + expensetypeid);
+        function editExpenseTypeDialog(expensetypeid = 0) {
+          $("#editDialog").load("/expensetypes/ajax/edit?expensetypeid=" + expensetypeid);
 
           dialog = $("#editDialog").dialog({
             autoOpen: false,
             height: 250,
-            width: 400,
+            width: 500,
             modal: true,
             buttons: {
               "Save": saveExpensetype,

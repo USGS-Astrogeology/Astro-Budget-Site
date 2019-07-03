@@ -2,7 +2,6 @@
 <html>
     <head>
         <title>Funding Programs Listing</title>
-        <script src="js/row_setting.js"></script>
         {% include 'menu-header.html' %}
     </head>
     {% for error in debug %}
@@ -13,7 +12,7 @@
       <div class="container">
         <div id="title">
           <h2>List of Funding Programs
-          {% if remote_user[0].admin == 't' %}
+          {% if g.user.admin %}
           <a href='javascript:void(0)' onClick="editProgramDialog('new')" id='newButton'>New</a>
           {% endif %}
           <br>
@@ -44,7 +43,7 @@
             "processing": true,
             "serverSide": false,
             "autoWidth": false,
-            "ajax": "index.php?view=programs-list-json",
+            "ajax": "/programs/ajax/get",
             "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]]
           } );
 
@@ -56,7 +55,7 @@
         }
 
         function editProgramDialog(programid) {
-          $("#editDialog").load("index.php?view=program-edit&programid=" + programid);
+          $("#editDialog").load("programs/ajax/edit?programid=" + programid);
 
           dialog = $("#editDialog").dialog({
             autoOpen: false,
