@@ -15,7 +15,7 @@
       <div class="container">
         <div id="title">
           <h2>List of Overhead Rates</h2>
-          {% if remote_user[0].admin == 't' %}
+          {% if g.user.admin %}
             <a href='javascript:void(0)' onClick="editOverheadDialog('new', 'null')" id='newButton'>New</a><p/>
           {% endif %}
           <br>

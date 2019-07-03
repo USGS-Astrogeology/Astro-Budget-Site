@@ -195,3 +195,15 @@ class Expenses(Base):
 
   def __repr__(self):
     return "<Expenses(description='%s')>" % (self.description)
+
+class OverheadRates(Base):
+    __tablename__='overheadrates'
+
+    overheadid      = Column(Integer, Sequence('overheadrates_overheadid_seq'), primary_key=True)
+    proposalid      = Column(Integer)
+    rate            = Column(REAL)
+    description     = Column(String(80))
+    effectivedate   = Column(DateTime(timezone=False))
+
+    def __repr__(self):
+        return "<OverheadRates(description='%s')>" % (self.description)

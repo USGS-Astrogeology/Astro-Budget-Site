@@ -1,6 +1,7 @@
 from flask import Flask, render_template, url_for, g, request, abort
 from flask_cas import CAS, login_required, login
-from database import db, Conferences, ConferenceRates, People, ConferenceAttendee, Proposals, FundingPrograms, ExpenseTypes
+from database import db, Conferences, ConferenceRates, People, ConferenceAttendee, Proposals, FundingPrograms, ExpenseTypes, Salaries
+
 
 def currencyformat(value):
 	if value is None:
@@ -95,7 +96,7 @@ def get_conferenceattendees(path):
 		filters.append(ConferenceAttendee.travelers == request.args.get('travelers'))
 	if request.args.get('proposalid'):
 		filters.append(ConferenceAttendee.proposalid == request.args.get('proposalid'))
-	
+
 	conferenceattendees = ConferenceAttendee.get_many(joins = [],
 													  filters = filters,
 													  orders = [])
@@ -119,7 +120,7 @@ def get_expensetypes(path):
 	filters = []
 	if request.args.get('expensetypeid'):
 		filters.append(ExpenseTypes.expensetypeid == request.args.get('expensetypeid'))
-	
+
 	expensetypes = ExpenseTypes.get_many(joins = [], filters = filters, orders = [])
 
 	if path == 'edit':
@@ -155,6 +156,21 @@ def get_programs(path):
 		abort(404)
 
 
+
+# overhead
+@app.route('/overhead', methods=['GET', 'POST'])
+@login_required
+def overhead():
+	return render_template('overheads.html')
+
+@app.route('/overhead/ajax/<path:path>')
+@login_required
+def get_overhead(path):
+	filters = []
+	#if request.args.get('proposalid'):
+	#	filters.append.()
+
+
 # PROPOSALS
 @app.route('/proposals')
 @login_required
@@ -173,6 +189,7 @@ def get_proposals(path):
 	else:
 		abort(404)
 
+
 # people
 @app.route('/people', methods=['GET'])
 @login_required
@@ -182,14 +199,42 @@ def people():
 @app.route('/people/ajax/<path:path>', methods=['POST', 'GET'])
 @login_required
 def get_people(path):
-	people = People.get_all()
-	#people = People.get_many(joins = [Salaries])
-	#						 filters = [People.name == name, People.title = title, People.])
+	filters = []
+	if request.args.get('peopleid'):
+		filters.append(People.peopleid == request.args.get('peopleid'))
+
+	people = People.get_many(joins = [], filters = filters, orders = [])
+
+	#people = People.get_all()
+
 
 	if path == 'edit':
-		return render_template('people-edit.html')
+		return render_template('people-edit.html', people = people)
 	elif path == 'get':
 		return render_template('people-list-ajax.json', people = people)
+	elif path == 'task':
+		return render_template('people-task-list.json', people = people)
+	else:
+		abort(404)
+
+
+# salaries
+@app.route('/salary/ajax/<path:path>', methods=['POST', 'GET'])
+@login_required
+def getSalaries(path):
+	filters = []
+	if request.args.get('peopleid'):
+		filters.append(Salaries.peopleid == request.args.get('peopleid'))
+
+	salaries = Salaries.get_many(joins = [], filters = filters, orders = [])
+
+	if path == 'edit':
+		return render_template('salary-edit-ajax.json', salaries = salaries)
+	elif path == 'get':
+		return render_template('salary-list-ajax.json', salaries = salaries)
+	else:
+		abort(404)
+
 
 
 if __name__ == "__main__":

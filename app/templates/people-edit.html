@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Editing {{ person.name }}</title>
-        <script src="js/date-tools.js"></script>
+        
+        <script src="{{url_for ('static', filename='js/date-tools.js') }}"></script>
     </head>
     <body>
     <div id="peopleedittabs">
       <ul>
         <li><a href="#peopleedittab1">Person</a></li>
-    {% if remote_user[0].admin == 't' %}
+    {% if g.user.admin %}
         <li><a href="#peopleedittab2">Salary</a></li>
     {% endif %}
         <li><a href="#peopleedittab3">Staffing</a></li>
       </ul>
-    {% if remote_user[0].admin == 't' %}
+    {% if g.user.admin %}
     <div id="peopleedittab1">
         {% for person in people %}
           <form id="peopleForm" action="index.php" method="GET">
@@ -47,7 +47,7 @@
         </table>
         </div>
     </div>
-    {% if remote_user[0].admin == 't' %}
+    {% if g.user.admin %}
     <div id="peopleedittab2">
       <form id="salaryForm" action="index.php" method="GET">
         <input type="hidden" name="act" value="save"/>
@@ -65,9 +65,11 @@
               <th>LAF</th><td><input type="text" id="laf" name="laf" size="4"/></td></tr>
           <tr><th>Effective Date</th><td><input type="text" id="effdate" name="effdate" size="16"
                   onchange="updateDropdown('effdate');"/>
-                  {% include 'fiscalyear-dropdown.html' with {'dropdown_name': 'effdate',
-                                                        'dropdown_id': 'effdate',
-                                                        'selected_fy': '' } %}
+                  {% with dropdown_name = 'effdate',
+                                          dropdown_id = 'effdate',
+                                           selected_fy = '' %}
+                       {% include "fiscalyear-dropdown.html" %}
+                  {% endwith %}
               </td>
               <th></th><td><a href='javascript:void(0)' onClick="salarySave()" id='saveSalaryButton'>Save Salary</a></td></tr>
         </table>
@@ -95,7 +97,7 @@
           "processing": true,
           "serverSide": false,
           'autoWidth': false,
-          "ajax": "index.php?view=salary-list-json&peopleid={{ people[0].peopleid }}"
+          "ajax": "/salary/ajax/get?peopleid=" + {{ people[0].peopleid|tojson }}
         } );
       }
 
@@ -106,9 +108,9 @@
             "processing": true,
             "serverSide": false,
             'autoWidth': false,
-            "ajax": "index.php?view=people-task-list-json&peopleid={{ people[0].peopleid }}"
+            "ajax": "/people/ajax/task?peopleid=" + {{ people[0].peopleid|tojson }}
           } );
-        
+
         $("#effdate").datepicker();
         $("#saveSalaryButton").button();
         $("#newSalaryButton").button();
@@ -119,7 +121,7 @@
         $("#peopleedittabs").tabs( "option", "active", 1 );
         $("#salaryid").val(salaryid);
         if (salaryid == 'new') {
-          $("#salpeopleid").val({{ person.peopleid }});
+          $("#salpeopleid").val({{ people[0].peopleid }});
           $("#payplan").val('');
           $("#saltitle").val('');
           $("#appttype").val('');
@@ -131,7 +133,7 @@
           $("#effdate").val('');
         }
         else {
-          $.getJSON( "index.php?view=salary-edit-json&salaryid=" + salaryid, function( data ) {
+          $.getJSON( "/salary/edit?salaryid=" + salaryid, function( data ) {
             $("#salpeopleid").val(data.data[0][1]);
             $("#effdate").val(data.data[0][2]);
             $("#payplan").val(data.data[0][3]);
