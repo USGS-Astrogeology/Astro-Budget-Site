@@ -2,7 +2,7 @@
 <html>
     <head>
         <title>Proposal Budget People Listing</title>
-        <script src="js/row_setting.js"></script>
+        <script src="{{url_for('static', filename='js/row_setting.js') }}"></script>
         {% include 'menu-header.html' %}
     </head>
     {% for error in debug %}
@@ -14,7 +14,7 @@
         <div id="title">
           <h2>List of People
           <a href='javascript:void(0)' onClick="editUserDialog('new')" id='newButton'>New</a>
-          
+
           <br>
 
           <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#peopleTable').DataTable())">Save Row Preference</button>
@@ -33,7 +33,7 @@
 
       <script type="text/javascript" charset="utf-8">
         function editUserDialog(peopleid) {
-          $("#editDialog").load("index.php?view=people-edit&peopleid=" + peopleid);
+          $("#editDialog").load("/people/ajax/edit/" + peopleid);
 
           dialog = $("#editDialog").dialog({
             autoOpen: false,
@@ -72,7 +72,7 @@
             "processing": true,
             "serverSide": false,
             "autoWidth": false,
-            "ajax": "index.php?view=people-list-json",
+            "ajax": "people/ajax/get",
             "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]]
           } );
 
