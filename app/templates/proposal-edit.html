@@ -4,9 +4,8 @@
         <title>Proposal Budget for {{ proposals[0].projectname }} </title>
         {% include 'menu-header.html' %}
         {% include 'graphs-header.html' %}
-        <script src="js/proposal-edit.js"></script>
-        <script src="js/date-tools.js"></script>
-        <script src="js/row_setting.js"></script>
+        <script src="{{ url_for('static', filename='js/proposal-edit.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/date-tools.js') }}"></script>
     </head>
     {% for error in debug %}
       <pre>error.msg</pre>
@@ -22,13 +21,13 @@
         <div id="accordions">
           <h3 id='proposalTitle'>Proposal Details - {{ proposals[0].projectname }}</h3>
             <div>
-              <a href="index.php?view=proposal-budget-details&proposalid={{ proposals[0].proposalid }}"
+              <a href="/proposal-budget/{{ proposals[0].proposalid }}"
                 target='report' id="budgetDetailsButton">Budget Details</a>
-              <a href="index.php?view=proposal-nspires&proposalid={{ proposals[0].proposalid }}"
+              <a href="/proposal-nspires/{{ proposals[0].proposalid }}"
                 target='report' id="nspiresButton">NSPIRES</a>
-              <a href="index.php?view=proposal-roses&proposalid={{ proposals[0].proposalid }}"
+              <a href="/proposal-roses/{{ proposals[0].proposalid }}"
                 target='report' id="rosesButton">Redacted</a>
-              <a href="index.php?view=proposal-basis&proposalid={{ proposals[0].proposalid }}"
+              <a href="/proposal-basis/{{ proposals[0].proposalid }}"
                 target='report' id="basisButton">BASIS+</a>
               <p/>
               <form id="proposalForm" action="index.php" method="GET">
@@ -40,20 +39,25 @@
                       value='{{ proposals[0].projectname }}'/></td></tr>
                 <tr><th>Principal Investigator</th>
                   <td colspan="3">
-                {% include 'people-dropdown.html' with {'dropdown_name': 'peopleid',
-                                                        'dropdown_id': 'proposalpeopledropdown',
-                                                        'selected_peopleid': proposals[0].peopleid } %}
-                  </td></tr>
-                <tr><th>Funding Program</th><td colspan="3">
-                {% include 'programs-dropdown.html' with {'dropdown_name': 'programid',
-                                                          'dropdown_id': 'programiddropdown',
-                                                          'selected_programid': proposals[0].programid } %}
-                  </td></tr>
-                <tr><th>Status</th><td colspan="3">
-                {% include 'status-dropdown.html' with {'dropdown_name': 'status',
-                                                        'dropdown_id': 'statusdropdown',
-                                                        'selected_status': proposals[0].status } %}
-                  </td></tr>
+                    {% with dropdown_name = 'peopleid', dropdown_id = 'proposalpeopledropdown', selected_peopleid = proposals[0].peopleid %}
+                      {% include 'people-dropdown.html' %}
+                    {% endwith %}
+                  </td>
+                </tr>
+                <tr><th>Funding Program</th>
+                  <td colspan="3">
+                    {% with dropdown_name = 'programid', dropdown_id = 'programiddropdown', selected_programid = proposals[0].programid %}
+                      {% include 'programs-dropdown.html' %}
+                    {% endwith %}
+                  </td>
+                </tr>
+                <tr><th>Status</th>
+                  <td colspan="3">
+                    {% with dropdown_name = 'status', dropdown_id = 'statusdropdown', selected_status = proposals[0].status %}
+                      {% include 'status-dropdown.html' %}
+                    {% endwith %}
+                  </td>
+                </tr>
                 <tr><th>Proposal Number</th>
                   <td><input type='text' name='proposalnumber' value='{{ proposals[0].proposalnumber }}'/></td>
                   <th>Award Number</th>
@@ -61,18 +65,18 @@
                 <tr><th>Starting</th>
                   <td><input type='text' id='proposalperfperiodstart' name='perfperiodstart'
                        value='{{ proposals[0].perfperiodstart }}' onchange='updateDropdown("proposalperfperiodstart");'/>
-                {% include 'fiscalyear-dropdown.html' with {'dropdown_name': 'perfperiodstart',
-                                                        'dropdown_id': 'proposalperfperiodstart',
-                                                        'selected_fy': proposals[0].perfperiodstart } %}
-                       </td>
+                    {% with dropdown_name = 'perfperiodstart', dropdown_id = 'proposalperfperiodstart', selected_fy = proposals[0].perfperiodstart %}
+                      {% include 'fiscalyear-dropdown.html' %}
+                    {% endwith %}
+                  </td>
                   <th>Ending</th>
                   <td><input type='text' id='proposalperfperiodend' name='perfperiodend'
                        value='{{ proposals[0].perfperiodend }}' onchange='updateDropdown("proposalperfperiodend");'/>
-                {% include 'fiscalyear-dropdown.html' with {'dropdown_name': 'perfperiodend',
-                                                        'dropdown_id': 'proposalperfperiodend',
-                                                        'selected_fy': proposals[0].perfperiodend } %}
+                    {% with dropdown_name = 'perfperiodend', dropdown_id = 'proposalperfperiodend', selected_fy = proposals[0].perfperiodend %}
+                      {% include 'fiscalyear-dropdown.html' %}
+                    {% endwith %}
                   </td></tr>
-                       </td></tr>
+                  </td></tr>
                 </tr>
                 <tr><th></th>
                     <td><a href='javascript:void(0)' onClick='saveProposal()' id='saveProposalButton'>Save</a></td>
@@ -123,9 +127,9 @@
                 <button type='button' class='ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only' id='AddColumn' onclick='addColumn({{ proposalid }})' >
                   Add Column
                 </button>
-                {% include 'fiscalyear-dropdown.html' with {'dropdown_name': 'validfiscalyears',
-                                                        'dropdown_id': 'validfiscalyears',
-                                                        'selected_fy': proposals[0].perfperiodstart} %}
+                {% with dropdown_name = 'validfiscalyears', dropdown_id = 'validfiscalyears', selected_fy = proposals[0].perfperiodstart %}
+                  {% include 'fiscalyear-dropdown.html' %}
+                {% endwith %}
               </div>
               <div>
                 <button type='button' class='ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only' id='addTaskButton' onclick='addTask()'>
@@ -166,7 +170,7 @@
             </div>
         </div>
 
-      <script type="text/javascript" charset="utf-8">
+      <script charset="utf-8">
         $(document).ready(function() {
           $('#proposalperfperiodstart').datepicker();
           $('#proposalperfperiodend').datepicker();

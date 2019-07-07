@@ -48,13 +48,22 @@ class Salaries(Base):
   title         = Column(String(128))
   appttype      = Column(String(8))
   authhours     = Column(REAL)
-  estsalary     = Column(NUMERIC(6,2))
-  estbenefits   = Column(NUMERIC(6,2))
+  estsalary     = Column(REAL)
+  estbenefits   = Column(REAL)
   leavecategory = Column(REAL)
   laf           = Column(REAL)
 
   def __repr__(self):
     return "<Salaries(peopleid='%d', payplan='%s', title='%s')>" % (self.peopleid, self.payplan, self.title)
+
+class Funding(Base):
+  __tablename__ = 'funding'
+
+  fundingid  = Column(Integer, Sequence('funding_fundingid_seq'), primary_key=True)
+  proposalid = Column(Integer, ForeignKey("proposals.proposalid"))
+  fiscalyear = Column(DateTime(timezone=False))
+  newfunding = Column(NUMERIC(6,2))
+  carryover  = Column(NUMERIC(6,2))
 
 class FundingPrograms(Base):
   __tablename__ = 'fundingprograms'
@@ -63,7 +72,7 @@ class FundingPrograms(Base):
   programname = Column(String(256))
   agency      = Column(String(32))
   pocname     = Column(String(128))
-  pocemail   = Column(String(128))
+  pocemail    = Column(String(128))
   startdate   = Column(DateTime(timezone=False))
   enddate     = Column(DateTime(timezone=False))
   proposals   = relationship('Proposals', backref='fundingprogram')
@@ -82,11 +91,12 @@ class Proposals(Base):
   programid           = Column(Integer, ForeignKey("fundingprograms.programid"), nullable=False)
   perfperiodstart     = Column(DateTime(timezone=False))
   perfperiodend       = Column(DateTime(timezone=False))
-  status              = Column(Integer)
+  status              = Column(Integer, ForeignKey("statuses.status"))
   fbmsaccounts        = relationship('FBMSAccounts', backref='proposal')
   conferenceattendees = relationship('ConferenceAttendee', backref='proposal')
   tasks               = relationship('Tasks', backref='proposal')
   expenses            = relationship('Expenses', backref='proposal')
+  fundings            = relationship('Funding', backref='proposal')
 
   def __repr__(self):
     return "<Proposals(project='%s', proposalnumber='%s', awardnumber='%s')>" % (self.projectname, self.proposalnumber, self.awardnumber)
@@ -207,3 +217,11 @@ class OverheadRates(Base):
 
     def __repr__(self):
         return "<OverheadRates(description='%s')>" % (self.description)
+
+class Statuses(Base):
+  __tablename__ = 'statuses'
+
+  status = Column(Integer, primary_key = True)
+  statusname = Column(String(16))
+  proposals = relationship('Proposals', backref='proposalstatus')
+

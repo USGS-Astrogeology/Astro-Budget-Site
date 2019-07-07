@@ -65,7 +65,7 @@ function loadFundingTable (reload, proposalid) {
     "processing": true,
     "serverSide": false,
     "autoWidth": false,
-    'ajax': 'index.php?view=funding-list-json&proposalid=' + proposalid,
+    'ajax': '/funding/ajax/get?proposalid=' + proposalid,
     'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
   });
 
@@ -138,12 +138,13 @@ function loadTasksTable (reload, proposalid) {
 
   });
 
-  $task_res = $.ajax('index.php?view=tasks-list-json&proposalid=' + proposalid, {dataType: "json", async: false});
+  $task_res = $.ajax('/tasks/ajax/get?proposalid=' + proposalid, {dataType: "json", async: false});
   $task_json = $task_res.responseJSON['data'];
+  console.log($task_json)
 
-  $people_res = $.ajax('index.php?view=people-dropdown-list-json', {dataType: "json", async: false});
+  $people_res = $.ajax('/people/ajax/dropdown', {dataType: "json", async: false});
 
-  $task_dd_res = $.ajax('index.php?view=tasks-dropdown-json&proposalid=' + proposalid, {dataType: "json", async: false});
+  $task_dd_res = $.ajax('/tasks/ajax/dropdown?proposalid=' + proposalid, {dataType: "json", async: false});
   $filtered_task_list = new Set($task_dd_res.responseJSON['data']);
   $task_dd_list = [];
   $filtered_task_list.forEach(function(task){
@@ -229,7 +230,7 @@ function loadTasksTable (reload, proposalid) {
     }
   });
 
-  // Intializes the grid using the fields array and JSON data
+  // Initializes the grid using the fields array and JSON data
   $("#tasksTableDiv").jsGrid({
     width: "100%",
     height: "400px",
@@ -450,7 +451,7 @@ function loadConferencesTable (reload, proposalid) {
     'processing': true,
     'serverSide': false,
     'autoWidth': false,
-    'ajax': 'index.php?view=conference-attendee-list-json&proposalid=' + proposalid,
+    'ajax': '/conferenceattendees/ajax/get?proposalid=' + proposalid,
     'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
   } );
 
@@ -473,7 +474,7 @@ function loadExpensesTable (reload, proposalid) {
     'processing': true,
     'serverSide': false,
     'autoWidth': false,
-    'ajax': 'index.php?view=expense-list-json&proposalid=' + proposalid,
+    'ajax': '/expenses/ajax/get?proposalid=' + proposalid,
     'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
   } );
 
@@ -526,7 +527,7 @@ function saveFunding(proposalid) {
 function deleteFundingDialog(fundingid, proposalid) {
   var fy;
 
-  $.getJSON( "index.php?view=funding-list-json&proposalid=" + proposalid + "&fundingid=" + fundingid, function( data ) {
+  $.getJSON( "/funding/ajax/get?proposalid=" + proposalid + "&fundingid=" + fundingid, function( data ) {
     var pattern = />(.+)<\/a>/i;
     fy = pattern.exec(data.data[0][0])[1];
     $("#editDialog").html("<html><head><title>Confirm Deletion</title></head>" +
@@ -705,8 +706,7 @@ function editTaskDialog (taskid, proposalid) {
     });
   }
 
-  $("#editDialog").load(
-    "index.php?view=task-edit&proposalid=" + proposalid + "&taskid=" + taskid);
+  $("#editDialog").load("/tasks/ajax/edit?proposalid=" + proposalid + "&taskid=" + taskid);
 
   dialog = $("#editDialog").dialog({
     autoOpen: false,
@@ -867,8 +867,7 @@ function loadConferenceRate() {
 }
 
 function editExpenseDialog(expenseid, proposalid) {
-  $("#editDialog").load(
-    "index.php?view=expense-edit&proposalid=" + proposalid + "&expenseid=" + expenseid);
+  $("#editDialog").load("/expenses/ajax/edit?expenseid=" + expenseid);
 
   dialog = $("#editDialog").dialog({
     autoOpen: false,

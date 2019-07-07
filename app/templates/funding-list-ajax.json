@@ -1,11 +1,13 @@
-{"draw":0,"recordsTotal":{{ proposals[0].funding|length }},"recordsFiltered":{{ proposals[0].funding|length }},"data":[
-{% for fund in proposals[0].funding %}
-  {% if remote_user[0].admin == 't' %}
-["<a href='javascript:void(0)' onclick='editFundingDialog({{ fund.fundingid }}, {{ proposals[0].proposalid }})'>{{ fund.FY }}</a>",
+{"draw":0,"recordsTotal":{{ funding|length }},"recordsFiltered":{{ funding|length }},"data":[
+{% for fund in funding %}
+  {% if g.user.admin %}
+    ["<a href='javascript:void(0)' onclick='editFundingDialog({{ fund.fundingid }}, {{ fund.proposalid }})'>{{ fund.fiscalyear }}</a>",
   {% else %}
-["{{ fund.FY }}",
+    ["{{ fund.fiscalyear }}",
   {% endif %}
-"${{ fund.newfunding|number_format(2,'.',',') }}", "${{ fund.carryover|number_format(2,'.',',') }}",
-"<a href='javascript:void(0)' onclick='deleteFundingDialog({{ fund.fundingid}}, {{ proposals[0].proposalid }})'><img src='images/trash-2-32.png' title='Delete funding'></a>"]{% if loop.last !=true %},{% endif %}
+  "{{ fund.newfunding|currencyformat }}",
+  "{{ fund.carryover|currencyformat }}",
+  "<a href='javascript:void(0)' onclick='deleteFundingDialog({{ fund.fundingid }}, {{ fund.proposalid }})'><img src='{{ url_for("static", filename="images/trash-2-32.png") }}' title='Delete funding'></a>"]
+  {% if loop.last !=true %},{% endif %}
 {% endfor %}
 ]}

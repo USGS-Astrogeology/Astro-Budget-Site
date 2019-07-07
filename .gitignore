@@ -3,6 +3,7 @@ app/config.py
 
 # Local Tests
 app/templates/json_local/*
+*.sql
 
 # Editor Files
 .vscode*

@@ -1,15 +1,30 @@
 from flask import Flask, render_template, url_for, g, request, abort
 from flask_cas import CAS, login_required, login
-from database import db, Conferences, ConferenceRates, People, ConferenceAttendee, Proposals, FundingPrograms, ExpenseTypes, Salaries
-
+from database import (db, Conferences, ConferenceRates, ConferenceAttendee, Expenses, ExpenseTypes,
+					  Funding, FundingPrograms, People, Proposals, Salaries, Tasks) 
 
 def currencyformat(value):
 	if value is None:
 		return '$0.00'
 	return "${:,.2f}".format(value)
 
-def dateformat(value, format='%m/%d/%Y'):
-	return value.strftime(format)
+def dateformat(datestring, format='%m/%d/%Y'):
+	return datestring.strftime(format)
+
+def floatformat(value):
+	if value is None:
+		return '0.00'
+	return "{:,.2f}".format(value)
+
+def intformat(value):
+	if value is None:
+		return '0'
+	return "{:,}".format(value)
+
+def jsonformat(string):
+	string = string.replace("'", r"\'")
+	string = string.replace('"', r'\"')
+	return string
 
 
 app = Flask(__name__)
@@ -17,6 +32,8 @@ cas = CAS(app, '/cas')
 app.config.from_object('config.Dev')
 app.jinja_env.filters['currencyformat'] = currencyformat
 app.jinja_env.filters['dateformat'] = dateformat
+app.jinja_env.filters['intformat'] = intformat
+app.jinja_env.filters['jsonformat'] = jsonformat
 db.init_app(app)
 
 @app.before_request
@@ -108,6 +125,25 @@ def get_conferenceattendees(path):
 	else:
 		abort(404)
 
+# EXPENSES
+@app.route('/expenses/ajax/<path:path>')
+@login_required
+def get_expenses(path):
+	filters = []
+	if request.args.get('proposalid'):
+		filters.append(Expenses.proposalid == request.args.get('proposalid'))
+	if request.args.get('expenseid'):
+		filters.append(Expenses.expenseid == request.args.get('expenseid'))
+
+	expenses = Expenses.get_many(joins = [], filters = filters, orders = [])
+
+	if path == 'edit':
+		return render_template('expense-edit.html', expenses = expenses)
+	elif path == 'get':
+		return render_template('expense-list-ajax.json', expenses = expenses)
+	else:
+		abort(404)
+
 # EXPENSE TYPES
 @app.route('/expensetypes')
 @login_required
@@ -127,6 +163,23 @@ def get_expensetypes(path):
 		return render_template('expensetype-edit.html', expensetypes = expensetypes)
 	elif path == 'get':
 		return render_template('expensetypes-list-ajax.json', expensetypes = expensetypes)
+	else:
+		abort(404)
+
+# FUNDING
+@app.route('/funding/ajax/<path:path>')
+@login_required
+def get_funding(path):
+	filters = []
+	if request.args.get('fundingid'):
+		filters.append(Funding.fundingid == request.args.get('fundingid'))
+	if request.args.get('proposalid'):
+		filters.append(Funding.proposalid == request.args.get('proposalid'))
+
+	funding = Funding.get_many(joins = [], filters = filters, orders = [])
+
+	if path == 'get':
+		return render_template('funding-list-ajax.json', funding = funding)
 	else:
 		abort(404)
 
@@ -181,34 +234,61 @@ def proposals():
 @login_required
 def get_proposals(path):
 	filters = []
+	if request.args.get('proposalid'):
+		filters.append(Proposals.proposalid == request.args.get('proposalid'))
 
 	proposals = Proposals.get_many(joins = [], filters = filters, orders = [])
 
-	if path == 'get':
+	if path == 'edit':
+		return render_template('proposal-edit.html', proposals = proposals)
+	elif path == 'get':
 		return render_template('proposal-list-ajax.json', proposals = proposals)
 	else:
 		abort(404)
 
+@app.route('/proposal-basis/<int:proposalid>')
+@app.route('/proposal-budget/<int:proposalid>')
+@app.route('/proposal-nspires/<int:proposalid>')
+@app.route('/proposal-roses/<int:proposalid>')
+@login_required
+def budget_reports(proposalid):
+	proposals = Proposals.get_many(joins = [], filters = [Proposals.proposalid == proposalid], orders = [])
 
-# people
-@app.route('/people', methods=['GET'])
+	route = request.url_rule
+	if 'basis' in route.rule:
+		return render_template('proposal-basis.html', proposals = proposals)
+	elif 'budget' in route.rule:
+		return render_template('proposal-budget-details.html', proposals = proposals)
+	elif 'nspires' in route.rule:
+		return render_template('proposal-nspires.html', proposals = proposals)
+	elif 'roses' in route.rule:
+		return render_template('proposal-roses.html', proposals = proposals)
+	else:
+		abort(404)
+
+# PEOPLE
+@app.route('/people')
 @login_required
 def people():
 	return render_template('people.html')
 
-@app.route('/people/ajax/<path:path>', methods=['POST', 'GET'])
+
+@app.route('/people/ajax/<path:path>')
 @login_required
 def get_people(path):
 	filters = []
 	if request.args.get('peopleid'):
 		filters.append(People.peopleid == request.args.get('peopleid'))
+	if request.args.get('name'):
+		filters.append(People.name == request.args.get('name'))
 
-	people = People.get_many(joins = [], filters = filters, orders = [])
+	people = People.get_many(joins = [Salaries],
+							 filters = filters,
+							 orders = [])
 
-	#people = People.get_all()
-
-
-	if path == 'edit':
+	if path == 'dropdown':
+		return render_template('people-dropdown-list-ajax.json', people = people)
+	elif path == 'edit':
 		return render_template('people-edit.html', people = people)
 	elif path == 'get':
 		return render_template('people-list-ajax.json', people = people)
@@ -218,7 +298,7 @@ def get_people(path):
 		abort(404)
 
 
-# salaries
+# SALARIES
 @app.route('/salary/ajax/<path:path>', methods=['POST', 'GET'])
 @login_required
 def getSalaries(path):
@@ -236,6 +316,24 @@ def getSalaries(path):
 		abort(404)
 
 
+# TASKS
+@app.route('/tasks/ajax/<path:path>')
+@login_required
+def get_tasks(path):
+	filters = []
+	if request.args.get('proposalid'):
+		filters.append(Tasks.proposalid == request.args.get('proposalid'))
+	if request.args.get('taskid'):
+		filters.append(Tasks.taskid == request.args.get('taskid'))
+
+	tasks = Tasks.get_many(joins = [], filters = filters, orders = [])
+
+	if path == 'dropdown':
+		return render_template('tasks-dropdown-ajax.json', tasks = tasks)
+	elif path == 'edit':
+		return render_template('task-edit.html', tasks = tasks)
+	elif path == 'get':
+		return render_template('tasks-list-ajax.json', tasks = tasks)
 
 if __name__ == "__main__":
 	app.run(host = '0.0.0.0', port = 5000)

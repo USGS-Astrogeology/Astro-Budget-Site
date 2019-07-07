@@ -4,7 +4,6 @@
         <title>Proposal Budget Listing</title>
         {% include 'menu-header.html' %}
         <script src="{{ url_for('static', filename='js/date-tools.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/row_setting.js') }}"></script>
     </head>
     {% for error in debug %}
       <pre>error.msg</pre>
@@ -27,7 +26,7 @@
               <td colspan="3">
                 {% with dropdown_name = 'peopleid', dropdown_id = 'proposalpeopledropdown',
                         selected_peopleid = g.user.peopleid %}
-                  {% include 'people-dropdown.html'}
+                  {% include 'people-dropdown.html' %}
                 {% endwith %}            
               </td>
             </tr>
@@ -113,8 +112,7 @@
             "ajax": "/proposals/ajax/get",
             "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]]
           } );
-
-
+          
           if (!reload)
           {
             check_row_preference($('#proposalsTable').DataTable());

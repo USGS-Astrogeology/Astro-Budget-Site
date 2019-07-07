@@ -1,5 +1,5 @@
 <select name='{{ dropdown_name }}dd' id='{{ dropdown_id }}dd' onchange="updateCalendar('{{ dropdown_id }}');">
-{% for fiscal_year in dd_fiscalyears %}
-  <option value='{{ dd_startdates[loop.index0] }}' {% if fiscal_year == selected_fy %} selected {% endif %}>{{ fiscal_year }}</option>
+{% for fiscal_year in g.dd_fiscalyears %}
+  <option value='{{ g.dd_startdates[loop.index0] }}' {% if fiscal_year == selected_fy %} selected {% endif %}>{{ fiscal_year }}</option>
 {% endfor %}
 </select>

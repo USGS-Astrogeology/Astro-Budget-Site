@@ -22,8 +22,8 @@
           <tr class="splits"><th align="left" >Person</th>{% for year in budgets[0].FYs %}<th>{{ year }}</th>{% endfor %}<th>TOTAL</th></tr>
           {% for person in proposals[0].people %}
           {% set total = 0 %}
-          <tr class="splits"><td>{{ person.name }}</td>{% for year in budgets[0].FYs %}<th>{{ (person[year].taskhours/person[year].authhours)|number_format(2,'.','') }}{% set total = total + (person[year].taskhours/person[year].authhours)|number_format(2,'.','') %}</th>{% endfor %}
-          <th>{{ total|number_format(2,'.','') }}</th></tr>
+          <tr class="splits"><td>{{ person.name }}</td>{% for year in budgets[0].FYs %}<th>{{ (person[year].taskhours/person[year].authhours)|floatformat }}{% set total = total + (person[year].taskhours/person[year].authhours)|floatformat %}</th>{% endfor %}
+          <th>{{ total|floatformat }}</th></tr>
           {% endfor %}
           </table>
           <p/>
@@ -33,8 +33,8 @@
           <tr class="splits"><th align="left" >Person</th>{% for year in budgets[0].FYs %}<th>{{ year }}</th>{% endfor %}<th>TOTAL</th></tr>
           {% for person in proposals[0].people %}
           {% set total = 0 %}
-          <tr class="splits"><td>{{ person.name }}</td>{% for year in budgets[0].FYs %}<th>{{ (person[year].taskhours/40)|number_format(2,'.','') }}{% set total = total + (person[year].taskhours/40)|number_format(2,'.','') %}</th>{% endfor %}
-          <th>{{ total|number_format(2,'.','') }}</th></tr>
+          <tr class="splits"><td>{{ person.name }}</td>{% for year in budgets[0].FYs %}<th>{{ (person[year].taskhours/40)|floatformat }}{% set total = total + (person[year].taskhours/40)|floatformat %}</th>{% endfor %}
+          <th>{{ total|floatformat }}</th></tr>
           {% endfor %}
           </table>
           <p/><p/>
@@ -45,31 +45,31 @@
           <th>({{ year }})</th><td></td><td></td>{% set budgetPeriod = budgetPeriod + 1 %}{% endfor %}</tr>
           <tr><th align="left" style="width: 400px;" >A Senior/Key People</th>
           {% for year in budgets[0].FYs %}<td></td><td></td><td></td><td></td>
-          <td>{{ proposals[0].peopletotals[year].total|number_format(2,'.','') }}</td>{% endfor %}</tr>
+          <td>{{ proposals[0].peopletotals[year].total|floatformat }}</td>{% endfor %}</tr>
           <tr><th align="left" ><em>Name (Role)</em></th>
           {% for year in budgets[0].FYs %}<td></td><th>Months</th><th>Requested Salary</th><th>Fringe Benefits</th><th>Funds Requested</th>
           {% endfor %}</tr>
           {% for person in proposals[0].people %}
           <tr class="splits"><th>{{ person.name }}</th>{% for year in budgets[0].FYs %}<td></td>
-          <td>{{ (person[year].taskhours/160)|number_format(2,'.','') }}</td><td>{{ person[year].salaryreqcosts|number_format(2,'.','') }}</td>
-          <td>{{ person[year].benefitsreqcosts|number_format(2,'.','') }}</td>
-          <td>{{ (person[year].salaryreqcosts + person[year].benefitsreqcosts)|number_format(2,'.','') }}</td>
+          <td>{{ (person[year].taskhours/160)|floatformat }}</td><td>{{ person[year].salaryreqcosts|floatformat }}</td>
+          <td>{{ person[year].benefitsreqcosts|floatformat }}</td>
+          <td>{{ (person[year].salaryreqcosts + person[year].benefitsreqcosts)|floatformat }}</td>
           {% endfor %}
           </tr>
           {% endfor %}
           <tr class="bordered" style="height: 40px;"><td></td>{% for year in budgets[0].FYs %}<td></td><td></td><td></td><td></td><td></td>{% endfor %}</tr>
           <tr class="bordered"><th class="bordered">C. Equipment Description</th>{% for year in budgets[0].FYs %}<td></td><td></td><td></td><td></td>
-          <th class="bordered">{{ budgets[0].FY[year].equipmenttotal|number_format(2,'.','') }}</th>{% endfor %}</tr>
+          <th class="bordered">{{ budgets[0].FY[year].equipmenttotal|floatformat }}</th>{% endfor %}</tr>
           {% for equipment in budgets[0].equipmentlist %}
           <tr class="splits"><th>{{ equipment }}</th>{% for year in budgets[0].FYs %}
-          <td></td><td></td><td></td><td></td><td>{{ budgets[0].FY[year].equipment[equipment]|number_format(2,'.','') }}</td>{% endfor %}</tr>
+          <td></td><td></td><td></td><td></td><td>{{ budgets[0].FY[year].equipment[equipment]|floatformat }}</td>{% endfor %}</tr>
           {% endfor %}
           <tr class="bordered" style="height: 40px;"><td></td>{% for year in budgets[0].FYs %}<td></td><td></td><td></td><td></td><td></td>{% endfor %}</tr>
           <tr class="bordered"><th class="bordered">D. Travel</th>{% for year in budgets[0].FYs %}<td></td><td></td><td></td><td></td><td></td>{% endfor %}</tr>
           <tr class="splits"><th>Travel Domestic (Incl. Canada, Mexico)</th>{% for year in budgets[0].FYs %}<td></td><td></td><td></td><td></td>
-          <th>{{ proposals[0].conferencetotals['D1'][year]|number_format(2,'.','') }}</th>{% endfor %}</tr>
+          <th>{{ proposals[0].conferencetotals['D1'][year]|floatformat }}</th>{% endfor %}</tr>
           <tr class="splits"><th>Travel Foreign</th>{% for year in budgets[0].FYs %}<td></td><td></td><td></td><td></td>
-          <th>{{ proposals[0].conferencetotals['D2'][year]|number_format(2,'.','') }}</th>{% endfor %}</tr>
+          <th>{{ proposals[0].conferencetotals['D2'][year]|floatformat }}</th>{% endfor %}</tr>
           <tr class="bordered" style="height: 40px;"><td></td>{% for year in budgets[0].FYs %}<td></td><td></td><td></td><td></td><td></td>{% endfor %}</tr>
           <tr class="bordered"><th class="bordered" align="left" >E. Participant/Trainee Support Costs</th>
           {% for year in budgets[0].FYs %}<td></td><td></td><td></td><td></td><th class="bordered">0.00</th>{% endfor %}</tr>
@@ -83,41 +83,41 @@
           <tr class="bordered" style="height: 40px;"><td></td>{% for year in budgets[0].FYs %}<td></td><td></td><td></td><td></td><td></td>{% endfor %}</tr>
           <tr class="bordered"><th class="bordered">F. Other Direct Costs</th>{% for year in budgets[0].FYs %}
           <td></td><td></td><td></td><td></td>
-          <th class="bordered">{{ budgets[0].FY[year].expensestotal|number_format(2,'.','') }}</th>{% endfor %}</tr>
+          <th class="bordered">{{ budgets[0].FY[year].expensestotal|floatformat }}</th>{% endfor %}</tr>
           <tr class="splits"><th>Materials and Supplies</th>{% for year in budgets[0].FYs %}<td></td><td></td><td></td><td></td><td>
-            {{ budgets[0].FY[year]['Materials and Supplies']|number_format(2,'.','') }}</td>{% endfor %}</tr>
+            {{ budgets[0].FY[year]['Materials and Supplies']|floatformat }}</td>{% endfor %}</tr>
           <tr class="splits"><th>Publication Costs</th>{% for year in budgets[0].FYs %}<td></td><td></td><td></td><td></td><td>
-            {{ budgets[0].FY[year]['Publication Costs']|number_format(2,'.','') }}</td>{% endfor %}</tr>
+            {{ budgets[0].FY[year]['Publication Costs']|floatformat }}</td>{% endfor %}</tr>
           <tr class="splits"><th>Consultant Services</th>{% for year in budgets[0].FYs %}<td></td><td></td><td></td><td></td><td>
-            {{ budgets[0].FY[year]['Consultant Services']|number_format(2,'.','') }}</td>{% endfor %}</tr>
+            {{ budgets[0].FY[year]['Consultant Services']|floatformat }}</td>{% endfor %}</tr>
           <tr class="splits"><th>ADP/Computer Services</th>{% for year in budgets[0].FYs %}<td></td><td></td><td></td><td></td><td>
-            {{ budgets[0].FY[year]['ADP/Computer Services']|number_format(2,'.','') }}</td>{% endfor %}</tr>
+            {{ budgets[0].FY[year]['ADP/Computer Services']|floatformat }}</td>{% endfor %}</tr>
           <tr class="splits"><th>Subawards/Consortium/Contractual Costs</th>{% for year in budgets[0].FYs %}<td></td><td></td><td></td><td></td><td>
-            {{ budgets[0].FY[year]['Subawards/Consortium/Contractual Costs']|number_format(2,'.','') }}</td>{% endfor %}</tr>
+            {{ budgets[0].FY[year]['Subawards/Consortium/Contractual Costs']|floatformat }}</td>{% endfor %}</tr>
           <tr class="splits"><th>Directed Funded Contracts (no USGS overhead)</th>{% for year in budgets[0].FYs %}<td></td><td></td><td></td><td></td><td>
-            {{ budgets[0].FY[year]['Directed Funded Contracts (no USGS overhead)']|number_format(2,'.','') }}</td>{% endfor %}</tr>
+            {{ budgets[0].FY[year]['Directed Funded Contracts (no USGS overhead)']|floatformat }}</td>{% endfor %}</tr>
           <tr class="splits"><th>Equipment or Facilities Rental/User Fees</th>{% for year in budgets[0].FYs %}<td></td><td></td><td></td><td></td><td>
-            {{ budgets[0].FY[year]['Equipment or Facilities Rental/User Fees']|number_format(2,'.','') }}</td>{% endfor %}</tr>
+            {{ budgets[0].FY[year]['Equipment or Facilities Rental/User Fees']|floatformat }}</td>{% endfor %}</tr>
           <tr class="splits"><th>Alterations and Renovations</th>{% for year in budgets[0].FYs %}<td></td><td></td><td></td><td></td><td>
-            {{ budgets[0].FY[year]['Alterations and Renovations']|number_format(2,'.','') }}</td>{% endfor %}</tr>
+            {{ budgets[0].FY[year]['Alterations and Renovations']|floatformat }}</td>{% endfor %}</tr>
           <tr class="splits"><th>Other</th>{% for year in budgets[0].FYs %}<td></td><td></td><td></td><td></td><td>
-            {{ budgets[0].FY[year]['Other']|number_format(2,'.','') }}</td>{% endfor %}</tr>
+            {{ budgets[0].FY[year]['Other']|floatformat }}</td>{% endfor %}</tr>
 
           <tr class="bordered" style="height: 40px;"><td></td>{% for year in budgets[0].FYs %}<td></td><td></td><td></td><td></td><td></td>{% endfor %}</tr>
           <tr class="bordered"><th class="bordered">G. Direct Costs</th>{% for year in budgets[0].FYs %}<td></td><td></td><td></td><td></td>
           <th class="bordered">{{ (budgets[0].FY[year].staffing + budgets[0].FY[year].travel + 
-          budgets[0].FY[year].expensestotal + budgets[0].FY[year].equipmenttotal)|number_format(2,'.','') }}</th>{% endfor %}</tr>
+          budgets[0].FY[year].expensestotal + budgets[0].FY[year].equipmenttotal)|floatformat }}</th>{% endfor %}</tr>
 
           <tr class="bordered" style="height: 40px;"><td></td>{% for year in budgets[0].FYs %}<td></td><td></td><td></td><td></td><td></td>{% endfor %}</tr>
           <tr class="bordered splits"><th class="bordered" >H INDIRECT COSTS</th>
           {% for year in budgets[0].FYs %}<td></td><td></td><td></td><td></td>
-          <th class="bordered splits">{{ budgets[0].FY[year].overhead|number_format(2,'.','') }}</th>{% endfor %}</tr>
+          <th class="bordered splits">{{ budgets[0].FY[year].overhead|floatformat }}</th>{% endfor %}</tr>
 
           <tr class="bordered" style="height: 40px;"><td></td>{% for year in budgets[0].FYs %}<td></td><td></td><td></td><td></td><td></td>{% endfor %}</tr>
           <tr class="bordered"><th class="bordered">I DIRECT AND INDIRECT COSTS</th>
           {% for year in budgets[0].FYs %}<td></td><td></td><td></td><td></td>
           <th class="bordered">{{ (budgets[0].FY[year].staffing + budgets[0].FY[year].travel +
-                    budgets[0].FY[year].expensestotal + budgets[0].FY[year].equipmenttotal + budgets[0].FY[year].overhead)|number_format(2,'.','') }}</th>
+                    budgets[0].FY[year].expensestotal + budgets[0].FY[year].equipmenttotal + budgets[0].FY[year].overhead)|floatformat }}</th>
           {% endfor %}</tr>
 
           <tr class="bordered" style="height: 40px;"><td></td>{% for year in budgets[0].FYs %}<td></td><td></td><td></td><td></td><td></td>{% endfor %}</tr>
@@ -128,7 +128,7 @@
           <tr class="bordered"><th class="bordered">K. Budget Total</th>
           {% for year in budgets[0].FYs %}<td></td><td></td><td></td><td></td>
           <th class="bordered">{{ (budgets[0].FY[year].staffing + budgets[0].FY[year].travel +
-                    budgets[0].FY[year].expensestotal + budgets[0].FY[year].equipmenttotal + budgets[0].FY[year].overhead)|number_format(2,'.','') }}</th>
+                    budgets[0].FY[year].expensestotal + budgets[0].FY[year].equipmenttotal + budgets[0].FY[year].overhead)|floatformat }}</th>
           {% endfor %}</tr>
           </table>
         </div>
