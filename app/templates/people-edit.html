@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        
+
         <script src="{{url_for ('static', filename='js/date-tools.js') }}"></script>
     </head>
     <body>
@@ -97,7 +97,7 @@
           "processing": true,
           "serverSide": false,
           'autoWidth': false,
-          "ajax": "/salary/ajax/get?peopleid=" + {{ people[0].peopleid|tojson }}
+          "ajax": "/salary/ajax/get?peopleid=" + {{ people[0].peopleid }}
         } );
       }
 
@@ -108,7 +108,7 @@
             "processing": true,
             "serverSide": false,
             'autoWidth': false,
-            "ajax": "/people/ajax/task?peopleid=" + {{ people[0].peopleid|tojson }}
+            "ajax": "/people/ajax/task?peopleid=" + {{ people[0].peopleid }}
           } );
 
         $("#effdate").datepicker();

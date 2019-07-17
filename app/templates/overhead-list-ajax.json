@@ -1,7 +1,11 @@
 {"draw":0,"recordsTotal":{{ overheadrates|length }},"recordsFiltered":{{ overheadrates|length }},"data":[
 {% for rate in overheadrates %}
-  {% if (((remote_user[0].admin == 't') and (proposalid != "null")) or ((remote_user[0].peopleid == proposals[0].peopleid) and (rate.proposalid matches '/^\\d+$/'))) %}
+  {% if (((g.user.admin) and (rate.proposalid != "null")) or ((g.user.peopleid == proposals[0].peopleid) )) %}
   ["<a href='javascript:void(0)' onclick='editOverheadDialog({{ rate.overheadid }}, {{ rate.proposalid }})'>{{ rate.rate }}%</a>",
-    {% else %} ["{{ rate.rate }}%", {% endif %} "{{ rate.description }}", "{{ rate.FY }}", "{% if (((remote_user[0].admin == 't') and (proposalid != "null")) or ((remote_user[0].peopleid == proposals[0].peopleid) and (rate.proposalid matches '/^\\d+$/'))) %}<a href='javascript:void(0)' onclick='deleteOverheadDialog({{ rate.overheadid }}, {{ rate.proposalid }})'><img src='images/trash-2-32.png' title='Delete Rate'></a>{% endif %}"]{% if loop.last != true %},{% endif %}
+    {% else %} ["{{ rate.rate }}%",
+      {% endif %}
+      "{{ rate.description }}", "{{ rate.effectivedate|fyformat }}", "{% if (((g.user.admin) and (proposalid != "null")) or ((g.user.peopleid == proposals[0].peopleid) )) %}<a href='javascript:void(0)' onclick='deleteOverheadDialog({{ rate.overheadid }}, {{ rate.proposalid }})'><img src={{url_for('static', filename='images/trash-2-32.png') }} title='Delete Rate'></a>{% endif %}"]
+      {% if loop.last != true %},
+      {% endif %}
 {% endfor %}
 ]}

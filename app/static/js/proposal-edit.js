@@ -111,7 +111,8 @@ function loadOverheadTable (reload, proposalid) {
     'processing': true,
     'serverSide': false,
     'autoWidth': false,
-    'ajax': 'index.php?view=overhead-list-json&proposalid=' + proposalid,
+    'ajax': '/overhead/ajax/get?proposalid=' + proposalid,
+    //'ajax': '/overhead/ajax/get',
     'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
   } );
 

@@ -1,7 +1,8 @@
 from flask import Flask, render_template, url_for, g, request, abort
 from flask_cas import CAS, login_required, login
 from database import (db, Conferences, ConferenceRates, ConferenceAttendee, Expenses, ExpenseTypes,
-					  Funding, FundingPrograms, People, Proposals, Salaries, Tasks) 
+					  Funding, FundingPrograms, OverheadRates, People, Proposals, Salaries, Staffing,
+					  Tasks)
 
 def currencyformat(value):
 	if value is None:
@@ -26,6 +27,15 @@ def jsonformat(string):
 	string = string.replace('"', r'\"')
 	return string
 
+def fyformat(datestring):
+	month = datestring.month
+	day = datestring.day
+	year = datestring.year
+	if month >= 10 and day >= 1:
+		year_string = "FY" + str(year+1).replace("20", "")
+	else:
+		year_string = "FY" + str(year).replace("20", "")
+	return year_string
 
 app = Flask(__name__)
 cas = CAS(app, '/cas')
@@ -34,6 +44,7 @@ app.jinja_env.filters['currencyformat'] = currencyformat
 app.jinja_env.filters['dateformat'] = dateformat
 app.jinja_env.filters['intformat'] = intformat
 app.jinja_env.filters['jsonformat'] = jsonformat
+app.jinja_env.filters['fyformat'] = fyformat
 db.init_app(app)
 
 @app.before_request
@@ -220,8 +231,24 @@ def overhead():
 @login_required
 def get_overhead(path):
 	filters = []
-	#if request.args.get('proposalid'):
-	#	filters.append.()
+
+	if request.args.get('proposalid'):
+		if request.args.get('proposalid') == 'null':
+			filters.append(OverheadRates.proposalid == None)
+		else:
+			filters.append(OverheadRates.proposalid == request.args.get('proposalid'))
+	#if request.args.get('_'):
+	#	filters.append(OverheadRates.proposalid == request.args.get('_'))
+
+
+	overheadrates = OverheadRates.get_many(joins = [], filters = filters, orders = [])
+	#overhead = OverheadRates.get_all()
+
+	if path == 'get':
+		return render_template('overhead-list-ajax.json', overheadrates = overheadrates)
+		#return render_template('overhead-list-ajax.json')
+	else:
+		abort(404)
 
 
 # PROPOSALS
@@ -277,14 +304,22 @@ def people():
 @login_required
 def get_people(path):
 	filters = []
-	if request.args.get('peopleid'):
-		filters.append(People.peopleid == request.args.get('peopleid'))
-	if request.args.get('name'):
-		filters.append(People.name == request.args.get('name'))
+	if path == 'task':
+		if request.args.get('peopleid'):
+			filters.append(Staffing.peopleid == request.args.get('peopleid'))
+	else:
+		if request.args.get('peopleid'):
+			filters.append(People.peopleid == request.args.get('peopleid'))
+	#if request.args.get('name'):
+	#	filters.append(People.name == request.args.get('name'))
 
 	people = People.get_many(joins = [Salaries],
-							 filters = filters,
+						     filters = filters,
 							 orders = [])
+
+	staffing = Staffing.get_many(joins = [Tasks, People, Proposals],
+								 filters = filters,
+								 orders = [])
 
 	if path == 'dropdown':
 		return render_template('people-dropdown-list-ajax.json', people = people)
@@ -293,7 +328,7 @@ def get_people(path):
 	elif path == 'get':
 		return render_template('people-list-ajax.json', people = people)
 	elif path == 'task':
-		return render_template('people-task-list.json', people = people)
+		return render_template('people-task-list-ajax.json', staffing = staffing)
 	else:
 		abort(404)
 
@@ -314,6 +349,7 @@ def getSalaries(path):
 		return render_template('salary-list-ajax.json', salaries = salaries)
 	else:
 		abort(404)
+
 
 
 # TASKS

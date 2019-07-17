@@ -3,9 +3,9 @@
     <head>
         <title>Proposal Budget Overhead Rates</title>
         {% include 'menu-header.html' %}
-        <script src="js/proposal-edit.js"></script>
-        <script src="js/date-tools.js"></script>
-        <script src="js/row_setting.js"></script>
+        <script src="{{url_for('static', filename='js/proposal-edit.js') }}"></script>
+        <script src="{{url_for('static', filename='js/date-tools.js') }}"></script>
+        <script src="{{url_for('static', filename='js/row_setting.js') }}"></script>
     </head>
     {% for error in debug %}
       <pre>error.msg</pre>
