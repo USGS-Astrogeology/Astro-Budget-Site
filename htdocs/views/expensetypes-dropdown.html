@@ -1,6 +1,0 @@
-<select name='{{ dropdown_name }}' id='{{ dropdown_id }}'>
-{% for expense in expensetypes %}
-  <option value='{{ expense.expensetypeid }}' {% if expense.expensetypeid == selected_expensetypeid %}selected {% endif %}>
-    {{ expense.description }}</option>
-{% endfor %}
-</select>
