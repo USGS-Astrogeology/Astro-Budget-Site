@@ -64,14 +64,14 @@
                   <td><input type='text' name='awardnumber' value='{{ proposals[0].awardnumber }}'/></td></tr>
                 <tr><th>Starting</th>
                   <td><input type='text' id='proposalperfperiodstart' name='perfperiodstart'
-                       value='{{ proposals[0].perfperiodstart }}' onchange='updateDropdown("proposalperfperiodstart");'/>
+                       value='{{ proposals[0].perfperiodstart|dateformat }}' onchange='updateDropdown("proposalperfperiodstart");'/>
                     {% with dropdown_name = 'perfperiodstart', dropdown_id = 'proposalperfperiodstart', selected_fy = proposals[0].perfperiodstart %}
                       {% include 'fiscalyear-dropdown.html' %}
                     {% endwith %}
                   </td>
                   <th>Ending</th>
                   <td><input type='text' id='proposalperfperiodend' name='perfperiodend'
-                       value='{{ proposals[0].perfperiodend }}' onchange='updateDropdown("proposalperfperiodend");'/>
+                       value='{{ proposals[0].perfperiodend|dateformat }}' onchange='updateDropdown("proposalperfperiodend");'/>
                     {% with dropdown_name = 'perfperiodend', dropdown_id = 'proposalperfperiodend', selected_fy = proposals[0].perfperiodend %}
                       {% include 'fiscalyear-dropdown.html' %}
                     {% endwith %}
@@ -84,7 +84,7 @@
               </table>
               </form>
             </div>
-          <h3 id='fundingTitle' >Funding</h3>
+          <h3 id='fundingTitle'>Funding</h3>
             <div id='fundingDiv' style='height: 400px;'>
               <a href='javascript:void(0)' onClick="editFundingDialog('new', {{ proposals[0].proposalid }})" id='newFundingButton'>New</a><p/>
               <br>
@@ -186,12 +186,12 @@
           $('#basisButton').button();
           $('#rosesButton').button();
 
-          loadFundingTable(false, {{ proposals[0].proposalid }});
-          loadFbmsTable(false, {{ proposals[0].proposalid }});
-          loadOverheadTable(false, {{ proposals[0].proposalid }});
-          loadTasksTable(false, {{ proposals[0].proposalid }});
-          loadConferencesTable(false, {{ proposals[0].proposalid }});
-          loadExpensesTable(false, {{ proposals[0].proposalid }});
+          loadFundingTable(false, '{{ proposals[0].proposalid }}');
+          loadFbmsTable(false, '{{ proposals[0].proposalid }}');
+          loadOverheadTable(false, '{{ proposals[0].proposalid }}');
+          loadTasksTable(false, '{{ proposals[0].proposalid }}');
+          loadConferencesTable(false, '{{ proposals[0].proposalid }}');
+          loadExpensesTable(false, '{{ proposals[0].proposalid }}');
 
           updateDropdown('proposalperfperiodstart');
           updateDropdown('proposalperfperiodend');

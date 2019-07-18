@@ -1,9 +1,9 @@
 {"draw":0,"recordsTotal":{{ expenses|length }},"recordsFiltered":{{ expenses|length }},"data":[
   {% for expense in expenses %}
   ["<a href='javascript:void(0)' onclick='editExpenseDialog({{ expense.expenseid }}, {{ expense.proposalid }})'>{{ expense.description }}</a>", 
-   "{{ expense.type }}", 
+   "{{ expense.expensetype.description }}", 
    "{{ expense.amount|currencyformat }}", 
-   "{{ expense.fiscalyear|dateformat }}", 
+   "{{ expense.fiscalyear|fyformat }}", 
    "<a href='javascript:void(0)' onclick='deleteExpenseDialog({{ expense.expenseid}}, {{ expense.proposalid }})'><img src='{{ url_for("static", filename="images/trash-2-32.png") }}'></a>"]
    {% if loop.last !=true %},{% endif %}
   {% endfor %}

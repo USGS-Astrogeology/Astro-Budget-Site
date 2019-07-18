@@ -65,9 +65,7 @@
               <th>LAF</th><td><input type="text" id="laf" name="laf" size="4"/></td></tr>
           <tr><th>Effective Date</th><td><input type="text" id="effdate" name="effdate" size="16"
                   onchange="updateDropdown('effdate');"/>
-                  {% with dropdown_name = 'effdate',
-                                          dropdown_id = 'effdate',
-                                           selected_fy = '' %}
+                  {% with dropdown_name = 'effdate', dropdown_id = 'effdate', selected_fy = '' %}
                        {% include "fiscalyear-dropdown.html" %}
                   {% endwith %}
               </td>

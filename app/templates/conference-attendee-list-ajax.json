@@ -1,17 +1,20 @@
 {"draw":0,"recordsTotal":{{ conferenceattendees|length }},"recordsFiltered":{{ conferenceattendees|length }},"data":[
-{% for attendee in conferenceattendees %}
-    ["<a href='javascript:void(0)' onclick='editAttendeeDialog({{ attendee.proposal.proposalid }}, {{ attendee.travelid }})'>{{ attendee.meeting }}</a>",
-    {{ attendee.travelers }}, 
-    "{{ attendee.startdate }}", 
-    "{{ attendee.FY }}", 
-    {{ attendee.meetingdays }}, 
-    {{ attendee.traveldays }}, 
-    "{{ attendee.conferencerate[0].airfarecosts|currencyformat }}", 
-    "{{ attendee.conferencerate[0].groundtransportcosts|currencyformat }}", 
-    "{{ (attendee.conferencerate[0].registrationcosts + attendee.conferencerate[0].othercosts)|currencyformat }}", 
-    "{{ attendee.conferencerate[0].perdiemcosts|currencyformat }}", 
-    "{{ attendee.conferencerate[0].lodgingcosts|currencyformat }}", 
-    "{{ attendee.conferencerate[0].totalcost|currencyformat }}",
-    "<a href='javascript:void(0)' onclick='deleteAttendeeDialog({{ attendee.travelid}}, {{ proposals[0].proposalid }})'><img src='images/trash-2-32.png' title='Delete Trip'></a>"]
-    {% if loop.last !=true %},{% endif %}{% endfor %}
-    ]}
+    {% for attendee in conferenceattendees %}
+        {% set conferencerate = attendee.conference.conferencerates[0] %}
+        ["<a href='javascript:void(0)' onclick='editAttendeeDialog({{ attendee.proposal.proposalid }}, {{ attendee.travelid }})'>{{ attendee.conference.meeting }}</a>",
+        {{ attendee.travelers }}, 
+        "{{ attendee.startdate|dateformat }}", 
+        "{{ attendee.startdate|fyformat }}", 
+        {{ attendee.meetingdays }}, 
+        {{ attendee.traveldays }}, 
+        "{{ conferencerate.airfare|currencyformat }}", 
+        "{{ conferencerate.groundtransport|currencyformat }}", 
+        "{{ conferencerate.registration|currencyformat }}", 
+        "{{ conferencerate.perdiem|currencyformat }}", 
+        "{{ conferencerate.lodging|currencyformat }}", 
+        {% set totalcost = conferencerate.airfare + conferencerate.groundtransport + conferencerate.registration + conferencerate.perdiem + conferencerate.lodging %}
+        "{{ totalcost|currencyformat }}",
+        "<a href='javascript:void(0)' onclick='deleteAttendeeDialog({{ attendee.travelid}}, {{ attendee.proposal.proposalid }})'><img src='{{ url_for("static", filename="images/trash-2-32.png") }}' title='Delete Trip'></a>"]
+        {% if loop.last !=true %},{% endif %}
+    {% endfor %}
+]}

@@ -31,7 +31,7 @@ class People(Base):
   username       = Column(String(32))
   admin          = Column(Boolean)
   row_preference = Column(Integer)
-  salaries       = relationship('Salaries', backref='person')
+  salaries       = relationship('Salaries', backref='person', order_by="desc(Salaries.effectivedate)")
   proposals      = relationship('Proposals', backref='person')
   staffing       = relationship('Staffing', backref='person')
 
@@ -116,7 +116,7 @@ class Conferences(Base):
 
   conferenceid        = Column(Integer, Sequence('conferences_conferenceid_seq'), primary_key=True)
   meeting             = Column(String(256))
-  conferencerates     = relationship('ConferenceRates', backref='conference')
+  conferencerates     = relationship('ConferenceRates', backref='conference', order_by='desc(ConferenceRates.effectivedate)')
   conferenceattendees = relationship('ConferenceAttendee', backref='conference')
 
   def __repr__(self):

@@ -1,9 +1,9 @@
 {"draw":0,"recordsTotal":{{ funding|length }},"recordsFiltered":{{ funding|length }},"data":[
 {% for fund in funding %}
   {% if g.user.admin %}
-    ["<a href='javascript:void(0)' onclick='editFundingDialog({{ fund.fundingid }}, {{ fund.proposalid }})'>{{ fund.fiscalyear }}</a>",
+    ["<a href='javascript:void(0)' onclick='editFundingDialog({{ fund.fundingid }}, {{ fund.proposalid }})'>{{ fund.fiscalyear|fyformat }}</a>",
   {% else %}
-    ["{{ fund.fiscalyear }}",
+    ["{{ fund.fiscalyear|fyformat }}",
   {% endif %}
   "{{ fund.newfunding|currencyformat }}",
   "{{ fund.carryover|currencyformat }}",

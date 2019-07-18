@@ -88,7 +88,7 @@ function loadFbmsTable (reload, proposalid) {
     "processing": true,
     "serverSide": false,
     "autoWidth": false,
-    'ajax': 'index.php?view=fbms-list-json&proposalid=' + proposalid,
+    'ajax': '/fbmsaccounts/ajax/get?proposalid=' + proposalid,
     'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
   } );
 
@@ -112,7 +112,6 @@ function loadOverheadTable (reload, proposalid) {
     'serverSide': false,
     'autoWidth': false,
     'ajax': '/overhead/ajax/get?proposalid=' + proposalid,
-    //'ajax': '/overhead/ajax/get',
     'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
   } );
 
@@ -563,8 +562,7 @@ function deleteFunding(fundingid, proposalid) {
 }
 
 function editOverheadDialog(overheadid, proposalid) {
-  $("#editDialog").load(
-    "index.php?view=overhead-edit&proposalid=" + proposalid + "&overheadid=" + overheadid);
+  $("#editDialog").load('/overheadrates/ajax/edit?proposalid=' + proposalid);
 
   dialog = $("#editDialog").dialog({
     autoOpen: false,

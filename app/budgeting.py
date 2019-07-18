@@ -1,8 +1,8 @@
 from flask import Flask, render_template, url_for, g, request, abort
 from flask_cas import CAS, login_required, login
-from database import (db, Conferences, ConferenceRates, ConferenceAttendee, Expenses, ExpenseTypes,
+from database import (db, Conferences, ConferenceRates, ConferenceAttendee, Expenses, ExpenseTypes, FBMSAccounts,
 					  Funding, FundingPrograms, OverheadRates, People, Proposals, Salaries, Staffing,
-					  Tasks)
+					  Statuses, Tasks)
 
 def currencyformat(value):
 	if value is None:
@@ -32,10 +32,17 @@ def fyformat(datestring):
 	day = datestring.day
 	year = datestring.year
 	if month >= 10 and day >= 1:
-		year_string = "FY" + str(year+1).replace("20", "")
+		year_string = "FY" + str(year+1).replace("20", "", 1)
 	else:
-		year_string = "FY" + str(year).replace("20", "")
+		year_string = "FY" + str(year).replace("20", "", 1)
 	return year_string
+
+def fiscal_years():
+	return ['FY13', 'FY14', 'FY15', 'FY16', 'FY17', 'FY18', 'FY19', 'FY20', 'FY21']
+
+def start_dates():
+	return ['10/01/2012', '10/01/2013', '10/01/2014', '10/01/2015', '10/01/2016',
+			'10/01/2017', '10/01/2018', '10/01/2019', '10/01/2020']
 
 app = Flask(__name__)
 cas = CAS(app, '/cas')
@@ -79,9 +86,8 @@ def get_conferences(path):
 
 	if path == 'edit':
 		return render_template('conference-edit.html', conferences = conferences,
-													   dd_fiscalyears = ['FY13', 'FY14', 'FY15', 'FY16', 'FY17', 'FY18', 'FY19', 'FY20', 'FY21'],
-													   dd_startdates = ['10/01/2012', '10/01/2013', '10/01/2014', '10/01/2015', '10/01/2016',
-					  													'10/01/2017', '10/01/2018', '10/01/2019', '10/01/2020'])
+													   dd_fiscalyears = fiscal_years(),
+													   dd_startdates = start_dates())
 	elif path == 'get':
 		return render_template('conferences-list-ajax.json', conferences = conferences)
 	else:
@@ -130,9 +136,9 @@ def get_conferenceattendees(path):
 													  orders = [])
 
 	if path == 'edit':
-		return render_template('conference-attendee-edit.html')
+		return render_template('conference-attendee-edit.html', conferenceattendees = conferenceattendees)
 	elif path == 'get':
-		return render_template('conference-attendee-list-ajax.json')
+		return render_template('conference-attendee-list-ajax.json', conferenceattendees = conferenceattendees)
 	else:
 		abort(404)
 
@@ -177,6 +183,24 @@ def get_expensetypes(path):
 	else:
 		abort(404)
 
+# FBMSACCOUNTS
+@app.route('/fbmsaccounts/ajax/<path:path>')
+@login_required
+def get_fbmsaccounts(path):
+	filters = []
+	if request.args.get('proposalid'):
+		filters.append(FBMSAccounts.proposalid == request.args.get('proposalid'))
+	
+	fbmsaccounts = FBMSAccounts.get_many(joins = [], filters = filters, orders = [])
+
+	if path == 'edit':
+		return render_template('fbms-edit.html', fbmsaccounts = fbmsaccounts)
+	elif path == 'get':
+		return render_template('fbms-list-ajax.json', fbmsaccounts = fbmsaccounts)
+	else:
+		abort(404)
+
+
 # FUNDING
 @app.route('/funding/ajax/<path:path>')
 @login_required
@@ -211,17 +235,15 @@ def get_programs(path):
 
 	if path == 'edit':
 		return render_template('programs-edit.html', programs = programs,
-													 dd_fiscalyears = ['FY13', 'FY14', 'FY15', 'FY16', 'FY17', 'FY18', 'FY19', 'FY20', 'FY21'],
-													 dd_startdates = ['10/01/2012', '10/01/2013', '10/01/2014', '10/01/2015', '10/01/2016',
-					  													'10/01/2017', '10/01/2018', '10/01/2019', '10/01/2020'])
+													 dd_fiscalyears = fiscal_years(),
+													 dd_startdates = start_dates())
 	elif path == 'get':
 		return render_template('programs-list-ajax.json', programs = programs)
 	else:
 		abort(404)
 
 
-
-# overhead
+# OVERHEAD
 @app.route('/overhead', methods=['GET', 'POST'])
 @login_required
 def overhead():
@@ -237,16 +259,15 @@ def get_overhead(path):
 			filters.append(OverheadRates.proposalid == None)
 		else:
 			filters.append(OverheadRates.proposalid == request.args.get('proposalid'))
-	#if request.args.get('_'):
-	#	filters.append(OverheadRates.proposalid == request.args.get('_'))
-
 
 	overheadrates = OverheadRates.get_many(joins = [], filters = filters, orders = [])
-	#overhead = OverheadRates.get_all()
+	if not overheadrates:
+		overheadrates = OverheadRates.get_many(joins = [], filters = [OverheadRates.proposalid == None], orders = [])
 
-	if path == 'get':
+	if path == 'edit':
+		return render_template('overhead-edit.html', overheadrates = overheadrates)
+	elif path == 'get':
 		return render_template('overhead-list-ajax.json', overheadrates = overheadrates)
-		#return render_template('overhead-list-ajax.json')
 	else:
 		abort(404)
 
@@ -267,7 +288,12 @@ def get_proposals(path):
 	proposals = Proposals.get_many(joins = [], filters = filters, orders = [])
 
 	if path == 'edit':
-		return render_template('proposal-edit.html', proposals = proposals)
+		return render_template('proposal-edit.html', proposals = proposals,
+													 people = People.get_all(orders = [People.name]),
+													 programs = FundingPrograms.get_all(orders = [FundingPrograms.programname]),
+													 statuses = Statuses.get_all(orders = [Statuses.statusname]),
+													 dd_fiscalyears = fiscal_years(),
+													 dd_startdates = start_dates())
 	elif path == 'get':
 		return render_template('proposal-list-ajax.json', proposals = proposals)
 	else:
@@ -299,7 +325,6 @@ def budget_reports(proposalid):
 def people():
 	return render_template('people.html')
 
-
 @app.route('/people/ajax/<path:path>')
 @login_required
 def get_people(path):
@@ -324,7 +349,9 @@ def get_people(path):
 	if path == 'dropdown':
 		return render_template('people-dropdown-list-ajax.json', people = people)
 	elif path == 'edit':
-		return render_template('people-edit.html', people = people)
+		return render_template('people-edit.html', people = people,
+												   dd_fiscalyears = fiscal_years(),
+												   dd_startdates = start_dates())
 	elif path == 'get':
 		return render_template('people-list-ajax.json', people = people)
 	elif path == 'task':
