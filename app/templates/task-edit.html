@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Editing {{ task.name }}</title>
+        <script src="js/date-tools.js"></script>
+    </head>
+    <body>
+    <div id="taskedittabs">
+      <ul>
+        <li><a href="#tasktab">Task</a></li>
+        <li><a href="#stafftab">Staffing</a></li>
+      </ul>
+    <div id="tasktab">
+        {% set taskid = 0 %}
+        {% for task in tasks %}
+          <form id="taskForm" action="index.php" method="GET">
+            <input type="hidden" name="act" value="save"/>
+            <input type="hidden" name="view" value="task-save"/>
+            <input type="hidden" id="proposalid" name="proposalid" value="{{ task.proposalid }}"/>
+            <input type="hidden" id="taskid" name="taskid" value="{{ task.taskid }}"/>{% set taskid = task.taskid %}
+            <table><tr><th>Task Name</th>
+            <td><input type="text" name="taskname" id="taskname" value="{{ task.taskname }}" size="40"/></td></tr>
+            <tr><td><a href='javascript:void(0)' onClick="staffingEdit({{ task.taskid }}, 'new')" id='newStaffButton'>New Staffing</a></td><td></td></tr>
+            </table>
+          </form>
+        {% endfor %}
+        <div id="taskStaffingTableDiv">
+        <table id='taskStaffingTable' class='display' cellspacing='0' width='100%'>
+           <thead>
+             <tr><th>Task</th><th>Staffing</th><th>Hours</th><th>Est. Cost<br/>(Est Sal + Ben w/ LAF)</th><th>FY</th>
+             </tr>
+           </thead>
+        </table>
+        </div>
+    </div>
+    <div id="stafftab">
+      <form id="staffingForm" action="index.php" method="GET">
+        <input type="hidden" name="act" value="save"/>
+        <input type="hidden" name="view" value="staffing-save"/>
+        <input type="hidden" id="taskid" name="taskid" value="{{ tasks[0].taskid }}"/>
+        <input type="hidden" id="staffingid" name="staffingid" value=""/>
+        <table>
+          <tr><th>Person</th><td>
+              {% include 'people-dropdown.html' with {'dropdown_name': 'staffingpeopleid',
+                                                      'dropdown_id': 'staffingpeopleid',
+                                                      'selected_peopleid': 1 } %}
+              </td>
+          </tr>
+          <tr>
+          </td><th>Fiscal Year</th><td><input type="text" id="fiscalyear" name="fiscalyear" size="20"
+               value="{{ tasks[0].fiscalyear }}" onchange="updateDropdown('fiscalyear');"/>
+                {% include 'fiscalyear-dropdown.html' with {'dropdown_name': 'fiscalyear',
+                                                        'dropdown_id': 'fiscalyear',
+                                                        'selected_fy': 'tasks[0].fiscalyear' } %}
+          </td></tr>
+        </table>
+        <table>
+          <tr><th>Q1 Hours</th><th>Q2 Hours</th><th>Q3 Hours</th><th>Q4 Hours</th><th>Flex Hours</th></tr>
+          <tr>
+            <td><input type="text" id="q1hours" name="q1hours" size="8"/></td>
+            <td><input type="text" id="q2hours" name="q2hours" size="8"/></td>
+            <td><input type="text" id="q3hours" name="q3hours" size="8"/></td>
+            <td><input type="text" id="q4hours" name="q4hours" size="8"/></td>
+            <td><input type="text" id="flexhours" name="flexhours" size="8"/></td>
+          </tr>
+        </table>
+        <table>
+          <tr><th></th><td>
+          <a href='javascript:void(0)' onClick="staffingSave()" id='saveStaffingButton'>Save Staffing</a></td></tr>
+        </table>
+    </div>
+    </div> <!-- taskedittabs div -->
+
+    <script type="text/javascript">
+      function loadStaffingTable (reload) {
+        if (reload) {
+          $('#taskStaffingTable').dataTable().fnDestroy();
+        }
+
+        $('#taskStaffingTableDiv').html("<table id='taskStaffingTable' class='display' cellspacing='0' width='100%'>" +
+           "<thead><tr><th>Task</th><th>Staffing</th><th>Hours</th><th>Est. Cost<br/>(Est Sal + Ben w/ LAF)</th>" +
+           "<th>FY</th><th>&nbsp;</th></tr></thead></table>");
+
+        $('#taskStaffingTable').dataTable( {
+          "processing": true,
+          "serverSide": false,
+          'autoWidth': false,
+          "ajax": "index.php?view=staffing-list-json&proposalid={{ proposalid }}&taskid={{ taskid }}"
+        } );
+      }
+      
+      $(function() {
+        $("#taskedittabs").tabs();
+        loadStaffingTable(false);
+
+        $("#fiscalyear").datepicker();
+        $("#newStaffButton").button();
+        $("#saveStaffingButton").button();
+
+        updateDropdown('fiscalyear');
+      });
+
+      function staffingEdit(taskid,staffingid) {
+        $("#taskedittabs").tabs( "option", "active", 1 );
+        $("#taskid").val(taskid);
+        $("#staffingid").val(staffingid);
+        if (staffingid == 'new') {
+          $("#staffingpeopleid").val(0);
+          $("#fiscalyear").val('');
+          $("#q1hours").val('0');
+          $("#q2hours").val('0');
+          $("#q3hours").val('0');
+          $("#q4hours").val('0');
+          $("#flexhours").val('0');
+          updateDropdown('fiscalyear');
+        }
+        else {
+          $.getJSON( "index.php?view=staffing-edit-json&proposalid={{ proposalid }}&taskid=" + taskid + "&staffingid=" + staffingid, function( data ) {
+            $("#staffingid").val(data.data[0][0]);
+            $("#staffingpeopleid").val(data.data[0][2]);
+            $("#fiscalyear").val(data.data[0][3]);
+            $("#q1hours").val(data.data[0][4]);
+            $("#q2hours").val(data.data[0][5]);
+            $("#q3hours").val(data.data[0][6]);
+            $("#q4hours").val(data.data[0][7]);
+            $("#flexhours").val(data.data[0][8]);
+            updateDropdown('fiscalyear');
+          });
+        }
+      }
+
+      function staffingSave() {
+        $.post("index.php", $("#staffingForm").serialize())
+          .always (function() {
+
+            loadStaffingTable(true);
+            loadTasksTable(true, {{ proposalid }});
+
+            $("#peopleedittabs").tabs( "option", "active", 0 );
+            $("#warningDiv").html("<p>Updated [" + $("#taskid").val() + "] " + $("#staffingid").val() +
+                                  " (" + $("#fiscalyear").val() +")</p>");
+            $("#warningDiv").show();
+
+            $("#taskedittabs").tabs( "option", "active", 0 );
+            figureCosts({{ proposalid }});
+          });
+    }
+
+    function deleteStaffing(staffingid, proposalid) {
+      $.get("index.php?view=staffing-delete&staffingid=" + staffingid + "&proposalid=" + proposalid)
+        .always (function() {
+          $("#warningDiv").html("<p>Deleted [" + staffingid + "]</p>");
+          $("#warningDiv").show();
+    
+          loadStaffingTable(true);
+          loadTasksTable(true, proposalid);
+          figureCosts(proposalid);
+        });
+    }
+
+
+    </script>
+
+    </body>
+</html>

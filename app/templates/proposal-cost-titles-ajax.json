@@ -1,0 +1,8 @@
+{% for error in debug %}
+  <pre>error.msg</pre>
+{% endfor %}
+{"draw":0,"recordsTotal":{{ costs|length }},"recordsFiltered":{{ costs|length }},"data":[
+{% for cost in costs %}
+[{"#proposalTitle":"{{ cost.proposal }}", "#tasksTitle":"{{ cost.staffing }}","#conferencesTitle":"{{ cost.conferences }}", "#expensesTitle":"{{ cost.expenses }}", "#overheadTitle":"{{ cost.overhead }}", "#fundingTitle":"{{ cost.funding }}"}]{% if loop.last != true %},{% endif %}
+{% endfor %}
+]}

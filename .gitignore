@@ -1,0 +1,15 @@
+# Configuration
+app/config.py
+
+# Local Tests
+app/templates/json_local/*
+*.sql
+
+# Editor Files
+.vscode*
+
+# Virtual Environments
+venv/*
+
+# Caching
+app/__pycache__/*

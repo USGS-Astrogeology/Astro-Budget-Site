@@ -1,0 +1,5 @@
+<select name='{{ dropdown_name }}' id='{{ dropdown_id }}' onchange='loadConferenceRate()'>
+{% for conference in conferences %}
+  <option value='{{ conference.conferenceid }}' meeting='{{ conference.meeting }}' {% if conference.conferenceid == selected_conferenceid %}selected {% endif %}> {{ conference.meeting }} ({{ conference.conferencerates[0].city }}, {{ conference.conferencerates[0].state }}  {{ conference.conferencerates[0].country }})</option>
+{% endfor %}
+</select>

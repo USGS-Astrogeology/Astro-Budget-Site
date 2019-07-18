@@ -1,0 +1,10 @@
+{"draw":0,"recordsTotal":{{ people|length }},"recordsFiltered":{{ people|length }},"data":[{},
+  {% for person in people%}
+    {% if person.title != 'No Longer Here' %}
+      {"display": "{{ person.name }} {{ person.payplan }} {{ person.title }}",
+       "name": "{{ person.name }}",
+       "peopleid": {{ person.peopleid }} }
+      {% if not loop.last %},{% endif %}
+    {% endif %}
+  {% endfor %}
+]}

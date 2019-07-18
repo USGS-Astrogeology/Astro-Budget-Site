@@ -1,0 +1,12 @@
+{"draw":0,"recordsTotal":{{ people|length }},"recordsFiltered":{{ people|length }},"data":[
+{% for person in people %}
+["<a href='javascript:void(0)' onclick='editUserDialog({{ person.peopleid }})'>{{ person.name }}</a>",
+  {% if person.salaries %}
+  "{{ person.salaries[-1].title }}", "{{ person.salaries[-1].payplan }}",
+  {% else %}
+  "","",
+  {% endif %}
+  "{{ person.username }}"
+  ]{% if loop.last != true %},{% endif %}
+{% endfor %}
+]}
