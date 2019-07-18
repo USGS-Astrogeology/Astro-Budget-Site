@@ -2,7 +2,8 @@
 <html>
     <head>
 
-        <script src="{{url_for ('static', filename='js/date-tools.js') }}"></script>
+        <script src="{{url_for('static', filename='js/date-tools.js') }}"></script>
+        <!--<script src="{{url_for('static', filename='js/row_setting.js') }}"></script> -->
     </head>
     <body>
     <div id="peopleedittabs">
@@ -25,7 +26,7 @@
             <tr><th>Username</th>
             <td><input type="text" name="username" id="username" value="{{ person.username }}" size="40"/></td></tr>
             <tr><th>Administrator</th>
-            <td><input type="checkbox" name="admin" id="admin" value="t" {% if person.admin == "t" %} checked {% endif %}/></td></tr>
+            <td><input type="checkbox" name="admin" id="admin" value="t" {% if person.admin %} checked {% endif %}/></td></tr>
             <tr><td><a href='javascript:void(0)' onClick="salaryEdit('new')" id='newSalaryButton'>New Salary</a></td><td></td></tr>
             </table>
           </form>
@@ -39,6 +40,10 @@
             </table>
         {% endfor %}
     {% endif %}
+      <div id="button">
+        <br>
+        <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#salaryTable').DataTable())">Save Row Preference</button>
+      </div>
         <div id="salaryTableDiv">
         <table id="salaryTable" class="display" cellspacing="0" width="100%">
           <thead><tr><th>ID</th><th>Effective<br/>Date</th><th>Pay<br/>Plan</th><th>Title</th>
@@ -74,13 +79,49 @@
     </div>
     {% endif %}
     <div id="peopleedittab3">
+      <div id="button">
+        <br>
+        <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#staffingTable').DataTable())">Save Row Preference</button>
+      </div>
       <table id="staffingTable" class="display" cellspacing="0" width="100%">
         <thead><tr><th>Project</th><th>Task</th><th>Fiscal</th><th>Hours</th></tr></thead>
       </table>
     </div>
     </div> <!-- peopleedittabs div -->
 
+
+
+
+
+
     <script type="text/javascript">
+      function loadStaffingTable(reload)
+      {
+        if (reload)
+        {
+          $('staffingTable').dataTable().fnDestroy();
+        }
+
+        $('staffingTableDiv').html('<table id="staffingTable" class="display" cellspacing="0" width="100%">' +
+          "<thead><tr><th>Project</th><th>Task</th><th>Fiscal</th><th>Hours</th></tr></thead>" +
+          "</table>");
+
+        $('#staffingTable').dataTable( {
+          "processing": true,
+          "serverSide": false,
+          'autoWidth': false,
+          "ajax": "/people/ajax/task?peopleid=" + {{ people[0].peopleid }},
+          'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
+        } );
+
+        if (!reload)
+        {
+          check_row_preference($('#staffingTable').DataTable());
+        }
+
+      }
+
+
       function loadSalaryTable (reload) {
         if (reload) {
           $('#salaryTable').dataTable().fnDestroy();
@@ -95,19 +136,29 @@
           "processing": true,
           "serverSide": false,
           'autoWidth': false,
-          "ajax": "/salary/ajax/get?peopleid=" + {{ people[0].peopleid }}
+          "ajax": "/salary/ajax/get?peopleid=" + {{ people[0].peopleid }},
+          'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
         } );
+
+        if (!reload)
+        {
+          check_row_preference($('#salaryTable').DataTable());
+        }
       }
+
 
       $(function() {
         $("#peopleedittabs").tabs();
+          //loadStaffingTable(false);
           loadSalaryTable(false);
-          $('#staffingTable').dataTable( {
+          /*$('#staffingTable').dataTable( {
             "processing": true,
             "serverSide": false,
             'autoWidth': false,
-            "ajax": "/people/ajax/task?peopleid=" + {{ people[0].peopleid }}
-          } );
+            "ajax": "/people/ajax/task?peopleid=" + {{ people[0].peopleid }},
+            'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
+          } );*/
+
 
         $("#effdate").datepicker();
         $("#saveSalaryButton").button();

@@ -2,7 +2,7 @@
   {% for rate in overheadrates %}
     {% if (((g.user.admin) and (rate.proposalid != "null")) or ((g.user.peopleid == proposals[0].peopleid) )) %}
       ["<a href='javascript:void(0)' onclick='editOverheadDialog({{ rate.overheadid }}, {{ rate.proposalid }})'>{{ rate.rate|intformat }}%</a>",
-    {% else %} 
+    {% else %}
       ["{{ rate.rate }}%",
     {% endif %}
     "{{ rate.description }}", "{{ rate.effectivedate|fyformat }}", "{% if (((g.user.admin) and (proposalid != "null")) or ((g.user.peopleid == proposals[0].peopleid) )) %}<a href='javascript:void(0)' onclick='deleteOverheadDialog({{ rate.overheadid }}, {{ rate.proposalid }})'><img src={{url_for('static', filename='images/trash-2-32.png') }} title='Delete Rate'></a>{% endif %}"]
