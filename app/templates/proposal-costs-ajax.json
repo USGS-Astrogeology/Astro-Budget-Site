@@ -1,0 +1,15 @@
+{% for error in debug %}
+  <pre>error.msg</pre>
+{% endfor %}
+{"draw":0,"recordsTotal":{{ proposals|length }},"recordsFiltered":{{ proposals|length }},"data":[
+{% for project in proposals %}
+  {"project":"{{ project.projectname }}", "status":"{{  statuscodes[project.status] }}", "budget":[
+  {% for fy in project.FYs %}
+    {% for projfy in project.FY %}
+      {% if projfy.fy == fy %}
+        {"fy": "{{ fy }}", "costs": {"expenses": {{ (projfy.expensestotal)|number_format(2,'.','') }}, "staffing": {{ projfy.staffing|number_format(2,'.','') }}, "travel": {{ projfy.travel|number_format(2,'.','') }}, "overhead": {{ projfy.overhead|number_format(2,'.','') }}, "equipment": {{ projfy.equipmenttotal|number_format(2,'.','') }}}, "funding": {{ projfy.funding|number_format(2,'.','') }} }
+      {% endif %}
+    {% endfor %}
+    {% if loop.last != true %}, {% endif %}{% endfor %}]}
+{% if loop.last != true %}, {% endif %}{% endfor %}]
+}

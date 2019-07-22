@@ -1,0 +1,16 @@
+{"draw":0,"recordsTotal":{{ conferencerates|length }},"recordsFiltered":{{ conferencerates|length }},"data":[
+    {% for rate in conferencerates %}
+    ["<a href='javascript:void(0)' onclick='rateEdit({{ rate.conferencerateid }})'>Edit</a>", 
+        "{{ rate.perdiem|currencyformat }}", 
+        "{{ rate.lodging|currencyformat }}", 
+        "{{ rate.registration|currencyformat }}", 
+        "{{ rate.groundtransport|currencyformat }}", 
+        "{{ rate.airfare|currencyformat }}", 
+        "{{ rate.city }}", 
+        "{{ rate.state }}", 
+        "{{ rate.country }}", 
+        "{{ rate.effectivedate|dateformat }}"]
+        {% if loop.last != true %},{% endif %}
+    {% endfor %}
+]}
+    

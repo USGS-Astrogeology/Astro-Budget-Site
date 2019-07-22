@@ -1,5 +1,15 @@
 # Configuration
-htdocs/configure.php
+app/config.py
 
-# Examples
-examples/
+# Local Tests
+app/templates/json_local/*
+*.sql
+
+# Editor Files
+.vscode*
+
+# Virtual Environments
+venv/*
+
+# Caching
+app/__pycache__/*

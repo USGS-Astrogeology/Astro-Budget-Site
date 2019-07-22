@@ -1,6 +1,0 @@
-{"draw":0,"recordsTotal":{{ fbms|length }},"recordsFiltered":{{ fbms|length }},"data":[
-{% for fbmsid in fbms %}
-["<a href='javascript:void(0)' onclick='editFBMSDialog({{ fbmsid.fbmsid }}, {{ fbmsid.proposalid }})'>{{ fbmsid.accountno }}</a>",
-"<a href='javascript:void(0)' onclick='deleteFBMSDialog({{ fbmsid.fbmsid }}, {{ fbmsid.proposalid }})'><img src='images/trash-2-32.png' title='Delete FBMS account'></a>"]{% if loop.last != true %},{% endif %}
-{% endfor %}
-]}

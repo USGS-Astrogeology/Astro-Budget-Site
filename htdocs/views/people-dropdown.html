@@ -1,7 +1,0 @@
-<select name='{{ dropdown_name }}' id='{{ dropdown_id }}'>
-{% if search %}<option value='ALL'>ALL People</option>{% endif %}
-{% for person in people %}{% if person.title != 'No longer here' %}
-  <option value='{{ person.peopleid }}' {% if person.peopleid == selected_peopleid %}selected {% endif %}>
-    {{ person.name }} {{ person.payplan }} {{ person.title }}</option>{% endif %}
-{% endfor %}
-</select>
