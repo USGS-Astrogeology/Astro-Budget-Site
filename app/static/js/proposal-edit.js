@@ -138,13 +138,15 @@ function loadTasksTable (reload, proposalid) {
 
   });
 
-  $task_res = $.ajax('/tasks/ajax/get?proposalid=' + proposalid, {dataType: "json", async: false});
+  //$task_res = $.ajax('/tasks/ajax/get?proposalid=' + proposalid, {dataType: "json", async: false});
+  $task_res = $.ajax('/tasks/ajax/get/?proposalid=' + proposalid, {dataType: "json", async: false});
   $task_json = $task_res.responseJSON['data'];
   console.log($task_json)
 
   $people_res = $.ajax('/people/ajax/dropdown', {dataType: "json", async: false});
 
-  $task_dd_res = $.ajax('/tasks/ajax/dropdown?proposalid=' + proposalid, {dataType: "json", async: false});
+  //$task_dd_res = $.ajax('/tasks/ajax/dropdown?proposalid=' + proposalid, {dataType: "json", async: false});
+  $task_dd_res = $.ajax('/tasks/ajax/dropdown/?proposalid=' + proposalid, {dataType: "json", async: false});
   $filtered_task_list = new Set($task_dd_res.responseJSON['data']);
   $task_dd_list = [];
   $filtered_task_list.forEach(function(task){
@@ -705,7 +707,8 @@ function editTaskDialog (taskid, proposalid) {
     });
   }
 
-  $("#editDialog").load("/tasks/ajax/edit?proposalid=" + proposalid + "&taskid=" + taskid);
+  //$("#editDialog").load("/tasks/ajax/edit?proposalid=" + proposalid + "&taskid=" + taskid);
+  $("#editDialog").load("/tasks/ajax/edit/?proposalid=" + proposalid + "&taskid=" + taskid);
 
   dialog = $("#editDialog").dialog({
     autoOpen: false,

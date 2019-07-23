@@ -110,7 +110,8 @@
           "processing": true,
           "serverSide": false,
           'autoWidth': false,
-          "ajax": "/people/ajax/task?peopleid=" + {{ people[0].peopleid }},
+          //"ajax": "/people/ajax/task?peopleid=" + {{ people[0].peopleid }},
+		  "ajax": "/people/ajax/task/?peopleid=" + {{ people[0].peopleid }},
           'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
         } );
 
@@ -151,14 +152,6 @@
         $("#peopleedittabs").tabs();
           loadStaffingTable(false);
           loadSalaryTable(false);
-          /*$('#staffingTable').dataTable( {
-            "processing": true,
-            "serverSide": false,
-            'autoWidth': false,
-            "ajax": "/people/ajax/task?peopleid=" + {{ people[0].peopleid }},
-            'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
-          } );*/
-
 
         $("#effdate").datepicker();
         $("#saveSalaryButton").button();
