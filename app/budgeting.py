@@ -94,29 +94,6 @@ def get_conferences(path):
 		abort(404)
 
 
-# CONFERENCE RATES
-@app.route('/conferencerates/ajax/<path:path>')
-@login_required
-def get_conferencerates(path):
-	filters = []
-	if request.args.get('conferenceid'):
-		filters.append(ConferenceRates.conferenceid == request.args.get('conferenceid'))
-	if request.args.get('conferencerateid'):
-		filters.append(ConferenceRates.conferencerateid == request.args.get('conferencerateid'))
-	if request.args.get('effectivedate'):
-		filters.append(ConferenceRates.effectivedate < request.args.get('effectivedate'))
-	conferencerates = ConferenceRates.get_many(joins = [],
-											   filters = filters,
-											   orders = [ConferenceRates.effectivedate.desc()])
-
-	if path == 'edit':
-		return render_template('conference-rate-edit-ajax.json', conferencerates = conferencerates)
-	elif path == 'get':
-		return render_template('conference-rate-list-ajax.json', conferencerates = conferencerates)
-	else:
-		abort(404)
-
-
 # CONFERENCE ATTENDEES
 @app.route('/conferenceattendees/ajax/<path:path>')
 @login_required
@@ -141,6 +118,29 @@ def get_conferenceattendees(path):
 		return render_template('conference-attendee-list-ajax.json', conferenceattendees = conferenceattendees)
 	else:
 		abort(404)
+		
+# CONFERENCE RATES
+@app.route('/conferencerates/ajax/<path:path>')
+@login_required
+def get_conferencerates(path):
+	filters = []
+	if request.args.get('conferenceid'):
+		filters.append(ConferenceRates.conferenceid == request.args.get('conferenceid'))
+	if request.args.get('conferencerateid'):
+		filters.append(ConferenceRates.conferencerateid == request.args.get('conferencerateid'))
+	if request.args.get('effectivedate'):
+		filters.append(ConferenceRates.effectivedate < request.args.get('effectivedate'))
+	conferencerates = ConferenceRates.get_many(joins = [],
+											   filters = filters,
+											   orders = [ConferenceRates.effectivedate.desc()])
+
+	if path == 'edit':
+		return render_template('conference-rate-edit-ajax.json', conferencerates = conferencerates)
+	elif path == 'get':
+		return render_template('conference-rate-list-ajax.json', conferencerates = conferencerates)
+	else:
+		abort(404)
+
 
 # EXPENSES
 @app.route('/expenses/ajax/<path:path>')
@@ -218,30 +218,6 @@ def get_funding(path):
 	else:
 		abort(404)
 
-# PROGRAMS
-@app.route('/programs')
-@login_required
-def programs():
-	return render_template('programs.html')
-
-@app.route('/programs/ajax/<path:path>')
-@login_required
-def get_programs(path):
-	filters = []
-	if request.args.get('programid'):
-		filters.append(FundingPrograms.programid == request.args.get('programid'))
-
-	programs = FundingPrograms.get_many(joins = [], filters = filters, orders = [])
-
-	if path == 'edit':
-		return render_template('programs-edit.html', programs = programs,
-													 dd_fiscalyears = fiscal_years(),
-													 dd_startdates = start_dates())
-	elif path == 'get':
-		return render_template('programs-list-ajax.json', programs = programs)
-	else:
-		abort(404)
-
 
 # OVERHEAD
 @app.route('/overhead', methods=['GET', 'POST'])
@@ -268,6 +244,72 @@ def get_overhead(path):
 		return render_template('overhead-edit.html', overheadrates = overheadrates)
 	elif path == 'get':
 		return render_template('overhead-list-ajax.json', overheadrates = overheadrates)
+	else:
+		abort(404)
+
+
+# PEOPLE
+@app.route('/people')
+@login_required
+def people():
+	return render_template('people.html')
+
+@app.route('/people/ajax/<path:path>')
+@login_required
+def get_people(path):
+	filters = []
+	if path == 'task':
+		if request.args.get('peopleid'):
+			filters.append(Staffing.peopleid == request.args.get('peopleid'))
+	else:
+		if request.args.get('peopleid'):
+			filters.append(People.peopleid == request.args.get('peopleid'))
+	#if request.args.get('name'):
+	#	filters.append(People.name == request.args.get('name'))
+
+	people = People.get_many(joins = [Salaries],
+						     filters = filters,
+							 orders = [])
+
+	staffing = Staffing.get_many(joins = [Tasks, People, Proposals],
+								 filters = filters,
+								 orders = [])
+
+	if path == 'dropdown':
+		return render_template('people-dropdown-list-ajax.json', people = people)
+	elif path == 'edit':
+		return render_template('people-edit.html', people = people,
+												   dd_fiscalyears = fiscal_years(),
+												   dd_startdates = start_dates())
+	elif path == 'get':
+		return render_template('people-list-ajax.json', people = people)
+	elif path == 'task':
+		return render_template('people-task-list-ajax.json', staffing = staffing)
+	else:
+		abort(404)
+
+
+# PROGRAMS
+@app.route('/programs')
+@login_required
+def programs():
+	return render_template('programs.html')
+
+@app.route('/programs/ajax/<path:path>')
+@login_required
+def get_programs(path):
+	filters = []
+	if request.args.get('programid'):
+		filters.append(FundingPrograms.programid == request.args.get('programid'))
+
+	programs = FundingPrograms.get_many(joins = [], filters = filters, orders = [])
+
+	if path == 'edit':
+		return render_template('programs-edit.html', programs = programs,
+													 dd_fiscalyears = fiscal_years(),
+													 dd_startdates = start_dates())
+	elif path == 'get':
+		return render_template('programs-list-ajax.json', programs = programs)
 	else:
 		abort(404)
 
@@ -319,46 +361,6 @@ def budget_reports(proposalid):
 	else:
 		abort(404)
 
-# PEOPLE
-@app.route('/people')
-@login_required
-def people():
-	return render_template('people.html')
-
-@app.route('/people/ajax/<path:path>')
-@login_required
-def get_people(path):
-	filters = []
-	if path == 'task':
-		if request.args.get('peopleid'):
-			filters.append(Staffing.peopleid == request.args.get('peopleid'))
-	else:
-		if request.args.get('peopleid'):
-			filters.append(People.peopleid == request.args.get('peopleid'))
-	#if request.args.get('name'):
-	#	filters.append(People.name == request.args.get('name'))
-
-	people = People.get_many(joins = [Salaries],
-						     filters = filters,
-							 orders = [])
-
-	staffing = Staffing.get_many(joins = [Tasks, People, Proposals],
-								 filters = filters,
-								 orders = [])
-
-	if path == 'dropdown':
-		return render_template('people-dropdown-list-ajax.json', people = people)
-	elif path == 'edit':
-		return render_template('people-edit.html', people = people,
-												   dd_fiscalyears = fiscal_years(),
-												   dd_startdates = start_dates())
-	elif path == 'get':
-		return render_template('people-list-ajax.json', people = people)
-	elif path == 'task':
-		return render_template('people-task-list-ajax.json', staffing = staffing)
-	else:
-		abort(404)
-
 
 # SALARIES
 @app.route('/salary/ajax/<path:path>', methods=['POST', 'GET'])
@@ -376,7 +378,6 @@ def getSalaries(path):
 		return render_template('salary-list-ajax.json', salaries = salaries)
 	else:
 		abort(404)
-
 
 
 # TASKS
