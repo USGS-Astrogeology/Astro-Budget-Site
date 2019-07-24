@@ -14,11 +14,13 @@
 
             <table>
             <tr><th>Fiscal Year</th>
-            <td><input type="text" name="fiscalyear" id="fiscalyear" size="12" 
+            <td><input type="text" name="fiscalyear" id="fiscalyear" size="12"
                 value="{{ proposals[0].funding[0].fiscalyear }}" onchange="updateDropdown('fiscalyear');"/>
-                {% include 'fiscalyear-dropdown.html' with {'dropdown_name': 'fiscalyear',
-                                                        'dropdown_id': 'fiscalyear',
-                                                        'selected_fy': proposals[0].funding[0].fiscalyear } %}
+                {% with dropdown_name = 'fiscalyear',
+                        dropdown_id = 'fiscalyear',
+                        selected_fy = proposals[0].funding[0].fiscalyear %}
+                {% include 'fiscalyear-dropdown.html' %}
+                {% endwith %}
                 </td></tr>
             <tr><th>New Funding</th>
             <td><input type="text" name="newfunding" id="newfunding" size="12" value="${{ proposals[0].funding[0].newfunding|number_format(2,'.',',') }}"/></td></tr>
