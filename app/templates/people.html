@@ -33,7 +33,7 @@
 
       <script type="text/javascript" charset="utf-8">
         function editUserDialog(peopleid) {
-          $("#editDialog").load("/people/ajax/edit?peopleid=" + peopleid);
+          $("#editDialog").load("/people/ajax/edit/" + peopleid);
 
           dialog = $("#editDialog").dialog({
             autoOpen: false,
@@ -72,7 +72,7 @@
             "processing": true,
             "serverSide": false,
             "autoWidth": false,
-            "ajax": "people/ajax/get",
+            "ajax": "people/ajax/list",
             "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]]
           } );
 

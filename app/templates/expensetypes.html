@@ -43,7 +43,7 @@
             "processing": true,
             "serverSide": false,
             "autowidth": false,
-            "ajax": "/expensetypes/ajax/get",
+            "ajax": "/expensetypes/ajax/list",
             "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]]
           } );
 
@@ -56,7 +56,7 @@
 
 
         function editExpenseTypeDialog(expensetypeid = 0) {
-          $("#editDialog").load("/expensetypes/ajax/edit?expensetypeid=" + expensetypeid);
+          $("#editDialog").load("/expensetypes/ajax/edit/" + expensetypeid);
 
           dialog = $("#editDialog").dialog({
             autoOpen: false,

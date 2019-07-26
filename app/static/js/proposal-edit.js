@@ -474,7 +474,7 @@ function loadExpensesTable (reload, proposalid) {
     'processing': true,
     'serverSide': false,
     'autoWidth': false,
-    'ajax': '/expenses/ajax/get?proposalid=' + proposalid,
+    'ajax': '/expenses/ajax/list/' + proposalid,
     'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
   } );
 
@@ -866,7 +866,7 @@ function loadConferenceRate() {
 }
 
 function editExpenseDialog(expenseid, proposalid) {
-  $("#editDialog").load("/expenses/ajax/edit?expenseid=" + expenseid);
+  $("#editDialog").load("/expenses/ajax/edit/" + expenseid);
 
   dialog = $("#editDialog").dialog({
     autoOpen: false,

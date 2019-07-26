@@ -515,36 +515,28 @@ def people_dropdown():
 	return render_template('people-dropdown-list-ajax.json', people = people)
 
 
-@app.route('/people/ajax/edit')
+@app.route('/people/ajax/edit/<int:peopleid>')
 @login_required
-def edit_people():
-	filters = []
-	if request.args.get('peopleid'):
-		filters.append(People.peopleid == request.args.get('peopleid'))
-
-	people = People.get_many(joins = [Salaries], filters = filters, orders = [])
+def edit_people(peopleid):
+	people = People.get_many(joins = [Salaries],
+							 filters = [People.peopleid == peopleid],
+							 orders = [])
 
 	return render_template('people-edit.html', people = people,
 											   dd_fiscalyears = fiscal_years(),
 											   dd_startdates = start_dates())
 
-@app.route('/people/ajax/get')
+@app.route('/people/ajax/list')
 @login_required
 def load_people():
-	filters = []
-	people = People.get_many(joins = [Salaries],
-									  filters = filters,
-									  orders = [])
+	people = People.get_many(joins = [Salaries], filters = [], orders = [])
 	return render_template('people-list-ajax.json', people = people)
 
-@app.route('/people/ajax/task')
+@app.route('/people/ajax/task/<int:peopleid>')
 @login_required
-def load_staffing():
-	filters = []
-	if request.args.get('peopleid'):
-		filters.append(Staffing.peopleid == request.args.get('peopleid'))
+def load_staffing(peopleid):
 	staffing = Staffing.get_many(joins = [Tasks, People, Proposals],
-										  filters = filters,
+										  filters = [Staffing.peopleid == peopleid],
 										  orders = [])
 	return render_template('people-task-list-ajax.json', staffing = staffing)
 
@@ -575,23 +567,20 @@ def get_programs(path):
 		abort(404)
 '''
 
-@app.route('/programs/ajax/edit')
+@app.route('/programs/ajax/edit/<int:programid>')
 @login_required
-def edit_program():
-	filters = []
-	if request.args.get('programid'):
-		filters.append(FundingPrograms.programid == request.args.get('programid'))
-
-	programs = FundingPrograms.get_many(joins = [], filters = filters, orders = [])
+def edit_program(programid):
+	programs = FundingPrograms.get_many(joins = [],
+										filters = [FundingPrograms.programid == programid],
+										orders = [])
 	return render_template('programs-edit.html', programs = programs,
 												 dd_fiscalyears = fiscal_years(),
 												 dd_startdates = start_dates())
 
-@app.route('/programs/ajax/get')
+@app.route('/programs/ajax/list')
 @login_required
 def load_programs():
-	filters = []
-	programs = FundingPrograms.get_many(joins = [], filters = filters, orders = [])
+	programs = FundingPrograms.get_many(joins = [], filters = [], orders = [])
 	return render_template('programs-list-ajax.json', programs = programs)
 
 
@@ -624,14 +613,12 @@ def get_proposals(path):
 		abort(404)
 '''
 
-@app.route('/proposals/ajax/edit')
+@app.route('/proposals/ajax/edit/<int:proposalid>')
 @login_required
-def edit_proposal():
-	filters = []
-	if request.args.get('proposalid'):
-		filters.append(Proposals.proposalid == request.args.get('proposalid'))
-
-	proposals = Proposals.get_many(joins = [], filters = filters, orders = [])
+def edit_proposal(proposalid):
+	proposals = Proposals.get_many(joins = [],
+								   filters = [Proposals.proposalid == proposalid],
+								   orders = [])
 	return render_template('proposal-edit.html', proposals = proposals,
 												 people = People.get_all(orders = [People.name]),
 												 programs = FundingPrograms.get_all(orders = [FundingPrograms.programname]),
@@ -639,11 +626,10 @@ def edit_proposal():
 												 dd_fiscalyears = fiscal_years(),
 												 dd_startdates = start_dates())
 
-@app.route('/proposals/ajax/get')
+@app.route('/proposals/ajax/list')
 @login_required
 def load_proposals():
-	filters = []
-	proposals = Proposals.get_many(joins = [], filters = filters, orders = [])
+	proposals = Proposals.get_many(joins = [], filters = [], orders = [])
 	return render_template('proposal-list-ajax.json', proposals = proposals)
 
 
@@ -694,24 +680,20 @@ def getSalaries(path):
 		abort(404)
 '''
 
-@app.route('/salary/ajax/edit')
+@app.route('/salary/ajax/edit/<int:peopleid>')
 @login_required
-def edit_salary():
-	filters = []
-	if request.args.get('peopleid'):
-		filters.append(Salaries.peopleid == request.args.get('peopleid'))
-
-	salaries = Salaries.get_many(joins = [], filters = filters, orders = [])
+def edit_salary(peopleid):
+	salaries = Salaries.get_many(joins = [],
+								 filters = [Salaries.peopleid == peopleid],
+								 orders = [])
 	return render_template('salary-edit-ajax.json', salaries = salaries)
 
-@app.route('/salary/ajax/get')
+@app.route('/salary/ajax/list/<int:peopleid>')
 @login_required
-def load_salaries():
-	filters = []
-	if request.args.get('peopleid'):
-		filters.append(Salaries.peopleid == request.args.get('peopleid'))
-
-	salaries = Salaries.get_many(joins = [], filters = filters, orders = [])
+def load_salaries(peopleid):
+	salaries = Salaries.get_many(joins = [],
+								 filters = [Salaries.peopleid == peopleid],
+								 orders = [])
 	return render_template('salary-list-ajax.json', salaries = salaries)
 
 
@@ -757,14 +739,12 @@ def edit_task():
 	tasks = Tasks.get_many(joins = [], filters = filters, orders = [])
 	return render_template('task-edit.html', tasks = tasks)
 
-@app.route('/tasks/ajax/get')
+@app.route('/tasks/ajax/list/<int:proposalid>')
 @login_required
-def load_tasks():
-	filters = []
-	if request.args.get('proposalid'):
-		filters.append(Tasks.proposalid == request.args.get('proposalid'))
-
-	tasks = Tasks.get_many(joins = [], filters = filters, orders = [])
+def load_tasks(proposalid):
+	tasks = Tasks.get_many(joins = [],
+						   filters = [Tasks.proposalid == proposalid],
+						   orders = [])
 	return render_template('tasks-list-ajax.json', tasks = tasks)
 
 
