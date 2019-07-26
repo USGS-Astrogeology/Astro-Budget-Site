@@ -494,12 +494,12 @@ function saveProposal() {
 
 function editFundingDialog(fundingid, proposalid) {
   $("#editDialog").load(
-    "index.php?view=funding-edit&proposalid=" + proposalid + "&fundingid=" + fundingid);
+    "/funding/ajax/edit?proposalid=" + proposalid + "&fundingid=" + fundingid);
 
   dialog = $("#editDialog").dialog({
     autoOpen: false,
     height: 300,
-    width: 400,
+    width: 450,
     modal: true,
     buttons: {
       "Save Funding": function () { saveFunding(proposalid); },

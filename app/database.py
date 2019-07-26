@@ -96,7 +96,7 @@ class Proposals(Base):
   conferenceattendees = relationship('ConferenceAttendee', backref='proposal')
   tasks               = relationship('Tasks', backref='proposal')
   expenses            = relationship('Expenses', backref='proposal')
-  fundings            = relationship('Funding', backref='proposal')
+  funding             = relationship('Funding', backref='proposal')
 
   def __repr__(self):
     return "<Proposals(project='%s', proposalnumber='%s', awardnumber='%s')>" % (self.projectname, self.proposalnumber, self.awardnumber)
@@ -224,4 +224,3 @@ class Statuses(Base):
   status = Column(Integer, primary_key = True)
   statusname = Column(String(16))
   proposals = relationship('Proposals', backref='proposalstatus')
-

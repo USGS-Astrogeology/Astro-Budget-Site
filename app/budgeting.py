@@ -355,6 +355,36 @@ def get_funding(path):
 		abort(404)
 '''
 
+@app.route('/funding/ajax/delete')
+@login_required
+def delete_funding():
+	# need to figure out how to remove items from the database with sqlalchemy
+
+	# requirements:
+		# update any fundings using the value that's being deleted to a default
+		# will the whole table need to be looked through and changed?
+			# could it be filtered by the name of the funding program?
+
+	# return message for the div
+	return ""
+
+@app.route('/funding/ajax/edit')
+@login_required
+def edit_funding():
+	filters = []
+	#proposals = []
+	if request.args.get('fundingid'):
+		filters.append(Funding.fundingid == request.args.get('fundingid'))
+	if request.args.get('proposalid'):
+		filters.append(Funding.proposalid == request.args.get('proposalid'))
+		#proposals = Proposals.get_many(joins = [],
+		#							   filters = request.args.get('proposalid'),
+		#							   orders = [])
+
+	proposals = Proposals.get_many(joins = [], filters = filters, orders = [])
+	funding = Funding.get_many(joins = [], filters = filters, orders = [])
+	return render_template('funding-edit.html', funding = funding, proposals = proposals)
+
 @app.route('/funding/ajax/get')
 @login_required
 def load_funding():
@@ -366,6 +396,21 @@ def load_funding():
 
 	funding = Funding.get_many(joins = [], filters = filters, orders = [])
 	return render_template('funding-list-ajax.json', funding = funding)
+
+@app.route('/funding/ajax/save')
+@login_required
+def save_funding():
+	# update if already existing
+	# make a new one if it is a new funding program
+
+	funding_proposalid = request.args.get('proposalid')
+	funding_fundingid = request.args.get('fundingid')
+	funding_fiscalyear = request.args.get('fiscalyear')
+	funding_newfunding = request.args.get('newfunding')
+	funding_carryover = request.args.get("carryover")
+
+	# return the message for the div
+	return ""
 
 
 # OVERHEAD
