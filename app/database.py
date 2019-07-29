@@ -113,6 +113,14 @@ class Proposals(Base):
   def __repr__(self):
     return "<Proposals(project='%s', proposalnumber='%s', awardnumber='%s')>" % (self.projectname, self.proposalnumber, self.awardnumber)
 
+  @hybrid_property
+  def effective_overheadrate(self):
+    effective_overheadrate = None
+    for overhead_rate in self.overheadrates:
+      if overhead_rate.effectivedate.date() <= date.today():
+        effective_overheadrate = overhead_rate
+    return effective_overheadrate    
+
 class FBMSAccounts(Base):
   __tablename__ = 'fbmsaccounts'
 

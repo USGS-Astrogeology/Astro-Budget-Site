@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, g, request, abort
+from flask import Flask, render_template, url_for, g, request, abort, session
 from flask_cas import CAS, login_required, login
 from datetime import datetime, date
 from database import (db, Conferences, ConferenceRates, ConferenceAttendee, Expenses, ExpenseTypes, FBMSAccounts,
@@ -73,13 +73,12 @@ db.init_app(app)
 def check_login():
 	if cas.username:
 		g.user = People.get_one(filters = [People.username == cas.username])
-	else:
-		login()
+		session.permanent = True
 
 @app.route('/')
+@login_required
 def home():
 	return render_template('default.html')
-
 
 # CONFERENCES
 
@@ -184,6 +183,12 @@ def load_expensetypes():
 	expensetypes = ExpenseTypes.get_many(joins = [], filters = [], orders = [])
 	return render_template('expensetypes-list-ajax.json', expensetypes = expensetypes)
 
+@app.route('/expensetypes/save/<int:expensetypeid>')
+@login_required
+def save_expensetype(expensetypeid):
+	expensetype = ExpenseTypes.get_one(filters = [ExpenseTypes.expensetypeid == expensetypeid])
+	
+
 
 # FBMSACCOUNTS
 
@@ -263,14 +268,9 @@ def edit_overhead(overheadid):
 @app.route('/overhead/ajax/list/<int:proposalid>')
 @login_required
 def load_overhead(proposalid):
-	overheadrates = OverheadRates.get_many(joins = [],
-										   filters = [OverheadRates.proposalid == proposalid],
-										   orders = [])
+	overheadrates = OverheadRates.get_many(filters = [OverheadRates.proposalid == proposalid])
 	if not overheadrates:
-		overheadrates = OverheadRates.get_many(joins = [], 
-											   filters = [OverheadRates.proposalid == None], 
-											   orders = [])
-
+		overheadrates = OverheadRates.get_many(filters = [OverheadRates.proposalid == None])
 	return render_template('overhead-list-ajax.json', overheadrates = overheadrates)
 
 

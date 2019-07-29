@@ -1,6 +1,5 @@
 {"draw":0,"recordsTotal":{{ tasks|length }},"recordsFiltered":{{ tasks|length }},"data":[
 {% for task in tasks %}
-
   {% set current_staff = task.staffing[0].peopleid %}
   {% set cost_total = 0 %}
   { "Task": "{{task.taskname}}", "taskid": {{ task.taskid }},
@@ -21,7 +20,9 @@
     {% endif %}
     "{{ staff.fiscalyear }}staffingid": {{ staff.staffingid }},
     "{{ staff.fiscalyear }}": {{ staff.q1hours + staff.q2hours + staff.q3hours + staff.q4hours + staff.flexhours }},
-    {% set cost_total = cost_total + ((staff.person.salaries[0].estsalary * staff.person.salaries[0].laf) + (staff.person.salaries[0].estbenefits * staff.person.salaries[0].laf)) %}
+    {% if staff.person.effective_salary %}
+      {% set cost_total = cost_total + ((staff.person.effective_salary.estsalary * staff.person.effective_salary.laf) + (staff.person.effective_salary.estbenefits * staff.person.effective_salary.laf)) %}
+    {% endif %}
     {% if loop.last %}
       "Cost": "{{ cost_total|currencyformat }}"}
     {% endif %}

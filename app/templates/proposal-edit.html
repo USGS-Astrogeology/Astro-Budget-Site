@@ -92,7 +92,7 @@
               <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#fundingTable').DataTable())">Save Row Preference</button>
               <div id="fundingTableDiv">
               <table id='fundingTable' class='display' cellspacing='0' width='100%'>
-                <thead><tr><th>FY</th><th>New Funding</th><th>Carryover</th></tr></thead>
+                <thead><tr><th>FY</th><th>New Funding</th><th>Carryover</th><th>&nbsp;</th></tr></thead>
               </table>
               </div>
             </div>
@@ -104,7 +104,7 @@
               <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#fbmsTable').DataTable())">Save Row Preference</button>
               <div id="fbmsTableDiv">
               <table id='fbmsTable' class='display' cellspacing='0' width='100%'>
-                <thead><tr><th>Account No.</th></tr></thead>
+                <thead><tr><th>Account No.</th><th>&nbsp</th></tr></thead>
               </table>
               </div>
             </div>
@@ -117,7 +117,7 @@
 
               <div id="overheadTableDiv">
               <table id='overheadTable' class='display' cellspacing='0' width='100%'>
-                <thead><tr><th>Rate</th><th>Description</th><th>Fiscal Year</th></tr>
+                <thead><tr><th>Rate</th><th>Description</th><th>Fiscal Year</th><th>&nbsp</th></tr>
               </table>
               </div>
             </div>
@@ -149,9 +149,9 @@
 
               <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#conferencesTable').DataTable())">Save Row Preference</button>
 
-              <div id="conferencesTableDiv">
-              <table id='conferencesTable' class='display' cellspace='0' width='100%'>
-                <thead><tr><th>Meeting</th><th>Number<br/>Travelers</th><th>Starting</th><th>FY</th><th>Meeting<br/>Days</th><th>Travel<br/>Days</th><th>Airfare</th><th>Ground<br/>Transport</th><th>Registration<br/>and Other</th><th>per diem</th><th>Lodging</th><th>Total</th></tr></thead>
+              <div id="conferenceattendeesTableDiv">
+              <table id='conferenceattendeesTable' class='display' cellspace='0' width='100%'>
+                <thead><tr><th>Meeting</th><th>Number<br/>Travelers</th><th>Starting</th><th>FY</th><th>Meeting<br/>Days</th><th>Travel<br/>Days</th><th>Airfare</th><th>Ground<br/>Transport</th><th>Registration<br/>and Other</th><th>per diem</th><th>Lodging</th><th>Total</th><th>&nbsp</th></tr></thead>
               </table>
               </div>
             </div>
@@ -164,7 +164,7 @@
 
               <div id="expensesTableDiv">
               <table id='expensesTable' class='display' cellspace='0' width='100%'>
-                <thead><tr><th>Expense</th><th>Type</th><th>Amount</th><th>Fiscal</th></tr></thead>
+                <thead><tr><th>Expense</th><th>Type</th><th>Amount</th><th>Fiscal</th><th>&nbsp</th></tr></thead>
               </table>
             </div>
             </div>
@@ -186,12 +186,23 @@
           $('#basisButton').button();
           $('#rosesButton').button();
 
-          loadFundingTable(false, '{{ proposal.proposalid }}');
-          loadFbmsTable(false, '{{ proposal.proposalid }}');
-          loadOverheadTable(false, '{{ proposal.proposalid }}');
+          // load funding
+          loadTable(false, '/funding/ajax/list/{{ proposal.proposalid }}', $('#fundingTable'));
+          
+          // load fbmsaccounts
+          loadTable(false, '/fbmsaccounts/ajax/list/{{ proposal.proposalid }}', $('#fbmsTable'));
+          
+          // load overhead
+          loadTable(false, '/overhead/ajax/list/{{ proposal.proposalid }}', $('#overheadTable'));
+          
+          // load tasks previous way for now
           loadTasksTable(false, '{{ proposal.proposalid }}');
-          loadConferencesTable(false, '{{ proposal.proposalid }}');
-          loadExpensesTable(false, '{{ proposal.proposalid }}');
+
+          // load conferenceattendees
+          loadTable(false, '/conferenceattendees/ajax/list/byproposal/{{ proposal.proposalid }}', $('#conferenceattendeesTable'));
+          
+          // load expenses
+          loadTable(false, '/expenses/ajax/list/{{ proposal.proposalid }}', $('#expensesTable'));
 
           updateDropdown('proposalperfperiodstart');
           updateDropdown('proposalperfperiodend');

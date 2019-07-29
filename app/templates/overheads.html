@@ -28,7 +28,7 @@
         <div id="editDialog" class="ui-widget"></div>
         <div id="overheadTableDiv">
            <table id='overheadTable' class='display' cellspacing='0' width='100%'>
-              <thead><tr><th>Rate</th><th>Description</th><th>Fiscal Year</th></tr>
+              <thead><tr><th>Rate</th><th>Description</th><th>Fiscal Year</th><th>&nbsp</th></tr>
            </table>
         </div>
       </div>
@@ -38,7 +38,7 @@
           $("#newButton").button();
           $("#warningDiv").hide();
 
-          loadOverheadTable(false, 0);
+          loadTable(false, '/overhead/ajax/list/0', $('#overheadTable'));
         } );
       </script>
     </body>

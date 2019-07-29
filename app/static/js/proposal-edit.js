@@ -53,75 +53,6 @@ function projectBudgetTable (id, data) {
   $(id).html(newTable);
 }
 
-function loadFundingTable (reload, proposalid) {
-  if (reload) {
-    $('#fundingTable').dataTable().fnDestroy();
-  }
-
-  $('#fundingTableDiv').html("<table id='fundingTable' class='display' cellspacing='0' width='100%'>" +
-    "<thead><tr><th>FY</th><th>New Funding</th><th>Carryover</th><th>&nbsp;</th></tr></thead></table>");
-
-  $('#fundingTable').dataTable( {
-    "processing": true,
-    "serverSide": false,
-    "autoWidth": false,
-    'ajax': '/funding/ajax/list/' + proposalid,
-    'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
-  });
-
-  if (!reload)
-  {
-    check_row_preference($('#fundingTable').DataTable());
-  }
-
-}
-
-function loadFbmsTable (reload, proposalid) {
-  if (reload) {
-    $('#fbmsTable').dataTable().fnDestroy();
-  }
-
-  $('#fbmsTableDiv').html("<table id='fbmsTable' class='display' cellspacing='0' width='100%'>" +
-    "<thead><tr><th>Account No.</th><th>&nbsp;</th></tr></thead></table>");
-
-  $('#fbmsTable').dataTable( {
-    "processing": true,
-    "serverSide": false,
-    "autoWidth": false,
-    'ajax': '/fbmsaccounts/ajax/list/' + proposalid,
-    'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
-  } );
-
-  if (!reload)
-  {
-    check_row_preference($('#fbmsTable').DataTable());
-  }
-
-}
-
-function loadOverheadTable (reload, proposalid) {
-  if (reload) {
-    $('#overheadTable').dataTable().fnDestroy();
-  }
-
-  $('#overheadTableDiv').html("<table id='overheadTable' class='display' cellspacing='0' width='100%'>" +
-    "<thead><tr><th>Rate</th><th>Description</th><th>Fiscal Year</th><th></th></tr></table>");
-
-  $('#overheadTable').dataTable( {
-    'processing': true,
-    'serverSide': false,
-    'autoWidth': false,
-    'ajax': '/overhead/ajax/list/' + proposalid,
-    'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
-  } );
-
-  if (!reload)
-  {
-    check_row_preference($('#overheadTable').DataTable());
-  }
-
-}
-
 function loadTasksTable (reload, proposalid) {
   if (reload) {
     $('#tasksTableDiv').jsGrid("destroy");
@@ -434,64 +365,15 @@ function addTask() {
   $("#tasksTableDiv").jsGrid("fieldOption", "Task", "items", $task_items);
 }
 
-function loadConferencesTable (reload, proposalid) {
-  if (reload) {
-    $('#conferencesTable').dataTable().fnDestroy();
-  }
-
-  $('#conferencesTableDiv').html("<table id='conferencesTable' class='display' cellspace='0' width='100%'>" +
-    "<thead><tr><th>Meeting</th><th>Number<br/>Travelers</th><th>Starting</th><th>FY</th>" +
-    "<th>Meeting<br/>Days</th><th>Travel<br/>Days</th><th>Airfare</th><th>Ground<br/>Transport</th>" +
-    "<th>Registration<br/>and Other</th><th>per diem</th><th>Lodging</th><th>Total</th><th>&nbsp;</th></tr></thead></table>");
-
-  $('#conferencesTable').dataTable( {
-    'processing': true,
-    'serverSide': false,
-    'autoWidth': false,
-    'ajax': '/conferenceattendees/ajax/list/byproposal/' + proposalid,
-    'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
-  } );
-
-  if (!reload)
-  {
-    check_row_preference($('#conferencesTable').DataTable());
-  }
-
-}
-
-function loadExpensesTable (reload, proposalid) {
-  if (reload) {
-    $('#expensesTable').dataTable().fnDestroy();
-  }
-
-  $('#expensesTableDiv').html("<table id='expensesTable' class='display' cellspace='0' width='100%'>" +
-    "<thead><tr><th>Expense</th><th>Type</th><th>Amount</th><th>Fiscal</th><th>&nbsp;</th></tr></thead></table>");
-
-  $('#expensesTable').dataTable( {
-    'processing': true,
-    'serverSide': false,
-    'autoWidth': false,
-    'ajax': '/expenses/ajax/list/' + proposalid,
-    'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
-  } );
-
-  if (!reload)
-  {
-    check_row_preference($('#expensesTable').DataTable());
-  }
-
-}
-
 function saveProposal() {
   $.post("index.php", $("#proposalForm").serialize());
 
   $("#warningDiv").html("<p>Updated proposal details</p>");
   $("#warningDiv").show();
 }
-
+/*
 function editFundingDialog(fundingid, proposalid) {
-  $("#editDialog").load(
-    "/funding/ajax/edit/" + fundingid);
+  $("#editDialog").load("/funding/ajax/edit/" + fundingid);
 
   dialog = $("#editDialog").dialog({
     autoOpen: false,
@@ -507,7 +389,7 @@ function editFundingDialog(fundingid, proposalid) {
   });
 
   dialog.dialog("open");
-}
+}*/
 
 function saveFunding(proposalid) {
   $.post("index.php", $("#fundingForm").serialize())
@@ -517,7 +399,7 @@ function saveFunding(proposalid) {
       $("#warningDiv").html("<p>Updated [" + $("#fiscalyear").val() + "]</p>");
       $("#warningDiv").show();
 
-      loadFundingTable(true, proposalid);
+      loadTable(true, '/funding/ajax/list/' + proposalid, $('#fundingTable'));
     });
 }
 
@@ -554,7 +436,7 @@ function deleteFunding(fundingid, proposalid) {
       $("#warningDiv").html("<p>Deleted [" + fundingid + "]</p>");
       $("#warningDiv").show();
 
-      loadFundingTable(true, proposalid);
+      loadTable(true, '/funding/ajax/list/' + proposalid, $('#fundingTable'));
     });
 }
 
@@ -581,7 +463,7 @@ function saveOverhead(proposalid) {
   $.post("index.php", $("#overheadForm").serialize())
     .always(function(){
 
-      loadOverheadTable(true, proposalid);
+      loadTable(true, '/overhead/ajax/list/' + proposalid, $('#overheadTable'));
 
       dialog.dialog("close");
       $("#warningDiv").html("<p>Updated [" + $("#overheadid").val() + "] (" + $("#rate").val() + ")</p>");
@@ -620,7 +502,7 @@ function deleteOverhead(overheadid, proposalid) {
       $("#warningDiv").html("<p>Deleted [" + overheadid + "]</p>");
       $("#warningDiv").show();
 
-      loadOverheadTable(true, proposalid);
+      loadTable(true, '/overhead/ajax/list/' + proposalid, $('#overheadTable'));
     });
 }
 
@@ -647,7 +529,7 @@ function saveFBMS(proposalid) {
   $.post("index.php", $("#fbmsForm").serialize())
     .always(function(){
 
-      loadFbmsTable(true, proposalid);
+      loadTable(true, '/fbmsaccounts/ajax/list/' + proposalid, $('#fbmsTable'));
 
       dialog.dialog("close");
       $("#warningDiv").html("<p>Updated [" + $("#fbmsid").val() + "] (" + $("#accountno").val() + ")</p>");
@@ -688,7 +570,7 @@ function deleteFBMS(fbmsid, proposalid) {
       $("#warningDiv").html("<p>Deleted [" + fbmsid + "]</p>");
       $("#warningDiv").show();
 
-      loadFbmsTable(true, proposalid);
+      loadTable(true, '/fbmsaccounts/ajax/list/' + proposalid, $('#fbmsTable'));
     });
 }
 
@@ -801,7 +683,7 @@ function saveAttendee(proposalid) {
 
       figureCosts(proposalid);
 
-      loadConferencesTable(true, proposalid);
+      loadTable(true, '/conferenceattendees/ajax/list/byproposal/' + proposalid, $('#conferenceattendeesTable'));
     });
 }
 
@@ -840,7 +722,7 @@ function deleteAttendee(travelid, proposalid) {
       $("#warningDiv").html("<p>Deleted [" + travelid + "]</p>");
       $("#warningDiv").show();
 
-      loadConferencesTable(true, proposalid);
+      loadTable(true, '/conferenceattendees/ajax/list/byproposal/' + proposalid, $('#conferenceattendeesTable'));
       figureCosts(proposalid);
     });
 }
@@ -889,7 +771,7 @@ function saveExpense(proposalid) {
 
       figureCosts(proposalid);
 
-      loadExpensesTable(true, proposalid);
+      loadTable(true, '/expenses/ajax/list/' + proposalid, $('#expensesTable'));
   });
 }
 
@@ -926,7 +808,7 @@ function deleteExpense(expenseid, proposalid) {
       $("#warningDiv").html("<p>Deleted [" + expenseid + "]</p>");
       $("#warningDiv").show();
 
-      loadExpensesTable(true, proposalid);
+      loadTable(true, '/expenses/ajax/list/' + proposalid, $('#expensesTable'));
       figureCosts(proposalid);
     });
 }
