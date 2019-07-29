@@ -34,7 +34,7 @@
 
       <script type="text/javascript" charset="utf-8">
         function editConferenceDialog(conferenceid) {
-          $("#editDialog").load("/conferences/ajax/edit?conferenceid=" + conferenceid);
+          $("#editDialog").load("/conferences/ajax/edit/" + conferenceid);
 
           console.log(conferenceid);
 
@@ -67,7 +67,7 @@
           $('#conferencesTable').dataTable( {
             "processing": true,
             "serverSide": false,
-            "ajax": "/conferences/ajax/get",
+            "ajax": "/conferences/ajax/list",
             "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]]
           } );
 

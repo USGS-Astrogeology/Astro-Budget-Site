@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-
         <script src="{{url_for('static', filename='js/date-tools.js') }}"></script>
-        <!--<script src="{{url_for('static', filename='js/row_setting.js') }}"></script> -->
     </head>
     <body>
     <div id="peopleedittabs">
@@ -58,7 +56,7 @@
         <input type="hidden" name="act" value="save"/>
         <input type="hidden" name="view" value="salary-save"/>
         <input type="hidden" id="salaryid" name="salaryid" value=""/>
-        <input type="hidden" id="salpeopleid" name="peopleid" value="{{ people[0].peopleid }}"/>
+        <input type="hidden" id="salpeopleid" name="peopleid" value="{{ person.peopleid }}"/>
         <table>
           <tr><th>Pay Plan</th><td><input type="text" id="payplan" name="payplan" size="20"/></td>
               <th>Title</th><td><input type="text" id="saltitle" name="title" size="30"/></td></tr>
@@ -110,7 +108,7 @@
           "processing": true,
           "serverSide": false,
           'autoWidth': false,
-          "ajax": "/people/ajax/task/" + {{ people[0].peopleid }},
+          "ajax": "/people/ajax/task/" + {{ person.peopleid }},
           'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
         } );
 
@@ -136,7 +134,7 @@
           "processing": true,
           "serverSide": false,
           'autoWidth': false,
-          "ajax": "/salary/ajax/list/" + {{ people[0].peopleid }},
+          "ajax": "/salaries/ajax/list/" + {{ person.peopleid }},
           'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
         } );
 
@@ -162,7 +160,7 @@
         $("#peopleedittabs").tabs( "option", "active", 1 );
         $("#salaryid").val(salaryid);
         if (salaryid == 'new') {
-          $("#salpeopleid").val({{ people[0].peopleid }});
+          $("#salpeopleid").val({{ person.peopleid }});
           $("#payplan").val('');
           $("#saltitle").val('');
           $("#appttype").val('');
@@ -174,7 +172,7 @@
           $("#effdate").val('');
         }
         else {
-          $.getJSON( "/salary/edit?salaryid=" + salaryid, function( data ) {
+          $.getJSON( "/salaries/ajax/edit/" + salaryid, function( data ) {
             $("#salpeopleid").val(data.data[0][1]);
             $("#effdate").val(data.data[0][2]);
             $("#payplan").val(data.data[0][3]);

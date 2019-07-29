@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Editing {{ expenses[0].description }}</title>
+        <title>Editing {{ expense.description }}</title>
         <script src="{{ url_for('static', filename='js/date-tools.js') }}"></script>
     </head>
     <body>
@@ -9,27 +9,27 @@
        <form id="expenseForm" action="index.php" method="GET">
             <input type="hidden" name="act" value="save"/>
             <input type="hidden" name="view" value="expense-save"/>
-            <input type="hidden" id="proposalid" name="proposalid" value="{{ expenses[0].proposalid }}"/>
+            <input type="hidden" id="proposalid" name="proposalid" value="{{ expense.proposalid }}"/>
             <input type="hidden" id="expenseid" name="expenseid"
-            {% if not expenses %} value="new"/>
-            {% else %} value="{{ expenses[0].expenseid }}"/>
+            {% if not expense %} value="new"/>
+              {% else %} value="{{ expense.expenseid }}"/>
             {% endif %}
 
             <table><tr><th>Description</th>
-            <td><input type="text" name="description" id="description" value="{{ expenses[0].description }}" size="40"/></td></tr>
+            <td><input type="text" name="description" id="description" value="{{ expense.description }}" size="40"/></td></tr>
             <tr><th>Expense Type</th>
               <td>
-                {% with dropdown_name = 'expensetypeid', dropdown_id = 'expensetypedropdown', selected_expensetypeid = expenses[0].expensetypeid %}
+                {% with dropdown_name = 'expensetypeid', dropdown_id = 'expensetypedropdown', selected_expensetypeid = expense.expensetypeid %}
                   {% include 'expensetypes-dropdown.html' %}
                 {% endwith %}
               </td>
             </tr>
             <tr><th>Amount</th>
-            <td><input type="text" name="amount" id="amount" size="12" value="{{ expenses[0].amount|currencyformat }}"/></td></tr>
+            <td><input type="text" name="amount" id="amount" size="12" value="{{ expense.amount|currencyformat }}"/></td></tr>
             <tr><th>Fiscal Year</th>
-              <td><input type="text" name="fiscalyear" id="fiscalyear" size="12" value="{{ expenses[0].fiscalyear|dateformat }}"
+              <td><input type="text" name="fiscalyear" id="fiscalyear" size="12" value="{{ expense.fiscalyear|dateformat }}"
                          onchange="updateDropdown('fiscalyear');"/>
-                {% with dropdown_name = 'fiscalyear', dropdown_id = 'fiscalyear', selected_fy = expenses[0].fiscalyear %}
+                {% with dropdown_name = 'fiscalyear', dropdown_id = 'fiscalyear', selected_fy = expense.fiscalyear %}
                  {% include 'fiscalyear-dropdown.html' %}
                 {% endwith %}
             </table>

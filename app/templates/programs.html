@@ -43,7 +43,7 @@
             "processing": true,
             "serverSide": false,
             "autoWidth": false,
-            "ajax": "/programs/ajax/get",
+            "ajax": "/programs/ajax/list",
             "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]]
           } );
 
@@ -55,7 +55,8 @@
         }
 
         function editProgramDialog(programid) {
-          $("#editDialog").load("programs/ajax/edit?programid=" + programid);
+          $("#editDialog").load("programs/ajax/edit/" + programid);
+          console.log(programid);
 
           dialog = $("#editDialog").dialog({
             autoOpen: false,

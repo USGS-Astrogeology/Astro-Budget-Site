@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Proposal Budget for {{ proposals[0].projectname }} </title>
+        <title>Proposal Budget for {{ proposal.projectname }} </title>
         {% include 'menu-header.html' %}
         {% include 'graphs-header.html' %}
         <script src="{{ url_for('static', filename='js/proposal-edit.js') }}"></script>
@@ -19,60 +19,60 @@
         <div id="warningDiv" class="ui-corner-all ui-state-highlight" style="width=100px;align=right;"></div>
         <div id="editDialog" class="ui-widget"></div>
         <div id="accordions">
-          <h3 id='proposalTitle'>Proposal Details - {{ proposals[0].projectname }}</h3>
+          <h3 id='proposalTitle'>Proposal Details - {{ proposal.projectname }}</h3>
             <div>
-              <a href="/proposal-budget/{{ proposals[0].proposalid }}"
+              <a href="/proposal-budget/{{ proposal.proposalid }}"
                 target='report' id="budgetDetailsButton">Budget Details</a>
-              <a href="/proposal-nspires/{{ proposals[0].proposalid }}"
+              <a href="/proposal-nspires/{{ proposal.proposalid }}"
                 target='report' id="nspiresButton">NSPIRES</a>
-              <a href="/proposal-roses/{{ proposals[0].proposalid }}"
+              <a href="/proposal-roses/{{ proposal.proposalid }}"
                 target='report' id="rosesButton">Redacted</a>
-              <a href="/proposal-basis/{{ proposals[0].proposalid }}"
+              <a href="/proposal-basis/{{ proposal.proposalid }}"
                 target='report' id="basisButton">BASIS+</a>
               <p/>
               <form id="proposalForm" action="index.php" method="GET">
-              <input type='hidden' name='proposalid' value='{{ proposals[0].proposalid }}'/>
+              <input type='hidden' name='proposalid' value='{{ proposal.proposalid }}'/>
               <input type='hidden' name='view' value='proposal-save'/>
               <table>
                 <tr><th>Project Name</th>
                   <td colspan="3"><input type='text' name='projectname' size="70"
-                      value='{{ proposals[0].projectname }}'/></td></tr>
+                      value='{{ proposal.projectname }}'/></td></tr>
                 <tr><th>Principal Investigator</th>
                   <td colspan="3">
-                    {% with dropdown_name = 'peopleid', dropdown_id = 'proposalpeopledropdown', selected_peopleid = proposals[0].peopleid %}
+                    {% with dropdown_name = 'peopleid', dropdown_id = 'proposalpeopledropdown', selected_peopleid = proposal.peopleid %}
                       {% include 'people-dropdown.html' %}
                     {% endwith %}
                   </td>
                 </tr>
                 <tr><th>Funding Program</th>
                   <td colspan="3">
-                    {% with dropdown_name = 'programid', dropdown_id = 'programiddropdown', selected_programid = proposals[0].programid %}
+                    {% with dropdown_name = 'programid', dropdown_id = 'programiddropdown', selected_programid = proposal.programid %}
                       {% include 'programs-dropdown.html' %}
                     {% endwith %}
                   </td>
                 </tr>
                 <tr><th>Status</th>
                   <td colspan="3">
-                    {% with dropdown_name = 'status', dropdown_id = 'statusdropdown', selected_status = proposals[0].status %}
+                    {% with dropdown_name = 'status', dropdown_id = 'statusdropdown', selected_status = proposal.status %}
                       {% include 'status-dropdown.html' %}
                     {% endwith %}
                   </td>
                 </tr>
                 <tr><th>Proposal Number</th>
-                  <td><input type='text' name='proposalnumber' value='{{ proposals[0].proposalnumber }}'/></td>
+                  <td><input type='text' name='proposalnumber' value='{{ proposal.proposalnumber }}'/></td>
                   <th>Award Number</th>
-                  <td><input type='text' name='awardnumber' value='{{ proposals[0].awardnumber }}'/></td></tr>
+                  <td><input type='text' name='awardnumber' value='{{ proposal.awardnumber }}'/></td></tr>
                 <tr><th>Starting</th>
                   <td><input type='text' id='proposalperfperiodstart' name='perfperiodstart'
-                       value='{{ proposals[0].perfperiodstart|dateformat }}' onchange='updateDropdown("proposalperfperiodstart");'/>
-                    {% with dropdown_name = 'perfperiodstart', dropdown_id = 'proposalperfperiodstart', selected_fy = proposals[0].perfperiodstart %}
+                       value='{{ proposal.perfperiodstart|dateformat }}' onchange='updateDropdown("proposalperfperiodstart");'/>
+                    {% with dropdown_name = 'perfperiodstart', dropdown_id = 'proposalperfperiodstart', selected_fy = proposal.perfperiodstart %}
                       {% include 'fiscalyear-dropdown.html' %}
                     {% endwith %}
                   </td>
                   <th>Ending</th>
                   <td><input type='text' id='proposalperfperiodend' name='perfperiodend'
-                       value='{{ proposals[0].perfperiodend|dateformat }}' onchange='updateDropdown("proposalperfperiodend");'/>
-                    {% with dropdown_name = 'perfperiodend', dropdown_id = 'proposalperfperiodend', selected_fy = proposals[0].perfperiodend %}
+                       value='{{ proposal.perfperiodend|dateformat }}' onchange='updateDropdown("proposalperfperiodend");'/>
+                    {% with dropdown_name = 'perfperiodend', dropdown_id = 'proposalperfperiodend', selected_fy = proposal.perfperiodend %}
                       {% include 'fiscalyear-dropdown.html' %}
                     {% endwith %}
                   </td></tr>
@@ -86,7 +86,7 @@
             </div>
           <h3 id='fundingTitle'>Funding</h3>
             <div id='fundingDiv' style='height: 400px;'>
-              <a href='javascript:void(0)' onClick="editFundingDialog('new', {{ proposals[0].proposalid }})" id='newFundingButton'>New</a><p/>
+              <a href='javascript:void(0)' onClick="editFundingDialog('new', {{ proposal.proposalid }})" id='newFundingButton'>New</a><p/>
               <br>
 
               <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#fundingTable').DataTable())">Save Row Preference</button>
@@ -98,7 +98,7 @@
             </div>
           <h3 id='fbmsTitle' >FMBS Accounts</h3>
             <div id='accountingDiv' style='height: 400px;'>
-              <a href='javascript:void(0)' onClick="editFBMSDialog('new', {{ proposals[0].proposalid }})" id='newFBMSButton'>New</a><p/>
+              <a href='javascript:void(0)' onClick="editFBMSDialog('new', {{ proposal.proposalid }})" id='newFBMSButton'>New</a><p/>
               <br>
 
               <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#fbmsTable').DataTable())">Save Row Preference</button>
@@ -110,7 +110,7 @@
             </div>
           <h3 id='overheadTitle'>Overhead Rates</h3>
             <div id='overheadDiv' style='height: 400px;'>
-              <a href='javascript:void(0)' onClick="editOverheadDialog('new', {{ proposals[0].proposalid }})" id='newOverheadButton'>New</a><p/>
+              <a href='javascript:void(0)' onClick="editOverheadDialog('new', {{ proposal.proposalid }})" id='newOverheadButton'>New</a><p/>
               <br>
 
               <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#overheadTable').DataTable())">Save Row Preference</button>
@@ -127,7 +127,7 @@
                 <button type='button' class='ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only' id='AddColumn' onclick='addColumn({{ proposalid }})' >
                   Add Column
                 </button>
-                {% with dropdown_name = 'validfiscalyears', dropdown_id = 'validfiscalyears', selected_fy = proposals[0].perfperiodstart %}
+                {% with dropdown_name = 'validfiscalyears', dropdown_id = 'validfiscalyears', selected_fy = proposal.perfperiodstart %}
                   {% include 'fiscalyear-dropdown.html' %}
                 {% endwith %}
               </div>
@@ -143,7 +143,7 @@
 
           <h3 id='conferencesTitle'>Conferences/Meetings/Travel</h3>
             <div>
-              <a href='javascript:void(0)' onClick="editAttendeeDialog({{ proposals[0].proposalid }}, 'new')" id='newConferenceButton'>New</a><p/>
+              <a href='javascript:void(0)' onClick="editAttendeeDialog({{ proposal.proposalid }}, 'new')" id='newConferenceButton'>New</a><p/>
 
               <br>
 
@@ -157,7 +157,7 @@
             </div>
           <h3 id='expensesTitle'>Expenses</h3>
             <div>
-              <a href='javascript:void(0)' onClick="editExpenseDialog('new', {{ proposals[0].proposalid }})" id='newExpenseButton'>New</a><p/>
+              <a href='javascript:void(0)' onClick="editExpenseDialog('new', {{ proposal.proposalid }})" id='newExpenseButton'>New</a><p/>
               <br>
 
               <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#expensesTable').DataTable())">Save Row Preference</button>
@@ -186,19 +186,19 @@
           $('#basisButton').button();
           $('#rosesButton').button();
 
-          loadFundingTable(false, '{{ proposals[0].proposalid }}');
-          loadFbmsTable(false, '{{ proposals[0].proposalid }}');
-          loadOverheadTable(false, '{{ proposals[0].proposalid }}');
-          loadTasksTable(false, '{{ proposals[0].proposalid }}');
-          loadConferencesTable(false, '{{ proposals[0].proposalid }}');
-          loadExpensesTable(false, '{{ proposals[0].proposalid }}');
+          loadFundingTable(false, '{{ proposal.proposalid }}');
+          loadFbmsTable(false, '{{ proposal.proposalid }}');
+          loadOverheadTable(false, '{{ proposal.proposalid }}');
+          loadTasksTable(false, '{{ proposal.proposalid }}');
+          loadConferencesTable(false, '{{ proposal.proposalid }}');
+          loadExpensesTable(false, '{{ proposal.proposalid }}');
 
           updateDropdown('proposalperfperiodstart');
           updateDropdown('proposalperfperiodend');
 
           $('#accordions').accordion( {heightStyle: 'content' });
 
-          figureCosts({{ proposals[0].proposalid }});
+          figureCosts({{ proposal.proposalid }});
         } );
 
       </script>

@@ -65,7 +65,7 @@ function loadFundingTable (reload, proposalid) {
     "processing": true,
     "serverSide": false,
     "autoWidth": false,
-    'ajax': '/funding/ajax/get?proposalid=' + proposalid,
+    'ajax': '/funding/ajax/list/' + proposalid,
     'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
   });
 
@@ -88,7 +88,7 @@ function loadFbmsTable (reload, proposalid) {
     "processing": true,
     "serverSide": false,
     "autoWidth": false,
-    'ajax': '/fbmsaccounts/ajax/get?proposalid=' + proposalid,
+    'ajax': '/fbmsaccounts/ajax/list/' + proposalid,
     'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
   } );
 
@@ -111,7 +111,7 @@ function loadOverheadTable (reload, proposalid) {
     'processing': true,
     'serverSide': false,
     'autoWidth': false,
-    'ajax': '/overhead/ajax/get?proposalid=' + proposalid,
+    'ajax': '/overhead/ajax/list/' + proposalid,
     'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
   } );
 
@@ -138,12 +138,9 @@ function loadTasksTable (reload, proposalid) {
 
   });
 
-  $task_res = $.ajax('/tasks/ajax/get?proposalid=' + proposalid, {dataType: "json", async: false});
+  $task_res = $.ajax('/tasks/ajax/list/' + proposalid, {dataType: "json", async: false});
   $task_json = $task_res.responseJSON['data'];
-  console.log($task_json)
-
   $people_res = $.ajax('/people/ajax/dropdown', {dataType: "json", async: false});
-
   $task_dd_res = $.ajax('/tasks/ajax/dropdown?proposalid=' + proposalid, {dataType: "json", async: false});
   $filtered_task_list = new Set($task_dd_res.responseJSON['data']);
   $task_dd_list = [];
@@ -451,7 +448,7 @@ function loadConferencesTable (reload, proposalid) {
     'processing': true,
     'serverSide': false,
     'autoWidth': false,
-    'ajax': '/conferenceattendees/ajax/get?proposalid=' + proposalid,
+    'ajax': '/conferenceattendees/ajax/list/byproposal/' + proposalid,
     'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
   } );
 
@@ -562,7 +559,7 @@ function deleteFunding(fundingid, proposalid) {
 }
 
 function editOverheadDialog(overheadid, proposalid) {
-  $("#editDialog").load('/overheadrates/ajax/edit?proposalid=' + proposalid);
+  $("#editDialog").load('/overhead/ajax/edit/' + overheadid);
 
   dialog = $("#editDialog").dialog({
     autoOpen: false,
@@ -628,8 +625,7 @@ function deleteOverhead(overheadid, proposalid) {
 }
 
 function editFBMSDialog(fbmsid, proposalid) {
-  $("#editDialog").load(
-    "index.php?view=fbms-edit&proposalid=" + proposalid + "&fbmsid=" + fbmsid);
+  $("#editDialog").load("/fbmsaccounts/ajax/edit/" + fbmsid);
 
   dialog = $("#editDialog").dialog({
     autoOpen: false,
@@ -776,9 +772,8 @@ function deleteTask(taskid, proposalid) {
     });
 }
 
-function editAttendeeDialog(proposalid, travelid) {
-  $("#editDialog").load(
-    "index.php?view=conference-attendee-edit&proposalid=" + proposalid + "&travelid=" + travelid);
+function editAttendeeDialog(proposalid, conferenceattendeeid) {
+  $("#editDialog").load("/conferenceattendees/ajax/edit/" + conferenceattendeeid);
 
   dialog = $("#editDialog").dialog({
     autoOpen: false,

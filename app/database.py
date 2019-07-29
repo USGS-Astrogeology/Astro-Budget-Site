@@ -1,7 +1,9 @@
+from datetime import date
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Sequence, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import REAL, NUMERIC, SMALLINT, BIGINT
 
 db = SQLAlchemy()
@@ -10,17 +12,17 @@ class Base(db.Model):
   __abstract__ = True
 
   @classmethod
-  def get_one(cls, filters=[False]):
+  def get_one(cls, filters=[]):
       return cls.query.filter(db.and_(*filters)).first()
 
   @classmethod
-  def get_many(cls, joins=[False], filters=[False], orders=[False]):
+  def get_many(cls, joins=[], filters=[], orders=[]):
       return cls.query.outerjoin(*joins)\
                       .filter(db.and_(*filters))\
                       .order_by(*orders).all()
 
   @classmethod
-  def get_all(cls, orders=[False]):
+  def get_all(cls, orders=[]):
       return cls.query.order_by(*orders).all()
 
 class People(Base):
@@ -31,12 +33,21 @@ class People(Base):
   username       = Column(String(32))
   admin          = Column(Boolean)
   row_preference = Column(Integer)
-  salaries       = relationship('Salaries', backref='person', order_by="desc(Salaries.effectivedate)")
+  salaries       = relationship('Salaries', backref='person', order_by="asc(Salaries.effectivedate)")
   proposals      = relationship('Proposals', backref='person')
   staffing       = relationship('Staffing', backref='person')
 
   def __repr__(self):
     return "<People(name='%s', username='%s')>" % (self.name, self.username)
+
+  @hybrid_property
+  def effective_salary(self):
+    effective_salary = None
+    for salary in self.salaries:
+      if salary.effectivedate.date() <= date.today():
+        effective_salary = salary
+    return effective_salary
+
 
 class Salaries(Base):
   __tablename__ = 'salaries'
@@ -97,6 +108,7 @@ class Proposals(Base):
   tasks               = relationship('Tasks', backref='proposal')
   expenses            = relationship('Expenses', backref='proposal')
   funding             = relationship('Funding', backref='proposal')
+  overheadrates       = relationship('OverheadRates', backref='proposal')
 
   def __repr__(self):
     return "<Proposals(project='%s', proposalnumber='%s', awardnumber='%s')>" % (self.projectname, self.proposalnumber, self.awardnumber)
@@ -116,11 +128,19 @@ class Conferences(Base):
 
   conferenceid        = Column(Integer, Sequence('conferences_conferenceid_seq'), primary_key=True)
   meeting             = Column(String(256))
-  conferencerates     = relationship('ConferenceRates', backref='conference', order_by='desc(ConferenceRates.effectivedate)')
+  conferencerates     = relationship('ConferenceRates', backref='conference', order_by='asc(ConferenceRates.effectivedate)')
   conferenceattendees = relationship('ConferenceAttendee', backref='conference')
 
   def __repr__(self):
     return "<Conference(meeting='%s', location='%s')>" % (self.meeting, self.location)
+
+  @hybrid_property
+  def effective_conferencerate(self):
+    effective_conferencerate = None
+    for conference_rate in self.conferencerates:
+      if conference_rate.effectivedate.date() <= date.today():
+        effective_conferencerate = conference_rate
+    return effective_conferencerate
 
 class ConferenceRates(Base):
   __tablename__ = 'conferencerates'
@@ -139,6 +159,7 @@ class ConferenceRates(Base):
 
   def __repr__(self):
     return "<ConferenceRates(perdiem='%d', registration='%s')>" % (self.perdiem, self.registration)
+
 
 class ConferenceAttendee(Base):
   __tablename__ = 'conferenceattendee'
@@ -210,7 +231,7 @@ class OverheadRates(Base):
     __tablename__='overheadrates'
 
     overheadid      = Column(Integer, Sequence('overheadrates_overheadid_seq'), primary_key=True)
-    proposalid      = Column(Integer)
+    proposalid      = Column(Integer, ForeignKey("proposals.proposalid"))
     rate            = Column(REAL)
     description     = Column(String(80))
     effectivedate   = Column(DateTime(timezone=False))

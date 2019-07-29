@@ -2,7 +2,7 @@
 {% for person in people %}
 ["<a href='javascript:void(0)' onclick='editUserDialog({{ person.peopleid }})'>{{ person.name }}</a>",
   {% if person.salaries %}
-  "{{ person.salaries[-1].title }}", "{{ person.salaries[-1].payplan }}",
+  "{{ person.effective_salary.title }}", "{{ person.effective_salary.payplan }}",
   {% else %}
   "","",
   {% endif %}

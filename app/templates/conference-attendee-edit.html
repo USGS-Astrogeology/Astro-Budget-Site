@@ -2,7 +2,6 @@
 <html>
     <head>
         <title>Editing Conference Attendee</title>
-
         <script src="{{ url_for('static', filename='js/date-tools.js') }}"></script>
     </head>
     <body>
@@ -25,44 +24,45 @@
             <input type="hidden" name="act" value="save"/>
             <input type="hidden" name="view" value="conference-attendee-save"/>
             <input type="hidden" id="travelid" name="travelid" 
-            {% if conferenceattendees[0] is empty %} value="new"/>
-            {% else %} value="{{ conferenceattendees[0].travelid }}"/>
+            {% if not conferenceattendee %} value="new"/>
+            {% else %} value="{{ conferenceattendee.travelid }}"/>
             {% endif %}
 
             <input type="hidden" id="proposalid" name="proposalid" value="{{ proposalid }}"/>
             <table><tr><th>Meeting/Conference/Training</th>
             <td colspan="3">
-              {% with dropdown_name = 'conferenceid', dropdown_id = 'conferenceiddropdown', selected_conferenceid = conferenceattendees[0].conferenceid %}
+              {% with dropdown_name = 'conferenceid', dropdown_id = 'conferenceiddropdown', selected_conferenceid = conferenceattendee.conferenceid %}
                 {% include 'conferences-dropdown.html' %}
               {% endwith %}
 
             </td></tr>
             <tr><th>Meeting</th><td colspan="3">
-            <input type="text" name="meeting" id="meeting" size=48 value="{{ conferenceattendees[0].meeting }}"/></td></tr>
+            <input type="text" name="meeting" id="meeting" size=48 value="{{ conferenceattendee.conference.meeting }}"/></td></tr>
             <tr><th>Meeting Days</th>
-            <td><input type="text" name="meetingdays" id="meetingdays" size="4" value="{{ conferenceattendees[0].meetingdays}}"/></td>
+            <td><input type="text" name="meetingdays" id="meetingdays" size="4" value="{{ conferenceattendee.meetingdays}}"/></td>
             <th>Travel Days</th>
-            <td><input type="text" name="traveldays" id="traveldays" size="4" value="{{ conferenceattendees[0].traveldays}}"/></td></tr>
+            <td><input type="text" name="traveldays" id="traveldays" size="4" value="{{ conferenceattendee.traveldays}}"/></td></tr>
             <tr><th>Travelers</th>
-            <td><input type="text" name="travelers" id="travelers" size="4" value="{{ conferenceattendees[0].travelers}}"/></td>
+            <td><input type="text" name="travelers" id="travelers" size="4" value="{{ conferenceattendee.travelers}}"/></td>
             <th>Trip Date</th>
-            <td><input type="text" name="startdate" id="tripstartdate" size="12" value="{{ conferenceattendees[0].startdate }}"
+            <td><input type="text" name="startdate" id="tripstartdate" size="12" value="{{ conferenceattendee.startdate|dateformat }}"
                         onchange="updateDropdown('startdate')"/>
-              {% with dropdown_name = 'startdate', dropdown_id = 'tripstartdate', selected_fy = conferenceattendees[0].startdate %}
+              {% with dropdown_name = 'startdate', dropdown_id = 'tripstartdate', selected_fy = conferenceattendee.startdate %}
                 {% include 'fiscalyear-dropdown.html' %}
               {% endwith %}
             </td></tr>
             <tr><th>How Many Rental Cars</th>
-            <td><input type="text" name="rentalcars" id="rentalcars" size="12" value="{{ conferenceattendees[0].rentalcars }}"/></td>
-            <th>Ground Transport</th><td><input type="text" name="groundtransport" id="groundtransport" size="9" value="{{ conferenceattendees[0].groundtransport }}"/></td></tr>
-            <tr><th>Airfare</th><td><input type="text" name="airfare" id="airfare" size="10" value="{{ conferenceattendees[0].airfare }}"/></td>
-            <th>Lodging</th><td><input type="text" name="lodging" id="lodging" size="9" value="{{ conferenceattendees[0].lodging }}"/></td></tr>
-            <tr><th colspan=3>Other per Traveler Costs such as CGE booking</th><td><input type="text" name="other" id="other" size="8" value="{{ conferenceattendees[0].other }}"/></td>
-            <tr><th>Per Diem</th><td><input type="text" name="perdiem" id="perdiem" size="8" value="{{ conferenceattendees[0].perdiem }}"/></td>
-            <th>Registration</th><td><input type="text" name="registration" id="registration" size="8" value="{{ conferenceattendees[0].registration }}"/></td></tr>
-            <tr><th>City, State</th><td><input type="text" name="city" id="city" size="20" value="{{ conferenceattendees[0].city }}"/>, 
-            <input type="text" name="state" id="state" size="3" value="{{ conferenceattendees[0].state }}"/></td>
-            <th>Country</th><td><input type="text" name="country" id="country" size="20" value="{{ conferenceattendees[0].country }}"/></td></tr>
+            {% set conferencerate = conferenceattendee.conference.effective_conferencerate %}
+            <td><input type="text" name="rentalcars" id="rentalcars" size="12" value="{{ conferenceattendee.rentalcars }}"/></td>
+            <th>Ground Transport</th><td><input type="text" name="groundtransport" id="groundtransport" size="9" value="{{ conferencerate.groundtransport|floatformat }}"/></td></tr>
+            <tr><th>Airfare</th><td><input type="text" name="airfare" id="airfare" size="10" value="{{ conferencerate.airfare|floatformat }}"/></td>
+            <th>Lodging</th><td><input type="text" name="lodging" id="lodging" size="9" value="{{ conferencerate.lodging|floatformat }}"/></td></tr>
+            <tr><th colspan=3>Other per Traveler Costs such as CGE booking</th><td><input type="text" name="other" id="other" size="8" value="--"/></td>
+            <tr><th>Per Diem</th><td><input type="text" name="perdiem" id="perdiem" size="8" value="{{ conferencerate.perdiem|floatformat }}"/></td>
+            <th>Registration</th><td><input type="text" name="registration" id="registration" size="8" value="{{ conferencerate.registration|floatformat }}"/></td></tr>
+            <tr><th>City, State</th><td><input type="text" name="city" id="city" size="20" value="{{ conferencerate.city }}"/>, 
+            <input type="text" name="state" id="state" size="3" value="{{ conferencerate.state }}"/></td>
+            <th>Country</th><td><input type="text" name="country" id="country" size="20" value="{{ conferencerate.country }}"/></td></tr>
            </table>
        </form>
     </div>

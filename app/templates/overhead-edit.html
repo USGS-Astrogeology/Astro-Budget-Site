@@ -9,16 +9,16 @@
           <form id="overheadForm" action="index.php" method="GET">
             <input type="hidden" name="act" value="save"/>
             <input type="hidden" name="view" value="overhead-save"/>
-            <input type="hidden" id="proposalid" name="proposalid" value="{{ overheadrates[0].proposalid }}"/>
-            <input type="hidden" id="overheadid" name="overheadid" value="{{ overheadrates[0].overheadid }}"/>
+            <input type="hidden" id="proposalid" name="proposalid" value="{{ overheadrate.proposalid }}"/>
+            <input type="hidden" id="overheadid" name="overheadid" value="{{ overheadrate.overheadid }}"/>
             <table><tr><th>Overhead Rate</th>
-            <td><input type="text" name="rate" id=rate" value="{{ overheadrates[0].rate }}" size="10"/></td></tr>
+            <td><input type="text" name="rate" id=rate" value="{{ overheadrate.rate }}" size="10"/></td></tr>
             <tr><th>Description</th>
-            <td><input type="text" name="description" id="description" value="{{ overheadrates[0].description }}" size="32"/></td></tr>
+            <td><input type="text" name="description" id="description" value="{{ overheadrate.description }}" size="32"/></td></tr>
             <tr><th>Effective Date</th>
-            <td><input type="text" name="effectivedate" id="effectivedate" value="{{ overheadrates[0].effectivedate }}" size="12"
+            <td><input type="text" name="effectivedate" id="effectivedate" value="{{ overheadrate.effectivedate|dateformat }}" size="12"
                  onchange="updateDropdown('effectivedate');"/>
-                 {% with dropdown_name = 'effectivedate', dropdown_id = 'effectivedate', selected_fy = overheadrates[0].effectivedate %}
+                 {% with dropdown_name = 'effectivedate', dropdown_id = 'effectivedate', selected_fy = overheadrate.effectivedate %}
                   {% include 'fiscalyear-dropdown.html' %}
                  {% endwith %}
             </td></tr>

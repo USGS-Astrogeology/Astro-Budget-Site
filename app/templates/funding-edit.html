@@ -9,38 +9,32 @@
        <form id="fundingForm" action="index.php" method="GET">
             <input type="hidden" name="act" value="save"/>
             <input type="hidden" name="view" value="funding-save"/>
-            <input type="hidden" id="proposalid" name="proposalid" value="{{ funding[0].proposalid }}"/>
-            <input type="hidden" id="fundingid" name="fundingid" value="{{ funding[0].fundingid }}"/>
+            <input type="hidden" id="proposalid" name="proposalid" value="{{ funding.proposalid }}"/>
+            <input type="hidden" id="fundingid" name="fundingid" value="{{ funding.fundingid }}"/>
 
             <table>
             <tr><th>Fiscal Year</th>
             <td><input type="text" name="fiscalyear" id="fiscalyear" size="16"
-                value="{{ funding[0].fiscalyear | fydateformat }}" onclick = "chooseDate()"      onchange="updateDropdown('fiscalyear');"/>
+                value="{{ funding.fiscalyear | fydateformat }}" onchange="updateDropdown('fiscalyear');"/>
                 {% with dropdown_name = 'fiscalyear',
                         dropdown_id = 'fiscalyear',
-                        selected_fy = funding[0].fiscalyear %}
+                        selected_fy = funding.fiscalyear %}
                 {% include 'fiscalyear-dropdown.html' %}
                 {% endwith %}
                 </td></tr>
             <tr><th>New Funding</th>
-            <td><input type="text" name="newfunding" id="newfunding" size="16" value="{{ funding[0].newfunding | currencyformat }}"/></td></tr>
+            <td><input type="text" name="newfunding" id="newfunding" size="16" value="{{ funding.newfunding | currencyformat }}"/></td></tr>
             <tr><th>Carryover</th>
-            <td><input type="text" name="carryover" id="carryover" size="16" value="{{ funding[0].carryover | currencyformat }}"/></td></tr>
+            <td><input type="text" name="carryover" id="carryover" size="16" value="{{ funding.carryover | currencyformat }}"/></td></tr>
        </form>
     </div>
 
     <script type="text/javascript">
 
-    function chooseDate() {
-      $("#fiscalyear").datepicker();
-      updateDropdown('fiscalyear');
-    }
-
       $(document).ready(function() {
-        //updateDropdown('fiscalyear');
-        chooseDate();
-        //$("#fiscalyear").datepicker();
-        //updateDropdown('fiscalyear');
+        $("#fiscalyear").datepicker();
+        updateDropdown('fiscalyear');
+        console.log("document ready")
       });
 
     </script>

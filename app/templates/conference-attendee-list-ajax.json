@@ -1,7 +1,7 @@
 {"draw":0,"recordsTotal":{{ conferenceattendees|length }},"recordsFiltered":{{ conferenceattendees|length }},"data":[
     {% for attendee in conferenceattendees %}
-        {% set conferencerate = attendee.conference.conferencerates[0] %}
-        ["<a href='javascript:void(0)' onclick='editAttendeeDialog({{ attendee.proposal.proposalid }}, {{ attendee.travelid }})'>{{ attendee.conference.meeting }}</a>",
+        {% set conferencerate = attendee.conference.effective_conferencerate %}
+        ["<a href='javascript:void(0)' onclick='editAttendeeDialog({{ attendee.proposal.proposalid }}, {{ attendee.conferenceattendeeid}})'>{{ attendee.conference.meeting }}</a>",
         {{ attendee.travelers }}, 
         "{{ attendee.startdate|dateformat }}", 
         "{{ attendee.startdate|fyformat }}", 

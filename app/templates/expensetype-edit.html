@@ -9,13 +9,13 @@
             <input type="hidden" name="act" value="save"/>
             <input type="hidden" name="view" value="expensetype-save"/>
             <input type="hidden" id="expensetypeid" name="expensetypeid" 
-              {% if not expensetypes %} value="new"/>
-              {% else %} value="{{ expensetypes[0].expensetypeid }}"/>
+              {% if not expensetype %} value="new"/>
+              {% else %} value="{{ expensetype.expensetypeid }}"/>
               {% endif %}
             <table><tr><th align="left">Expense Description</th></tr>
             <tr><td><input type="text" name="description" id="desciption" 
-              {% if not expensetypes %} value='' size="40"/>
-              {% else %} value="{{ expensetypes[0].description }}" size="40"/>
+              {% if not expensetype %} value='' size="40"/>
+              {% else %} value="{{ expensetype.description }}" size="40"/>
               {% endif %}
             </td></tr>
             </table>

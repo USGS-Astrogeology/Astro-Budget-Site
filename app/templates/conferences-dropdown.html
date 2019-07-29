@@ -1,5 +1,10 @@
 <select name='{{ dropdown_name }}' id='{{ dropdown_id }}' onchange='loadConferenceRate()'>
 {% for conference in conferences %}
-  <option value='{{ conference.conferenceid }}' meeting='{{ conference.meeting }}' {% if conference.conferenceid == selected_conferenceid %}selected {% endif %}> {{ conference.meeting }} ({{ conference.conferencerates[0].city }}, {{ conference.conferencerates[0].state }}  {{ conference.conferencerates[0].country }})</option>
+<option value='{{ conference.conferenceid }}' meeting='{{ conference.meeting }}' {% if conference.conferenceid == selected_conferenceid %}selected {% endif %}> 
+{% set conferencerate = conference.effective_conferencerate %}
+{{ conference.meeting }} (
+{% if conferencerate.city %}{{ conference.effective_conferencerate.city }}, {% endif %}
+{% if conferencerate.state %}{{ conference.effective_conferencerate.state }}, {% endif %}{{ conference.effective_conferencerate.country }})
+</option>
 {% endfor %}
 </select>

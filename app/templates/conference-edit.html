@@ -19,11 +19,11 @@
             <input type="hidden" name="view" value="conference-save"/>
             <input type="hidden" id="conferenceid" name="conferenceid" 
             {% if not conference %} value="new"/>
-            {% else %} value="{{ conferences[0].conferenceid }}"/>
+            {% else %} value="{{ conference.conferenceid }}"/>
             {% endif %}
             <table>
             <tr><th align="left">Conference/Meeting/Travel</th></tr>
-            <tr><td><input type="text" name="meeting" id="meeting" value="{{ conferences[0].meeting }}" size="40"/></td></tr>
+            <tr><td><input type="text" name="meeting" id="meeting" value="{{ conference.meeting }}" size="40"/></td></tr>
             <tr><td><a href='javascript:void(0)' onClick="rateEdit('new')" id='newRateButton'>New Rate</a></td><td></td></tr>
 
             </table>
@@ -40,7 +40,7 @@
           <form id="rateForm" action="index.php" method="GET">
             <input type="hidden" name="act" value="save"/>
             <input type="hidden" name="view" value="conference-rate-save"/>
-            <input type="hidden" id="conferenceid" name="conferenceid" value="{{ conferences[0].conferenceid }}"/>
+            <input type="hidden" id="conferenceid" name="conferenceid" value="{{ conference.conferenceid }}"/>
             <input type="hidden" id="conferencerateid" name="conferencerateid" value=""/>
             <table>
               <tr><th>Per Diem</th><td><input type="text" id="perdiem" name="perdiem" size="12"/></td>
@@ -80,7 +80,7 @@
           "processing": true,
           "serverSide": false,
           'autoWidth': false,
-          "ajax": "/conferencerates/ajax/get?conferenceid=" + {{ conferences[0].conferenceid|tojson }}
+          "ajax": "/conferencerates/ajax/list/" + {{ conference.conferenceid }}
         } );
       }
 
@@ -98,7 +98,7 @@
         $("#conferenceedittabs").tabs( "option", "active", 1 );
         $("#conferencerateid").val(conferencerateid);
         if (conferencerateid == 'new') {
-          $("#conferenceid").val({{ conferences[0].conferenceid|tojson }});
+          $("#conferenceid").val({{ conference.conferenceid }});
           $("#perdiem").val('');
           $("#lodging").val('');
           $("#registration").val('');
@@ -110,7 +110,7 @@
           $("#effectivedate").val(Date());
         }
         else {
-          $.getJSON( "/conferencerates/ajax/edit?conferencerateid=" + conferencerateid, function( data ) {
+          $.getJSON( "/conferencerates/ajax/edit/" + conferencerateid, function( data ) {
             $("#conferencerateid").val(data.data[0][0]);
             $("#conferenceid").val(data.data[0][1]);
             $("#perdiem").val(data.data[0][2]);
