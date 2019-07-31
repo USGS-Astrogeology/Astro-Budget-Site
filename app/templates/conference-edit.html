@@ -3,6 +3,7 @@
     <head>
         <title>Editing Conferences</title>
         <script src="{{ url_for('static', filename='js/date-tools.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/row_setting.js') }}"></script>
     </head>
     <body>
     <div id="conferenceedittabs">
@@ -17,7 +18,7 @@
           <form id="conferenceForm" action="index.php" method="GET">
             <input type="hidden" name="act" value="save"/>
             <input type="hidden" name="view" value="conference-save"/>
-            <input type="hidden" id="conferenceid" name="conferenceid" 
+            <input type="hidden" id="conferenceid" name="conferenceid"
             {% if not conference %} value="new"/>
             {% else %} value="{{ conference.conferenceid }}"/>
             {% endif %}
@@ -80,8 +81,13 @@
           "processing": true,
           "serverSide": false,
           'autoWidth': false,
-          "ajax": "/conferencerates/ajax/list/" + {{ conference.conferenceid }}
+          "ajax": "/conferencerates/ajax/list/" + {{ conference.conferenceid }},
+          "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]]
         } );
+
+
+        check_row_preference($('#rateTable').DataTable());
+
       }
 
       $(function() {
@@ -133,7 +139,7 @@
 
             $("#warningDiv").html("<p>Updated [" + $("#conferencerateid").val() + "]</p>");
             $("#warningDiv").show();
-    
+
             loadRateTable(true);
 
             $("#conferenceedittabs").tabs( "option", "active", 0 );

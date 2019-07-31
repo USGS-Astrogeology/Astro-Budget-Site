@@ -15,7 +15,7 @@
         </div>
         <div id="warningDiv" class="ui-corner-all ui-state-highlight" style="width=100px;align=right;"></div>
         <div id="editDialog" class="ui-widget">
-          <p/>
+          
           <form id="reportForm" action="index.php" method="GET">
           <table id='reportFormTable' class='display' cellspacing='0' width='100%'>
           <tr><th>CSV Download File Name</th><td>
@@ -26,18 +26,20 @@
           <tr><th>End Date</th><td><input type="text" name="enddate" id="enddate" value="{{ enddate }}" size="24"/></td></tr>
           <tr><th>Report Type</th><td><input type="radio" name="view" value="tasks-list-csv" checked/>Staffing
                   <input type="radio" name="view" value="budgets-list-csv"/>Costs</td></tr>
-          <tr><th>Program</th><td>{% with dropdown_name = 'programid',
-                                                            search = 1,
-                                                            dropdown_id = 'programiddropdown',
-                                                            selected_programid = 0 %}
-                                  {% include 'programs-dropdown.html' %}
-                                {% endwith %}</td></tr>
+          <tr><th>Program</th><td>
+            {% with dropdown_name = 'programid',
+                    search = 1,
+                    dropdown_id = 'programiddropdown',
+                    selected_programid = 0 %}
+                {% include 'programs-dropdown.html' %}
+            {% endwith %}
+          </td></tr>
           <tr><th>Person <span style="font-weight:normal;">(staffing only)</span></th><td>
             {% with dropdown_name = 'peopleid',
-                                      search = 1,
-                                      dropdown_id = 'peopledropdown',
-                                      selected_peopleid = 0 %}
-            {% include 'people-dropdown.html'  %}
+                    search = 1,
+                    dropdown_id = 'peopledropdown',
+                    selected_peopleid = 0 %}
+                {% include 'people-dropdown.html'  %}
             {% endwith %}
           </td></tr>
 

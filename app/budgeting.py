@@ -123,7 +123,7 @@ def load_conferenceattendees(id):
 		filters.append(ConferenceAttendee.proposalid == id)
 	if 'byconference' in route.rule:
 		filters.append(ConferenceAttendee.conferenceid == id)
-	
+
 	conferenceattendees = ConferenceAttendee.get_many(joins = [], filters = filters, orders = [])
 	return render_template('conference-attendee-list-ajax.json', conferenceattendees = conferenceattendees)
 
@@ -187,7 +187,7 @@ def load_expensetypes():
 @login_required
 def save_expensetype(expensetypeid):
 	expensetype = ExpenseTypes.get_one(filters = [ExpenseTypes.expensetypeid == expensetypeid])
-	
+
 
 
 # FBMSACCOUNTS
@@ -203,6 +203,11 @@ def edit_fbmsaccount(fbmsid):
 def load_fbmsaccounts(proposalid):
 	fbmsaccounts = FBMSAccounts.get_many(filters = [FBMSAccounts.proposalid == proposalid])
 	return render_template('fbms-list-ajax.json', fbmsaccounts = fbmsaccounts)
+
+@app.route('/fbmsaccounts/ajax/save?<path:path>')
+@login_required
+def save_fbmsaccounts():
+	# saving code goes here
 
 
 # FUNDING
@@ -257,6 +262,15 @@ def save_funding():
 def overhead():
 	return render_template('overheads.html')
 
+@app.route('/overhead/ajax/delete?<path:path>')
+@login_required
+def delete_overhead():
+	# use the get arguments methods to get the elements in the url
+	# return a message saying that this specific overhead was deleted?
+	# make sure all parameters have been filled out for this delete, make sure
+	# not to try to delete something that doesn't exist
+		# might be how a whole table got deleted before
+
 @app.route('/overhead/ajax/edit/<int:overheadid>')
 @login_required
 def edit_overhead(overheadid):
@@ -272,6 +286,12 @@ def load_overhead(proposalid):
 	if not overheadrates:
 		overheadrates = OverheadRates.get_many(filters = [OverheadRates.proposalid == None])
 	return render_template('overhead-list-ajax.json', overheadrates = overheadrates)
+
+@app.route('/overhead/ajax/save?<path:path>')
+@login_required
+def save_overhead():
+	# check for all elements in the path before editing?
+	# use if statements and the get arguments method to get the parameters
 
 
 # PEOPLE
@@ -360,25 +380,43 @@ def load_proposals():
 	proposals = Proposals.get_many(joins = [], filters = [], orders = [])
 	return render_template('proposal-list-ajax.json', proposals = proposals)
 
+
 @app.route('/proposal-basis/<int:proposalid>')
+@login_required
+def proposal_basis(proposalid):
+	proposal = Proposals.get_one(filters = [Proposals.proposalid == proposalid])
+	return render_template('proposal-basis.html', proposal = proposal)
+
 @app.route('/proposal-budget/<int:proposalid>')
+@login_required
+def proposal_budget_details(proposalid):
+	proposal = Proposals.get_one(filters = [Proposals.proposalid == proposalid])
+	people = People.get_all()
+	years = {}
+	for task in proposal.tasks:
+		for staffing in task.staffing:
+			year = fyformat(staffing.fiscalyear)
+			date = staffing.fiscalyear
+			if year not in years.keys():
+				years[year] = []
+			years[year].append(staffing)
+	return render_template('proposal-budget-details.html', proposal = proposal,
+														   people = people,
+														   years = years)
+
 @app.route('/proposal-nspires/<int:proposalid>')
+@login_required
+def proposal_nspires(proposalid):
+	proposal = Proposals.get_one(filters = [Proposals.proposalid == proposalid])
+
+	return render_template('proposal-nspires.html', proposal = proposal)
+
 @app.route('/proposal-roses/<int:proposalid>')
 @login_required
-def budget_reports(proposalid):
-	proposals = Proposals.get_one(filters = [Proposals.proposalid == proposalid])
+def proposal_redacted(proposalid):
+	proposal = Proposals.get_one(filters = [Proposals.proposalid == proposalid])
+	return render_template('proposal-roses.html', proposal = proposal)
 
-	route = request.url_rule
-	if 'basis' in route.rule:
-		return render_template('proposal-basis.html', proposals = proposals)
-	elif 'budget' in route.rule:
-		return render_template('proposal-budget-details.html', proposals = proposals)
-	elif 'nspires' in route.rule:
-		return render_template('proposal-nspires.html', proposals = proposals)
-	elif 'roses' in route.rule:
-		return render_template('proposal-roses.html', proposals = proposals)
-	else:
-		abort(404)
 
 # REPORTS
 
