@@ -13,7 +13,7 @@
         <div id="title">
           <h2>List of Funding Programs
           {% if g.user.admin %}
-          <a href='javascript:void(0)' onClick="editProgramDialog('new')" id='newButton'>New</a>
+          <a href='javascript:void(0)' onClick="editDialog('/programs/ajax/edit/0', null, $('#programsTable'))" id='newButton'>New</a>
           {% endif %}
           <br>
 
@@ -30,51 +30,6 @@
       </div>
 
       <script type="text/javascript" charset="utf-8">
-        function loadProgramTable (reload) {
-          if (reload) {
-            $('#programsTable').dataTable().fnDestroy();
-          }
-
-          $('#programsTableDiv').html("<table id='programsTable' class='display' cellspacing='0' width='100%'> " +
-          "<thead><tr><th>Name</th><th>Agency</th><th>POC</th><th>POC E-Mail</th><th>Start</th><th>End</th></tr>" +
-          "</thead></table>");
-
-          $('#programsTable').dataTable( {
-            "processing": true,
-            "serverSide": false,
-            "autoWidth": false,
-            "ajax": "/programs/ajax/list",
-            "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]]
-          } );
-
-          if (!reload)
-          {
-            check_row_preference($('#programsTable').DataTable());
-          }
-
-        }
-
-        function editProgramDialog(programid) {
-          $("#editDialog").load("programs/ajax/edit/" + programid);
-          console.log(programid);
-
-          dialog = $("#editDialog").dialog({
-            autoOpen: false,
-            height: 600,
-            width: 950,
-            modal: true,
-            buttons: {
-              "Save": saveProgram,
-              Cancel: function () {
-                dialog.dialog("close");
-              }
-            }
-          });
-
-          dialog.dialog("open");
-
-        }
-
         function saveProgram() {
           $.post("index.php", $("#programForm").serialize())
             .always( function () {
@@ -89,7 +44,7 @@
         $(document).ready(function() {
           $("#newButton").button();
           $("#warningDiv").hide();
-          loadProgramTable(false);
+          loadTable('/programs/ajax/list', false, $('#programsTable'));
         } );
       </script>
     </body>

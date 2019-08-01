@@ -2,7 +2,7 @@
 {"draw":0,"recordsTotal":{{ conferences|length }},"recordsFiltered":{{ conferences|length }},"data":[
   {% for conference in conferences %}
       {% if g.user.admin %}
-          ["<a href='javascript:void(0)' onclick='editConferenceDialog({{ conference.conferenceid }})'>{{ conference.meeting }}</a>",
+          ["<a href='javascript:void(0)' onclick='editDialog(\"/conferences/ajax/edit/{{ conference.conferenceid }}\", null, $(\"#conferencesTable\"))'>{{ conference.meeting }}</a>",
       {% else %}
           ["{{ conference.meeting }}",
       {% endif %}

@@ -25,14 +25,6 @@ class Base(db.Model):
   def get_all(cls, orders=[]):
       return cls.query.order_by(*orders).all()
 
-  @classmethod
-  def get_effective(cls, date, list):
-    effective_item = None
-    for item in list:
-      if item.effectivedate.date() <= date:
-        effective_item = item
-    return effective_item
-
 class People(Base):
   __tablename__ = 'people'
 
@@ -47,17 +39,6 @@ class People(Base):
 
   def __repr__(self):
     return "<People(name='%s', username='%s')>" % (self.name, self.username)
-
-  '''
-  @hybrid_property
-  def effective_salary(self):
-    effective_salary = None
-    for salary in self.salaries:
-      if salary.effectivedate.date() <= date.today():
-        effective_salary = salary
-    return effective_salary
-    '''
-
 
 class Salaries(Base):
   __tablename__ = 'salaries'
@@ -123,16 +104,6 @@ class Proposals(Base):
   def __repr__(self):
     return "<Proposals(project='%s', proposalnumber='%s', awardnumber='%s')>" % (self.projectname, self.proposalnumber, self.awardnumber)
 
-  '''
-  @hybrid_property
-  def effective_overheadrate(self):
-    effective_overheadrate = None
-    for overhead_rate in self.overheadrates:
-      if overhead_rate.effectivedate.date() <= date.today():
-        effective_overheadrate = overhead_rate
-    return effective_overheadrate
-    '''
-
 class FBMSAccounts(Base):
   __tablename__ = 'fbmsaccounts'
 
@@ -153,16 +124,6 @@ class Conferences(Base):
 
   def __repr__(self):
     return "<Conference(meeting='%s', location='%s')>" % (self.meeting, self.location)
-
-  '''
-  @hybrid_property
-  def effective_conferencerate(self):
-    effective_conferencerate = None
-    for conference_rate in self.conferencerates:
-      if conference_rate.effectivedate.date() <= date.today():
-        effective_conferencerate = conference_rate
-    return effective_conferencerate
-    '''
 
 class ConferenceRates(Base):
   __tablename__ = 'conferencerates'

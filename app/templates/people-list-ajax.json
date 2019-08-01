@@ -1,10 +1,11 @@
 {"draw":0,"recordsTotal":{{ people|length }},"recordsFiltered":{{ people|length }},"data":[
 {% for person in people %}
-["<a href='javascript:void(0)' onclick='editUserDialog({{ person.peopleid }})'>{{ person.name }}</a>",
+["<a href='javascript:void(0)' onclick='editDialog(\"/people/ajax/edit/{{ person.peopleid }}\", null, $(\"#peopleTable\"))'>{{ person.name }}</a>",
   {% if person.salaries %}
-  "{{ person.effective_salary.title }}", "{{ person.effective_salary.payplan }}",
+    {% set salary = person.salaries|geteffective %}
+    "{{ salary.title }}", "{{ salary.payplan }}",
   {% else %}
-  "","",
+    "","",
   {% endif %}
   "{{ person.username }}"
   ]{% if loop.last != true %},{% endif %}

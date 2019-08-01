@@ -2,7 +2,6 @@
 <html>
     <head>
         <title>Editing Overhead</title>
-        <script src="{{ url_for('static', filename='js/date-tools.js') }}"></script>
     </head>
     <body>
     <div>
@@ -27,11 +26,10 @@
     </div>
 
     <script type="text/javascript" charset="utf-8">
-    $(function() {
-      $("#effectivedate").datepicker();
-
-      updateDropdown ('effectivedate');
-    });
+      $(document).ready(function() {
+        $("#effectivedate").datepicker();
+        updateDropdown ('effectivedate');
+      });
     </script>
     </body>
 </html>

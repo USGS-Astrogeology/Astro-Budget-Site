@@ -20,8 +20,9 @@
     {% endif %}
     "{{ staff.fiscalyear }}staffingid": {{ staff.staffingid }},
     "{{ staff.fiscalyear }}": {{ staff.q1hours + staff.q2hours + staff.q3hours + staff.q4hours + staff.flexhours }},
-    {% if staff.person.effective_salary %}
-      {% set cost_total = cost_total + ((staff.person.effective_salary.estsalary * staff.person.effective_salary.laf) + (staff.person.effective_salary.estbenefits * staff.person.effective_salary.laf)) %}
+    {% if staff.person.salaries|geteffective %}
+      {% set salary = staff.person.salaries|geteffective %}
+      {% set cost_total = cost_total + ((salary.estsalary * salary.laf) + (salary.estbenefits * salary.laf)) %}
     {% endif %}
     {% if loop.last %}
       "Cost": "{{ cost_total|currencyformat }}"}

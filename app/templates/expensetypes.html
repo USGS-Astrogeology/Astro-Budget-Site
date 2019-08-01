@@ -13,7 +13,7 @@
         <div id="title">
           <h2>List of Expense Types
           {% if g.user.admin %}
-            <a href='javascript:void(0)' onClick="editExpenseTypeDialog()" id='newButton'>New</a>
+            <a href='javascript:void(0)' onClick="editDialog('/expensetypes/ajax/edit/0', null, $('#expensetypesTable'))" id='newButton'>New</a>
           {% endif %}
           <br>
 
@@ -31,50 +31,6 @@
       </div>
 
       <script type="text/javascript" charset="utf-8">
-        function loadExpenseTypeTable(reload) {
-          if (reload) {
-            $('#expensetypesTable').dataTable().fnDestroy();
-          }
-
-          $('#expensetypesTableDiv').html("<table id='expensetypesTable' class='display' cellspacing='0' width='100%'>"+
-                                          "<thead><tr><th>Description</th></tr></thead></table>");
-
-          $('#expensetypesTable').dataTable( {
-            "processing": true,
-            "serverSide": false,
-            "autowidth": false,
-            "ajax": "/expensetypes/ajax/list",
-            "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]]
-          } );
-
-          if (!reload)
-          {
-            check_row_preference($('#expensetypesTable').DataTable());
-          }
-
-        }
-
-
-        function editExpenseTypeDialog(expensetypeid = 0) {
-          $("#editDialog").load("/expensetypes/ajax/edit/" + expensetypeid);
-
-          dialog = $("#editDialog").dialog({
-            autoOpen: false,
-            height: 250,
-            width: 500,
-            modal: true,
-            buttons: {
-              "Save": saveExpensetype,
-              Cancel: function () {
-                dialog.dialog("close");
-              }
-            }
-          });
-
-          dialog.dialog("open");
-
-        }
-
         function saveExpensetype() {
           $.post("index.php", $("#expensetypeForm").serialize())
             .always (function() {
@@ -89,8 +45,7 @@
         $(document).ready(function() {
           $("#newButton").button();
           $("#warningDiv").hide();
-
-          loadExpenseTypeTable(false);
+          loadTable('/expensetypes/ajax/list', false, $('#expensetypesTable'));
         } );
       </script>
     </body>

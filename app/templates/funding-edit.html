@@ -2,7 +2,6 @@
 <html>
     <head>
         <title>Editing Funding</title>
-        <script src="{{ url_for('static', filename='js/date-tools.js') }}"></script>
     </head>
     <body>
     <div id="fundingeditdiv">
@@ -18,7 +17,7 @@
                 value="{{ funding.fiscalyear | fydateformat }}" onchange="updateDropdown('fiscalyear');"/>
                 {% with dropdown_name = 'fiscalyear',
                         dropdown_id = 'fiscalyear',
-                        selected_fy = funding.fiscalyear %}
+                        selected_fy = 'test' %}
                 {% include 'fiscalyear-dropdown.html' %}
                 {% endwith %}
                 </td></tr>
@@ -34,7 +33,6 @@
       $(document).ready(function() {
         $("#fiscalyear").datepicker();
         updateDropdown('fiscalyear');
-        console.log("document ready")
       });
 
     </script>

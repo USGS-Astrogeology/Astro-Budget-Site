@@ -12,15 +12,9 @@
         {% include 'menu-tags.html' %}
       <div class="container">
         <div id="title">
-          <h2>List of People
-          <a href='javascript:void(0)' onClick="editUserDialog('new')" id='newButton'>New</a>
-
-          <br>
-
-          <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#peopleTable').DataTable())">Save Row Preference</button>
-
-        </h2>
-
+          <h2>List of People</h2>
+            <a href='javascript:void(0)' onClick="editDialog('/people/ajax/edit/0', null, $('#peopleTable'))" id='newButton'>New</a> <br>
+            <p><button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#peopleTable').DataTable())">Save Row Preference</button></p>
         </div>
         <div id="warningDiv" class="ui-corner-all ui-state-highlight" style="width=100px;align=right;"></div>
         <div id="editDialog" class="ui-widget"></div>
@@ -32,25 +26,6 @@
       </div>
 
       <script type="text/javascript" charset="utf-8">
-        function editUserDialog(peopleid) {
-          $("#editDialog").load("/people/ajax/edit/" + peopleid);
-
-          dialog = $("#editDialog").dialog({
-            autoOpen: false,
-            height: 800,
-            width: 1100,
-            modal: true,
-            buttons: {
-              "Save User": saveUser,
-              Cancel: function () {
-                dialog.dialog("close");
-              }
-            }
-          });
-
-          dialog.dialog("open");
-        }
-
         function saveUser() {
           $.post("index.php", $("#peopleForm").serialize());
 
@@ -62,31 +37,10 @@
           $("#warningDiv").show();
         }
 
-        function loadPeopleTable (reload) {
-        if (reload) { $('#peopleTable').dataTable().fnDestroy(); }
-
-          $("#peopleTableDiv").html('<table id="peopleTable" class="display" cellspacing="0" width="100%">' +
-            '<thead><tr><th>Name</th><th>Title</th><th>Pay Plan</th><th>Username</th></tr></thead></table>');
-
-          $('#peopleTable').dataTable( {
-            "processing": true,
-            "serverSide": false,
-            "autoWidth": false,
-            "ajax": "people/ajax/list",
-            "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]]
-          } );
-
-          if (!reload)
-          {
-            check_row_preference($('#peopleTable').DataTable());
-          }
-
-        }
-
         $(document).ready(function() {
           $("#newButton").button();
           $("#warningDiv").hide();
-          loadPeopleTable(false);
+          loadTable('/people/ajax/list', false, $('#peopleTable'));
         } );
       </script>
     </body>

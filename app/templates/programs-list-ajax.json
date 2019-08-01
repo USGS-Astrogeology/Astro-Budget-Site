@@ -1,7 +1,7 @@
 {"draw":0,"recordsTotal":{{ programs|length }},"recordsFiltered":{{ programs|length }},"data":[
   {% for program in programs %}
     {% if g.user.admin %}
-      ["<a href='javascript:void(0)' onclick='editProgramDialog({{ program.programid }})'>{{ program.programname }}</a>",
+      ["<a href='javascript:void(0)' onclick='editDialog(\"/programs/ajax/edit/{{ program.programid }}\", null, $(\"#programsTable\"))'>{{ program.programname }}</a>",
     {% else %}
       ["{{ program.programname }}",
     {% endif %}

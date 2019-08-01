@@ -1,7 +1,7 @@
 {"draw":0,"recordsTotal":{{ overheadrates|length }},"recordsFiltered":{{ overheadrates|length }},"data":[
   {% for rate in overheadrates %}
     {% if (g.user.admin and rate.proposalid) or (g.user.peopleid == rate.proposal.peopleid and rate.proposalid) %}
-      ["<a href='javascript:void(0)' onclick='editOverheadDialog({{ rate.overheadid }}, {{ rate.proposalid }})'>{{ rate.rate|intformat }}%</a>",
+      ["<a href='javascript:void(0)' onclick='editDialog(\"/overhead/ajax/edit/{{ rate.overheadid }}\", {{ rate.proposalid }}, $(\"#overheadTable\"))'>{{ rate.rate|intformat }}%</a>",
     {% else %}
       ["{{ rate.rate }}%",
     {% endif %}

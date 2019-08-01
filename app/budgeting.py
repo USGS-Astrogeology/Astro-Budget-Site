@@ -5,13 +5,17 @@ from database import (db, Conferences, ConferenceRates, ConferenceAttendee, Expe
 					  Funding, FundingPrograms, OverheadRates, People, Proposals, Salaries, Staffing,
 					  Statuses, Tasks)
 
+# Jinja Filters ------------------>
 def currencyformat(value):
 	if value is None:
 		return '$0.00'
 	return "${:,.2f}".format(value)
 
-def dateformat(datestring, format='%m/%d/%Y'):
-	return datestring.strftime(format)
+def dateformat(datestring):
+	if not datestring:
+		return datestring
+	else:
+		return datestring.strftime('%m/%d/%Y')
 
 def floatformat(value):
 	if value is None:
@@ -29,6 +33,8 @@ def jsonformat(string):
 	return string
 
 def fydateformat(datestring):
+	if not datestring:
+		return datestring
 	month = datestring.month
 	day = datestring.day
 	year = datestring.year
@@ -41,6 +47,8 @@ def fydateformat(datestring):
 	return fy_date.strftime('%m/%d/%Y')
 
 def fyformat(datestring):
+	if not datestring:
+		return datestring
 	month = datestring.month
 	day = datestring.day
 	year = datestring.year
@@ -50,12 +58,24 @@ def fyformat(datestring):
 		year_string = "FY" + str(year).replace("20", "", 1)
 	return year_string
 
+def geteffective(list, cutoff_date = date.today()):
+	effective_item = None
+	if cutoff_date != date.today():
+		cutoff_date = date.strptime(cuttoff_date)
+
+	for item in list:
+		if item.effectivedate.date() <= cutoff_date:
+			effective_item = item
+	return effective_item
+# ------------------------------
+
 def fiscal_years():
 	return ['FY13', 'FY14', 'FY15', 'FY16', 'FY17', 'FY18', 'FY19', 'FY20', 'FY21']
 
 def start_dates():
 	return ['10/01/2012', '10/01/2013', '10/01/2014', '10/01/2015', '10/01/2016',
 			'10/01/2017', '10/01/2018', '10/01/2019', '10/01/2020']
+
 
 app = Flask(__name__)
 cas = CAS(app, '/cas')
@@ -67,6 +87,7 @@ app.jinja_env.filters['intformat'] = intformat
 app.jinja_env.filters['jsonformat'] = jsonformat
 app.jinja_env.filters['fyformat'] = fyformat
 app.jinja_env.filters['fydateformat'] = fydateformat
+app.jinja_env.filters['geteffective'] = geteffective
 db.init_app(app)
 
 @app.before_request
@@ -107,7 +128,7 @@ def load_conferences():
 @app.route('/conferenceattendees/ajax/edit/<int:conferenceattendeeid>')
 @login_required
 def edit_conferenceattendee(conferenceattendeeid):
-	conferenceattendee = ConferenceAttendee.get_one([ConferenceAttendee.conferenceattendeeid == conferenceattendeeid])
+	conferenceattendee = ConferenceAttendee.get_one(filters = [ConferenceAttendee.conferenceattendeeid == conferenceattendeeid])
 	return render_template('conference-attendee-edit.html', conferenceattendee = conferenceattendee,
 															conferences = Conferences.get_all(orders = [Conferences.meeting]),
 															dd_fiscalyears = fiscal_years(),
@@ -204,10 +225,11 @@ def load_fbmsaccounts(proposalid):
 	fbmsaccounts = FBMSAccounts.get_many(filters = [FBMSAccounts.proposalid == proposalid])
 	return render_template('fbms-list-ajax.json', fbmsaccounts = fbmsaccounts)
 
-@app.route('/fbmsaccounts/ajax/save?<path:path>')
+@app.route('/fbmsaccounts/ajax/save/<int:fbmsid>')
 @login_required
-def save_fbmsaccounts():
-	# saving code goes here
+def save_fbmsaccounts(fbmsid):
+	fbmsaccount = FBMSAccounts.get_one(filters = [FBMSAccounts.fbmsid == fbmsid])
+	return ""
 
 
 # FUNDING
@@ -227,8 +249,10 @@ def delete_funding():
 
 @app.route('/funding/ajax/edit/<int:fundingid>')
 @login_required
-def edit_funding(fundingid):
-	funding = Funding.get_one(filters = [Funding.fundingid == fundingid])
+def edit_funding(fundingid = None):
+	funding = []
+	if fundingid:
+		funding = Funding.get_one(filters = [Funding.fundingid == fundingid])
 	return render_template('funding-edit.html', funding = funding,
 	 						dd_fiscalyears = fiscal_years(),
 							dd_startdates = start_dates())
@@ -262,14 +286,16 @@ def save_funding():
 def overhead():
 	return render_template('overheads.html')
 
-@app.route('/overhead/ajax/delete?<path:path>')
+@app.route('/overhead/ajax/delete/<int:overheadid>')
 @login_required
-def delete_overhead():
+def delete_overhead(overheadid):
 	# use the get arguments methods to get the elements in the url
 	# return a message saying that this specific overhead was deleted?
 	# make sure all parameters have been filled out for this delete, make sure
 	# not to try to delete something that doesn't exist
 		# might be how a whole table got deleted before
+
+	return ""
 
 @app.route('/overhead/ajax/edit/<int:overheadid>')
 @login_required
@@ -287,11 +313,13 @@ def load_overhead(proposalid):
 		overheadrates = OverheadRates.get_many(filters = [OverheadRates.proposalid == None])
 	return render_template('overhead-list-ajax.json', overheadrates = overheadrates)
 
-@app.route('/overhead/ajax/save?<path:path>')
+@app.route('/overhead/ajax/save/<int:overheadid>')
 @login_required
 def save_overhead():
 	# check for all elements in the path before editing?
 	# use if statements and the get arguments method to get the parameters
+
+	return ""
 
 
 # PEOPLE
@@ -364,58 +392,46 @@ def proposals():
 	return render_template('proposals.html')
 
 @app.route('/proposals/ajax/edit/<int:proposalid>')
+@app.route('/proposals/view/<int:proposalid>')
 @login_required
-def edit_proposal(proposalid):
-	proposal = Proposals.get_one([Proposals.proposalid == proposalid])
-	return render_template('proposal-edit.html', proposal = proposal,
-												 people = People.get_all(orders = [People.name]),
-												 programs = FundingPrograms.get_all(orders = [FundingPrograms.programname]),
-												 statuses = Statuses.get_all(orders = [Statuses.statusname]),
-												 dd_fiscalyears = fiscal_years(),
-												 dd_startdates = start_dates())
+def view_proposal(proposalid):
+	params = {'proposal': Proposals.get_one(filters = [Proposals.proposalid == proposalid]),
+			  'people': People.get_all(orders = [People.name]),
+			  'programs': FundingPrograms.get_all(orders = [FundingPrograms.programname]),
+			  'statuses': Statuses.get_all(orders = [Statuses.statusname]),
+			  'dd_fiscalyears': fiscal_years(),
+			  'dd_startdates': start_dates()}
+	if 'edit' in request.url_rule.rule:
+		return render_template('proposal-edit.html', **params)
+	else:
+		return render_template('proposal-view.html', **params)
 
 @app.route('/proposals/ajax/list')
 @login_required
 def load_proposals():
-	proposals = Proposals.get_many(joins = [], filters = [], orders = [])
+	proposals = Proposals.get_all()
 	return render_template('proposal-list-ajax.json', proposals = proposals)
 
 
 @app.route('/proposal-basis/<int:proposalid>')
 @login_required
 def proposal_basis(proposalid):
-	proposal = Proposals.get_one(filters = [Proposals.proposalid == proposalid])
-	return render_template('proposal-basis.html', proposal = proposal)
+	return render_template('proposal-basis.html')
 
 @app.route('/proposal-budget/<int:proposalid>')
 @login_required
 def proposal_budget_details(proposalid):
-	proposal = Proposals.get_one(filters = [Proposals.proposalid == proposalid])
-	people = People.get_all()
-	years = {}
-	for task in proposal.tasks:
-		for staffing in task.staffing:
-			year = fyformat(staffing.fiscalyear)
-			date = staffing.fiscalyear
-			if year not in years.keys():
-				years[year] = []
-			years[year].append(staffing)
-	return render_template('proposal-budget-details.html', proposal = proposal,
-														   people = people,
-														   years = years)
+	return render_template('proposal-budget-details.html')
 
 @app.route('/proposal-nspires/<int:proposalid>')
 @login_required
 def proposal_nspires(proposalid):
-	proposal = Proposals.get_one(filters = [Proposals.proposalid == proposalid])
-
-	return render_template('proposal-nspires.html', proposal = proposal)
+	return render_template('proposal-nspires.html')
 
 @app.route('/proposal-roses/<int:proposalid>')
 @login_required
 def proposal_redacted(proposalid):
-	proposal = Proposals.get_one(filters = [Proposals.proposalid == proposalid])
-	return render_template('proposal-roses.html', proposal = proposal)
+	return render_template('proposal-roses.html')
 
 
 # REPORTS

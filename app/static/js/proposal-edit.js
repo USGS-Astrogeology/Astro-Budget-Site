@@ -371,25 +371,6 @@ function saveProposal() {
   $("#warningDiv").html("<p>Updated proposal details</p>");
   $("#warningDiv").show();
 }
-/*
-function editFundingDialog(fundingid, proposalid) {
-  $("#editDialog").load("/funding/ajax/edit/" + fundingid);
-
-  dialog = $("#editDialog").dialog({
-    autoOpen: false,
-    height: 300,
-    width: 450,
-    modal: true,
-    buttons: {
-      "Save Funding": function () { saveFunding(proposalid); },
-      Cancel: function () {
-        dialog.dialog("close");
-      }
-    }
-  });
-
-  dialog.dialog("open");
-}*/
 
 function saveFunding(proposalid) {
   $.post("index.php", $("#fundingForm").serialize())
@@ -399,7 +380,7 @@ function saveFunding(proposalid) {
       $("#warningDiv").html("<p>Updated [" + $("#fiscalyear").val() + "]</p>");
       $("#warningDiv").show();
 
-      loadTable(true, '/funding/ajax/list/' + proposalid, $('#fundingTable'));
+      loadTable('/funding/ajax/list/' + proposalid, true, $('#fundingTable'));
     });
 }
 
@@ -436,34 +417,15 @@ function deleteFunding(fundingid, proposalid) {
       $("#warningDiv").html("<p>Deleted [" + fundingid + "]</p>");
       $("#warningDiv").show();
 
-      loadTable(true, '/funding/ajax/list/' + proposalid, $('#fundingTable'));
+      loadTable('/funding/ajax/list/' + proposalid, true, $('#fundingTable'));
     });
-}
-
-function editOverheadDialog(overheadid, proposalid) {
-  $("#editDialog").load('/overhead/ajax/edit/' + overheadid);
-
-  dialog = $("#editDialog").dialog({
-    autoOpen: false,
-    height: 275,
-    width: 525,
-    modal: true,
-    buttons: {
-      "Save Overhead": function () { saveOverhead(proposalid); },
-      Cancel: function () {
-        dialog.dialog("close");
-      }
-    }
-  });
-
-  dialog.dialog("open");
 }
 
 function saveOverhead(proposalid) {
   $.post("index.php", $("#overheadForm").serialize())
     .always(function(){
 
-      loadTable(true, '/overhead/ajax/list/' + proposalid, $('#overheadTable'));
+      loadTable('/overhead/ajax/list/' + proposalid, true, $('#overheadTable'));
 
       dialog.dialog("close");
       $("#warningDiv").html("<p>Updated [" + $("#overheadid").val() + "] (" + $("#rate").val() + ")</p>");
@@ -502,34 +464,15 @@ function deleteOverhead(overheadid, proposalid) {
       $("#warningDiv").html("<p>Deleted [" + overheadid + "]</p>");
       $("#warningDiv").show();
 
-      loadTable(true, '/overhead/ajax/list/' + proposalid, $('#overheadTable'));
+      loadTable('/overhead/ajax/list/' + proposalid, true, $('#overheadTable'));
     });
-}
-
-function editFBMSDialog(fbmsid, proposalid) {
-  $("#editDialog").load("/fbmsaccounts/ajax/edit/" + fbmsid);
-
-  dialog = $("#editDialog").dialog({
-    autoOpen: false,
-    height: 200,
-    width: 400,
-    modal: true,
-    buttons: {
-      "Save FBMS": function () { saveFBMS(proposalid); },
-      Cancel: function () {
-        dialog.dialog("close");
-      }
-    }
-  });
-
-  dialog.dialog("open");
 }
 
 function saveFBMS(proposalid) {
   $.post("index.php", $("#fbmsForm").serialize())
     .always(function(){
 
-      loadTable(true, '/fbmsaccounts/ajax/list/' + proposalid, $('#fbmsTable'));
+      loadTable('/fbmsaccounts/ajax/list/' + proposalid, true, $('#fbmsTable'));
 
       dialog.dialog("close");
       $("#warningDiv").html("<p>Updated [" + $("#fbmsid").val() + "] (" + $("#accountno").val() + ")</p>");
@@ -570,10 +513,11 @@ function deleteFBMS(fbmsid, proposalid) {
       $("#warningDiv").html("<p>Deleted [" + fbmsid + "]</p>");
       $("#warningDiv").show();
 
-      loadTable(true, '/fbmsaccounts/ajax/list/' + proposalid, $('#fbmsTable'));
+      loadTable('/fbmsaccounts/ajax/list/' + proposalid, true, $('#fbmsTable'));
     });
 }
 
+/*
 function editTaskDialog (taskid, proposalid) {
   if (taskid == 'new') {
     $.post("index.php", $("#newTaskForm").serialize())
@@ -599,7 +543,7 @@ function editTaskDialog (taskid, proposalid) {
   });
 
   dialog.dialog("open");
-}
+}*/
 
 function saveTask (proposalid) {
   $.post("index.php", $("#taskForm").serialize())
@@ -654,6 +598,7 @@ function deleteTask(taskid, proposalid) {
     });
 }
 
+/*
 function editAttendeeDialog(proposalid, conferenceattendeeid) {
   $("#editDialog").load("/conferenceattendees/ajax/edit/" + conferenceattendeeid);
 
@@ -671,7 +616,7 @@ function editAttendeeDialog(proposalid, conferenceattendeeid) {
   });
 
   dialog.dialog("open");
-}
+}*/
 
 function saveAttendee(proposalid) {
   $.post("index.php", $("#conferenceAttendeeForm").serialize())
@@ -683,7 +628,7 @@ function saveAttendee(proposalid) {
 
       figureCosts(proposalid);
 
-      loadTable(true, '/conferenceattendees/ajax/list/byproposal/' + proposalid, $('#conferenceattendeesTable'));
+      loadTable('/conferenceattendees/ajax/list/byproposal/' + proposalid, true, $('#conferenceattendeesTable'));
     });
 }
 
@@ -722,7 +667,7 @@ function deleteAttendee(travelid, proposalid) {
       $("#warningDiv").html("<p>Deleted [" + travelid + "]</p>");
       $("#warningDiv").show();
 
-      loadTable(true, '/conferenceattendees/ajax/list/byproposal/' + proposalid, $('#conferenceattendeesTable'));
+      loadTable('/conferenceattendees/ajax/list/byproposal/' + proposalid, true, $('#conferenceattendeesTable'));
       figureCosts(proposalid);
     });
 }
@@ -742,25 +687,6 @@ function loadConferenceRate() {
   });
 }
 
-function editExpenseDialog(expenseid, proposalid) {
-  $("#editDialog").load("/expenses/ajax/edit/" + expenseid);
-
-  dialog = $("#editDialog").dialog({
-    autoOpen: false,
-    height: 600,
-    width: 800,
-    modal: true,
-    buttons: {
-      "Save Expense": function () { saveExpense(proposalid); },
-      Cancel: function () {
-        dialog.dialog("close");
-      }
-    }
-  });
-
-  dialog.dialog("open");
-}
-
 function saveExpense(proposalid) {
   $.post("index.php", $("#expenseForm").serialize())
     .always (function () {
@@ -771,7 +697,7 @@ function saveExpense(proposalid) {
 
       figureCosts(proposalid);
 
-      loadTable(true, '/expenses/ajax/list/' + proposalid, $('#expensesTable'));
+      loadTable('/expenses/ajax/list/' + proposalid, true, $('#expensesTable'));
   });
 }
 
@@ -808,7 +734,7 @@ function deleteExpense(expenseid, proposalid) {
       $("#warningDiv").html("<p>Deleted [" + expenseid + "]</p>");
       $("#warningDiv").show();
 
-      loadTable(true, '/expenses/ajax/list/' + proposalid, $('#expensesTable'));
+      loadTable('/expenses/ajax/list/' + proposalid, true, $('#expensesTable'));
       figureCosts(proposalid);
     });
 }

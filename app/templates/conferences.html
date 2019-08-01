@@ -14,7 +14,7 @@
         <div id="title">
           <h2>List of Conferences/Meetings/Travel
             {% if g.user.admin %}
-              <a href='javascript:void(0)' onClick="editConferenceDialog('new')" id='newButton'>New</a>
+              <a href='javascript:void(0)' onClick="editDialog('/conferences/ajax/edit/0', null, $('#conferencesTable'))" id='newButton'>New</a>
             {% endif %}
             <br>
 
@@ -33,52 +33,6 @@
       </div>
 
       <script type="text/javascript" charset="utf-8">
-        function editConferenceDialog(conferenceid) {
-          $("#editDialog").load("/conferences/ajax/edit/" + conferenceid);
-
-          console.log(conferenceid);
-
-          dialog = $("#editDialog").dialog({
-            autoOpen: false,
-            height: 620,
-            width: 1100,
-            modal: true,
-            buttons: {
-              "Save": saveConference,
-              Cancel: function () {
-                dialog.dialog("close");
-              }
-            }
-          });
-
-          dialog.dialog("open");
-
-        }
-
-        function loadConferencesTable (reload) {
-          if (reload) {
-            $('#conferencesTable').dataTable().fnDestroy();
-          }
-
-          $("#conferencesTableDiv").html('<table id="conferencesTable" class="display" cellspacing="0" width="100%">' +
-            '<thead><tr><th>Meeting</th><th>Location</th><th>Per<br/>Diem</th><th>Lodging</th><th>Registration</th>' +
-            '<th>Ground<br/>Transport</th><th>Airfare</th></tr></thead></table>');
-
-          $('#conferencesTable').dataTable( {
-            "processing": true,
-            "serverSide": false,
-            "ajax": "/conferences/ajax/list",
-            "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]]
-          } );
-
-          check_row_preference($('#conferencesTable').DataTable());
-          /*if (!reload)
-          {
-            check_row_preference($('#conferencesTable').DataTable());
-          }*/
-
-        }
-
         function saveConference() {
           $.post("index.php", $("#conferenceForm").serialize())
             .always( function() {
@@ -94,8 +48,7 @@
         $(document).ready(function() {
           $("#newButton").button();
           $("#warningDiv").hide();
-
-          loadConferencesTable(false);
+          loadTable('/conferences/ajax/list', false, $('#conferencesTable'));
         } );
       </script>
     </body>

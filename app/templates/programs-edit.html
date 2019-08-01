@@ -2,16 +2,15 @@
 <html>
     <head>
         <title>Editing {{ program.programname }}</title>
-        <script src="{{ url_for('static', filename='js/date-tools.js') }}"></script>
     </head>
     <body>
     {% if g.user.admin %}
-    <div>
-          <form id="programForm" action="index.php" method="GET">
-            <input type="hidden" name="act" value="save"/>
-            <input type="hidden" name="view" value="program-save"/>
-            <input type="hidden" id="programid" name="programid" value="{{ programid }}"/>
-            <table><tr><th>Name</th>
+      <div>
+        <form id="programForm" action="index.php" method="GET">
+          <input type="hidden" name="act" value="save"/>
+          <input type="hidden" name="view" value="program-save"/>
+          <input type="hidden" id="programid" name="programid" value="{{ programid }}"/>
+          <table><tr><th>Name</th>
             <td><input type="text" name="programname" id="programname" value="{{ program.programname }}" size="40"/></td></tr>
             <tr><th>Agency</th>
             <td><input type="text" name="agency" id="agency" value="{{ program.agency }}" size="40"/></td></tr>
@@ -21,39 +20,39 @@
             <td><input type="text" name="pocemail" id="pocemail" value="{{ program.pocemail }}" size="40"/></td></tr>
             <tr><th>Start Date</th>
             <td><input type="text" name="startdate" id="startdate" value="{{ program.startdate|dateformat }}" size="24"
-                       onchange="updateDropdown('startdate');"/>
+                      onchange="updateDropdown('startdate');"/>
               {% with dropdown_name = 'startdate', dropdown_id = 'startdate', selected_fy = program.startdate %}
                 {% include 'fiscalyear-dropdown.html' %}
               {% endwith %}
             </td></tr>
             <tr><th>End Date</th>
             <td><input type="text" name="enddate" id="enddate" value="{{ program.enddate|dateformat }}" size="24"
-                       onchange="updateDropdown('enddate');"/>
+                      onchange="updateDropdown('enddate');"/>
               {% with dropdown_name = 'enddate', dropdown_id = 'enddate', selected_fy = program.enddate %}
                 {% include 'fiscalyear-dropdown.html' %}
               {% endwith %}
             </td></tr>
-            </table>
-          </form>
-    </div>
+          </table>
+        </form>
+      </div>
     {% else %}
-    <div>
-            <table><tr><th>Name</th><td>{{ program.programname }}</td></tr>
+      <div>
+          <table>
+            <tr><th>Name</th><td>{{ program.programname }}</td></tr>
             <tr><th>Agency</th><td>{{ program.agency }}</td></tr>
             <tr><th>POC</th><td>{{ program.pocname }}</td></tr>
             <tr><th>POC E-Mail</th><td>{{ program.pocemail }}</td></tr>
             <tr><th>Start Date</th><td>{{ program.startdate }}</td></tr>
             <tr><th>End Date</th><td>{{ program.enddate }}</td></tr>
-            </table>
-          </form>
-    </div>
+          </table>
+        </form>
+      </div>
     {% endif %}
 
     <script charset="utf-8">
     $(function() {
       $("#startdate").datepicker();
       $("#enddate").datepicker();
-
       updateDropdown ('startdate');
       updateDropdown ('enddate');
     });

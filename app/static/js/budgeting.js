@@ -1,13 +1,13 @@
 // TODO: update references throughout application (outside of proposal-edit.html)
-function loadTable(reload, ajax, div) {
-    let html =$(div).html();
+function loadTable(ajax, reload, table) {
+    let html =$(table).html();
 
     if (reload) {
-        $(div).dataTable().fnDestroy();
-        $(div).html(html);
+        $(table).dataTable().fnDestroy();
+        $(table).html(html);
     }
 
-    $(div).dataTable( {
+    $(table).dataTable( {
         'processing': true,
         'serverSide': false,
         'autoWidth': false,
@@ -15,7 +15,7 @@ function loadTable(reload, ajax, div) {
         'lengthMenu': [[5, 10, 20, -1], [5,10, 20, 'All']]
     });
 
-    check_row_preference($(div).DataTable());
+    check_row_preference($(table).DataTable());
     /*
     if (!reload) {
         check_row_preference($(div).DataTable());
@@ -23,21 +23,18 @@ function loadTable(reload, ajax, div) {
     */
 }
 
-// TODO: generalize dialog for edit
+
 // TODO: update references throughout application
-function editDialog(ajax, proposalid, height, width, table) {
+function editDialog(ajax, proposalid, table) {
     $('#editDialog').load(ajax);
 
     dialog = $('#editDialog').dialog({
       autoOpen: false,
-      height: height,
-      width: width,
+      width: 'auto',
       modal: true,
       buttons: {
-        "Save": function () { callSave(proposalid, ajax, table); }, // TODO, determine simplest way to call this with minimum parameters
-        Cancel: function () {
-          dialog.dialog("close");
-        }
+        "Save": function () { callSave(proposalid, ajax, table); },
+        Cancel: function () { dialog.dialog("close"); }
       }
     });
 
@@ -45,29 +42,26 @@ function editDialog(ajax, proposalid, height, width, table) {
 }
 
 // TODO: generalize dialog for delete
-function deleteDialog(ajax, proposalid, height, width, table)
-{
-  $.getJSON( ajax ) {
+function deleteDialog(ajax, proposalid, table) {
+  $.getJSON(ajax, function(data) {
     $("#editDialog").html("<html><head><title>Confirm Deletion</title></head>" +
                         "<body><h2>Are you sure you want to delete?</h2></body></html>");
   });
 
   dialog = $("#editDialog").dialog({
     autoOpen: false,
-    height: height,
-    width: width,
+    width: 'auto',
     modal: true,
     buttons: {
       "Delete": function () { callDelete(proposalid, ajax, table); },
-      Cancel: function () {
-        dialog.dialog("close");
-      }
+      Cancel: function () { dialog.dialog("close"); }
     }
+  });
 }
 
 // TODO: generalize a save call
-function callSave(proposalid, ajax, table) {
-  //$.post("index.php", $("#fbmsForm").serialize())
+function callSave(ajax, proposalid, table) {
+  $.post("index.php", $("#fbmsForm").serialize())
     .always(function(){
 
     dialog.dialog("close");
@@ -77,22 +71,54 @@ function callSave(proposalid, ajax, table) {
     var load_ajax = ajax.replace('edit', 'list');
 
     // see if proposalid is provided in the ajax call already
-    loadTable(true, load_ajax + proposalid, ('#' + table));
+    loadTable(load_ajax + proposalid, true, ('#' + table));
   });
 }
 
 // TODO: generalize a delete call
-function callDelete(proposalid, ajax, table)
-{
+function callDelete(ajax, proposalid, table) {
   var load_ajax = ajax.replace('edit', 'list');
 
-  $.get(ajax)
+  $.get(load_ajax)
     .always (function() {
       dialog.dialog("close");
-      $("#warningDiv").html("<p>Succesfully Deleted</p>");
+      $("#warningDiv").html("<p>Successfully Deleted</p>");
       $("#warningDiv").show();
 
       // see if proposalid is provided in the ajax call already
-      loadTable(true, load_ajax + proposalid, ('#' + table));
+      loadTable(load_ajax + proposalid, true, ('#' + table));
     });
+}
+
+function updateDropdown (id) {
+  var newDate = $("#" + id).datepicker("getDate");
+
+  console.log ("datepicker returned " + newDate);
+  if (newDate == null) {
+    console.log ("newDate is NULL!!!!!");
+    newDate = new Date();
+    $("#" + id).val((newDate.getMonth() + 1) + '/' + newDate.getDate() + '/' +  newDate.getFullYear());
+  }
+
+  var month = newDate.getMonth() + 1;
+  var year  = newDate.getFullYear();
+
+  var fyYear = year - 2000;
+  if (month >= 10) {
+    fyYear += 1;
+  }
+
+  var FYDate = '10/01/20' + (fyYear - 1);
+  var hid = '#' + id + 'dd';
+
+  console.log ("Setting " + hid + " to " + FYDate);
+  $(hid).val(FYDate);
+}
+
+function updateCalendar (id) {
+  var hid = '#' + id;
+  var idname = hid + 'dd';
+  var newDate = $(idname).val();
+ 
+  $(hid).val (newDate);
 }

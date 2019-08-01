@@ -2,7 +2,6 @@
 <html>
     <head>
         <title>Editing Conferences</title>
-        <script src="{{ url_for('static', filename='js/date-tools.js') }}"></script>
         <script src="{{ url_for('static', filename='js/row_setting.js') }}"></script>
     </head>
     <body>
@@ -62,42 +61,19 @@
                       {% endwith %}
                       </td></tr>
               <tr><th></th><td></td>
-                  <th></th><td><a href='javascript:void(0)' onClick="conferenceRateSave()" id='rateSaveButton'>Save Rate</a></td></tr>
+                  <th></th><td><a href='javascript:void(0)' onClick="callSave()" id='rateSaveButton'>Save Rate</a></td></tr>
             </table>
         </div>
         {% endif %}
 
-    <script type="text/javascript">
-      function loadRateTable(reload) {
-        if (reload) {
-          $('#rateTable').dataTable().fnDestroy();
-        }
-
-        $("#rateTableDiv").html('<table id="rateTable" class="display" cellspacing="0" width="100%">' +
-          '<thead><tr><th>Action</th><th>Per Diem</th><th>Lodging</th><th>Registration</th><th>Ground<br/>Transport</th>' +
-          '<th>Airfare</th><th>City</th><th>State</th><th>Country</th><th>Effective<br/>Date</tr></thead></table>');
-
-        $('#rateTable').dataTable( {
-          "processing": true,
-          "serverSide": false,
-          'autoWidth': false,
-          "ajax": "/conferencerates/ajax/list/" + {{ conference.conferenceid }},
-          "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]]
-        } );
-
-
-        check_row_preference($('#rateTable').DataTable());
-
-      }
-
-      $(function() {
+    <script>
+      $(document).ready(function() {
         $("#conferenceedittabs").tabs();
         $("#effectivedate").datepicker();
         $("#rateSaveButton").button();
         $("#newRateButton").button();
-
-        loadRateTable(false);
-         updateDropdown('effectivedate');
+        loadTable('/conferencerates/ajax/list/' + {{ conference.conferenceid }}, false, $('#rateTable'));
+        updateDropdown('effectivedate');
       });
 
       function rateEdit(conferencerateid) {

@@ -4,7 +4,6 @@
         <title>Proposal Budget Overhead Rates</title>
         {% include 'menu-header.html' %}
         <script src="{{url_for('static', filename='js/proposal-edit.js') }}"></script>
-        <script src="{{url_for('static', filename='js/date-tools.js') }}"></script>
         <script src="{{url_for('static', filename='js/row_setting.js') }}"></script>
     </head>
     {% for error in debug %}
@@ -16,7 +15,7 @@
         <div id="title">
           <h2>List of Overhead Rates</h2>
           {% if g.user.admin %}
-            <a href='javascript:void(0)' onClick="editOverheadDialog('new', 'null')" id='newButton'>New</a><p/>
+            <a href='javascript:void(0)' onClick="editDialog('/overhead/ajax/edit/0', null, $('#overheadTable'))" id='newButton'>New</a><p/>
           {% endif %}
           <br>
 
@@ -38,7 +37,7 @@
           $("#newButton").button();
           $("#warningDiv").hide();
 
-          loadTable(false, '/overhead/ajax/list/0', $('#overheadTable'));
+          loadTable('/overhead/ajax/list/null', false, $('#overheadTable'));
         } );
       </script>
     </body>

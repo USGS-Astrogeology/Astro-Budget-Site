@@ -2,7 +2,6 @@
 <html>
     <head>
         <title>Editing Conference Attendee</title>
-        <script src="{{ url_for('static', filename='js/date-tools.js') }}"></script>
     </head>
     <body>
 
@@ -52,7 +51,7 @@
               {% endwith %}
             </td></tr>
             <tr><th>How Many Rental Cars</th>
-            {% set conferencerate = conferenceattendee.conference.effective_conferencerate %}
+            {% set conferencerate = conferenceattendee.conference.conferencerates|geteffective %}
             <td><input type="text" name="rentalcars" id="rentalcars" size="12" value="{{ conferenceattendee.rentalcars }}"/></td>
             <th>Ground Transport</th><td><input type="text" name="groundtransport" id="groundtransport" size="9" value="{{ conferencerate.groundtransport|floatformat }}"/></td></tr>
             <tr><th>Airfare</th><td><input type="text" name="airfare" id="airfare" size="10" value="{{ conferencerate.airfare|floatformat }}"/></td>
