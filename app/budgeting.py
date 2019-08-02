@@ -61,7 +61,7 @@ def fyformat(datestring):
 def geteffective(list, cutoff_date = date.today()):
 	effective_item = None
 	if cutoff_date != date.today():
-		cutoff_date = date.strptime(cuttoff_date)
+		cutoff_date = datetime.strptime(cuttoff_date)
 
 	for item in list:
 		if item.effectivedate.date() <= cutoff_date:
@@ -304,6 +304,12 @@ def edit_overhead(overheadid):
 	return render_template('overhead-edit.html', overheadrate = overheadrate,
 												 dd_fiscalyears = fiscal_years(),
 												 dd_startdates = start_dates())
+
+@app.route('/overhead/ajax/list')
+@login_required
+def load_overhead_list():
+	overheadrates = OverheadRates.get_many(filters = [OverheadRates.proposalid == None])
+	return render_template('overhead-list-ajax.json', overheadrates = overheadrates)
 
 @app.route('/overhead/ajax/list/<int:proposalid>')
 @login_required

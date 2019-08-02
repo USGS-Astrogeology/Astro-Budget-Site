@@ -43,10 +43,10 @@ function editDialog(ajax, proposalid, table) {
 
 // TODO: generalize dialog for delete
 function deleteDialog(ajax, proposalid, table) {
-  $.getJSON(ajax, function(data) {
+  //$.getJSON(ajax, function(data) {
     $("#editDialog").html("<html><head><title>Confirm Deletion</title></head>" +
                         "<body><h2>Are you sure you want to delete?</h2></body></html>");
-  });
+  //});
 
   dialog = $("#editDialog").dialog({
     autoOpen: false,
@@ -57,6 +57,9 @@ function deleteDialog(ajax, proposalid, table) {
       Cancel: function () { dialog.dialog("close"); }
     }
   });
+
+  dialog.dialog("open");
+
 }
 
 // TODO: generalize a save call
@@ -119,6 +122,6 @@ function updateCalendar (id) {
   var hid = '#' + id;
   var idname = hid + 'dd';
   var newDate = $(idname).val();
- 
+
   $(hid).val (newDate);
 }

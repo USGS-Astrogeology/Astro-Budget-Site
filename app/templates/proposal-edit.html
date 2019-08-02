@@ -9,7 +9,7 @@
         {% with dropdown_name = 'peopleid', dropdown_id = 'proposalpeopledropdown',
                 selected_peopleid = g.user.peopleid %}
             {% include 'people-dropdown.html' %}
-        {% endwith %}            
+        {% endwith %}
         </td>
     </tr>
     <tr><th>Funding Program</th>
@@ -44,11 +44,11 @@
         <td><input type='text' id='proposalperfperiodend' name='perfperiodend' value=''
             onchange="updateDropDown('proposalperfperiodend');"/>
             {% with dropdown_name = 'perfperiodend', dropdown_id = 'proposalperfperiodend',
-                    selected_fy = '' %}                          
+                    selected_fy = '' %}
             {% include 'fiscalyear-dropdown.html' %}
             {% endwith %}
         </td></tr>
-    </tr>
+    
   </table>
 </form>
 

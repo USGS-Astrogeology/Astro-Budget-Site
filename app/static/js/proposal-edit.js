@@ -433,6 +433,7 @@ function saveOverhead(proposalid) {
     });
 }
 
+/*
 function deleteOverheadDialog(overheadid, proposalid) {
   var account;
 
@@ -456,6 +457,7 @@ function deleteOverheadDialog(overheadid, proposalid) {
 
   dialog.dialog("open");
 }
+*/
 
 function deleteOverhead(overheadid, proposalid) {
   $.get("index.php?view=overhead-delete&overheadid=" + overheadid + "&proposalid=" + proposalid)

@@ -5,6 +5,7 @@
         {% include 'menu-header.html' %}
         <script src="{{url_for('static', filename='js/proposal-edit.js') }}"></script>
         <script src="{{url_for('static', filename='js/row_setting.js') }}"></script>
+        <script src="{{url_for('static', filename='js/budgeting.js') }}"></script>
     </head>
     {% for error in debug %}
       <pre>error.msg</pre>
@@ -37,7 +38,7 @@
           $("#newButton").button();
           $("#warningDiv").hide();
 
-          loadTable('/overhead/ajax/list/null', false, $('#overheadTable'));
+          loadTable('/overhead/ajax/list', false, $('#overheadTable'));
         } );
       </script>
     </body>
