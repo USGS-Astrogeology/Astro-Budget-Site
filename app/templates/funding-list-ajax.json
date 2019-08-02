@@ -7,7 +7,7 @@
   {% endif %}
   "{{ fund.newfunding|currencyformat }}",
   "{{ fund.carryover|currencyformat }}",
-  "<a href='javascript:void(0)' onclick='deleteFundingDialog({{ fund.fundingid }}, {{ fund.proposalid }})'><img src='{{ url_for("static", filename="images/trash-2-32.png") }}' title='Delete funding'></a>"]
+  "<a href='javascript:void(0)' onclick='deleteDialog(\"/funding/ajax/delete/{{ fund.fundingid }}\", {{ fund.proposalid }}, $(\"#fundingTable\"), \"{{ fund.fiscalyear|fyformat}}\" )'><img src='{{ url_for("static", filename="images/trash-2-32.png") }}' title='Delete funding'></a>"]
   {% if loop.last !=true %},{% endif %}
 {% endfor %}
 ]}

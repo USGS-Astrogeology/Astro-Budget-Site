@@ -384,6 +384,7 @@ function saveFunding(proposalid) {
     });
 }
 
+/*
 function deleteFundingDialog(fundingid, proposalid) {
   var fy;
 
@@ -409,6 +410,7 @@ function deleteFundingDialog(fundingid, proposalid) {
 
   dialog.dialog("open");
 }
+*/
 
 function deleteFunding(fundingid, proposalid) {
   $.get("index.php?view=funding-delete&fundingid=" + fundingid + "&proposalid=" + proposalid)
@@ -482,6 +484,7 @@ function saveFBMS(proposalid) {
     });
 }
 
+/*
 function deleteFBMSDialog(fbmsid, proposalid) {
   var account;
 
@@ -507,6 +510,7 @@ function deleteFBMSDialog(fbmsid, proposalid) {
 
   dialog.dialog("open");
 }
+*/
 
 function deleteFBMS(fbmsid, proposalid) {
   $.get("index.php?view=fbms-delete&fbmsid=" + fbmsid + "&proposalid=" + proposalid)
@@ -634,6 +638,7 @@ function saveAttendee(proposalid) {
     });
 }
 
+/*
 function deleteAttendeeDialog(travelid, proposalid) {
   var description;
 
@@ -660,7 +665,7 @@ function deleteAttendeeDialog(travelid, proposalid) {
 
   dialog.dialog("open");
 }
-
+*/
 
 function deleteAttendee(travelid, proposalid) {
   $.get("index.php?view=conference-attendee-delete&travelid=" + travelid + "&proposalid=" + proposalid)
@@ -703,6 +708,7 @@ function saveExpense(proposalid) {
   });
 }
 
+/*
 function deleteExpenseDialog(expenseid, proposalid) {
   var description;
 
@@ -728,6 +734,7 @@ function deleteExpenseDialog(expenseid, proposalid) {
 
   dialog.dialog("open");
 }
+*/
 
 function deleteExpense(expenseid, proposalid) {
   $.get("index.php?view=expense-delete&expenseid=" + expenseid + "&proposalid=" + proposalid)

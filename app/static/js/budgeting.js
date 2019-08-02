@@ -42,10 +42,10 @@ function editDialog(ajax, proposalid, table) {
 }
 
 // TODO: generalize dialog for delete
-function deleteDialog(ajax, proposalid, table) {
+function deleteDialog(ajax, proposalid, table, description) {
   //$.getJSON(ajax, function(data) {
     $("#editDialog").html("<html><head><title>Confirm Deletion</title></head>" +
-                        "<body><h2>Are you sure you want to delete?</h2></body></html>");
+                        "<body><h2>Are you sure you want to delete " + description + "?</h2></body></html>");
   //});
 
   dialog = $("#editDialog").dialog({
@@ -53,7 +53,7 @@ function deleteDialog(ajax, proposalid, table) {
     width: 'auto',
     modal: true,
     buttons: {
-      "Delete": function () { callDelete(proposalid, ajax, table); },
+      "Delete": function () { callDelete(ajax, proposalid, table); },
       Cancel: function () { dialog.dialog("close"); }
     }
   });
@@ -80,16 +80,18 @@ function callSave(ajax, proposalid, table) {
 
 // TODO: generalize a delete call
 function callDelete(ajax, proposalid, table) {
-  var load_ajax = ajax.replace('edit', 'list');
-
-  $.get(load_ajax)
+  $.get(ajax + '&' + proposalid)
     .always (function() {
       dialog.dialog("close");
       $("#warningDiv").html("<p>Successfully Deleted</p>");
       $("#warningDiv").show();
 
+      console.log(ajax);
+
+      var load_ajax = ajax.replace('delete', 'list');
+
       // see if proposalid is provided in the ajax call already
-      loadTable(load_ajax + proposalid, true, ('#' + table));
+      loadTable(load_ajax, true, table);
     });
 }
 

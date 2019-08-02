@@ -2,19 +2,19 @@
     {% for attendee in conferenceattendees %}
         {% set conferencerate = attendee.conference.conferencerates|geteffective %}
         ["<a href='javascript:void(0)' onclick='editDialog(\"/conferenceattendees/ajax/edit/{{ attendee.conferenceattendeeid }}\", {{ attendee.proposalid }}, $(\"#conferenceattendeesTable\"))'>{{ attendee.conference.meeting }}</a>",
-        {{ attendee.travelers }}, 
-        "{{ attendee.startdate|dateformat }}", 
-        "{{ attendee.startdate|fyformat }}", 
-        {{ attendee.meetingdays }}, 
-        {{ attendee.traveldays }}, 
-        "{{ conferencerate.airfare|currencyformat }}", 
-        "{{ conferencerate.groundtransport|currencyformat }}", 
-        "{{ conferencerate.registration|currencyformat }}", 
-        "{{ conferencerate.perdiem|currencyformat }}", 
-        "{{ conferencerate.lodging|currencyformat }}", 
+        {{ attendee.travelers }},
+        "{{ attendee.startdate|dateformat }}",
+        "{{ attendee.startdate|fyformat }}",
+        {{ attendee.meetingdays }},
+        {{ attendee.traveldays }},
+        "{{ conferencerate.airfare|currencyformat }}",
+        "{{ conferencerate.groundtransport|currencyformat }}",
+        "{{ conferencerate.registration|currencyformat }}",
+        "{{ conferencerate.perdiem|currencyformat }}",
+        "{{ conferencerate.lodging|currencyformat }}",
         {% set totalcost = conferencerate.airfare + conferencerate.groundtransport + conferencerate.registration + conferencerate.perdiem + conferencerate.lodging %}
         "{{ totalcost|currencyformat }}",
-        "<a href='javascript:void(0)' onclick='deleteAttendeeDialog({{ attendee.travelid}}, {{ attendee.proposal.proposalid }})'><img src='{{ url_for("static", filename="images/trash-2-32.png") }}' title='Delete Trip'></a>"]
+        "<a href='javascript:void(0)' onclick='deleteDialog(\"/conferenceattendees/ajax/delete/{{ attendee.travelid}}\", {{ attendee.proposal.proposalid }}, $(\"#conferenceattendeesTable\"), \"{{ attendee.conference.meeting }}\" )'><img src='{{ url_for("static", filename="images/trash-2-32.png") }}' title='Delete Trip'></a>"]
         {% if loop.last !=true %},{% endif %}
     {% endfor %}
 ]}

@@ -213,6 +213,11 @@ def save_expensetype(expensetypeid):
 
 # FBMSACCOUNTS
 
+@app.route('/fbmsaccounts/ajax/delete/<int:fbmsid><int:proposalid>')
+@login_required
+def delete_fbmsaccount(fbmsid, proposalid):
+	return ""
+
 @app.route('/fbmsaccounts/ajax/edit/<int:fbmsid>')
 @login_required
 def edit_fbmsaccount(fbmsid):

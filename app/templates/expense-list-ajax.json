@@ -1,10 +1,10 @@
 {"draw":0,"recordsTotal":{{ expenses|length }},"recordsFiltered":{{ expenses|length }},"data":[
   {% for expense in expenses %}
-  ["<a href='javascript:void(0)' onclick='editDialog(\"/expenses/ajax/edit/{{ expense.expenseid }}\", {{ expense.proposalid }}, $(\"#expensesTable\"))'>{{ expense.description }}</a>", 
-   "{{ expense.expensetype.description }}", 
-   "{{ expense.amount|currencyformat }}", 
-   "{{ expense.fiscalyear|fyformat }}", 
-   "<a href='javascript:void(0)' onclick='deleteExpenseDialog({{ expense.expenseid}}, {{ expense.proposalid }})'><img src='{{ url_for("static", filename="images/trash-2-32.png") }}'></a>"]
+  ["<a href='javascript:void(0)' onclick='editDialog(\"/expenses/ajax/edit/{{ expense.expenseid }}\", {{ expense.proposalid }}, $(\"#expensesTable\"))'>{{ expense.description }}</a>",
+   "{{ expense.expensetype.description }}",
+   "{{ expense.amount|currencyformat }}",
+   "{{ expense.fiscalyear|fyformat }}",
+   "<a href='javascript:void(0)' onclick='deleteDialog(\"/expenses/ajax/delete/{{ expense.expenseid}}\", {{ expense.proposalid }}, $(\"#expensesTable\"), \"{{ expense.description }}\" )'><img src='{{ url_for("static", filename="images/trash-2-32.png") }}'></a>"]
    {% if loop.last !=true %},{% endif %}
   {% endfor %}
 ]}
