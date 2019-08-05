@@ -5,7 +5,7 @@
     {% else %}
       ["{{ rate.rate }}%",
     {% endif %}
-    "{{ rate.description }}", "{{ rate.effectivedate|fyformat }}", "{% if (g.user.admin and rate.proposalid) or (g.user.peopleid == rate.proposal.peopleid and rate.proposalid) %}<a href='javascript:void(0)' onclick='deleteDialog(\"/overhead/ajax/delete/{{ rate.proposalid }}\", {{ rate.proposalid }}, $(\"#overheadTable\"), \"{{ rate.description }}\" )'><img src={{url_for('static', filename='images/trash-2-32.png') }} title='Delete Rate'></a>{% endif %}"]
+    "{{ rate.description }}", "{{ rate.effectivedate|fyformat }}", "{% if (g.user.admin and rate.proposalid) or (g.user.peopleid == rate.proposal.peopleid and rate.proposalid) %}<a href='javascript:void(0)' onclick='deleteDialog(\"/overhead/ajax/delete/{{ rate.overheadid }}\", {{ rate.proposalid }}, $(\"#overheadTable\"), \"{{ rate.description }}\" )'><img src={{url_for('static', filename='images/trash-2-32.png') }} title='Delete Rate'></a>{% endif %}"]
     {% if loop.last != true %},{% endif %}
   {% endfor %}
 ]}

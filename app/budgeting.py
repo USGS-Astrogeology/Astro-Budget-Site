@@ -213,10 +213,17 @@ def save_expensetype(expensetypeid):
 
 # FBMSACCOUNTS
 
-@app.route('/fbmsaccounts/ajax/delete/<int:fbmsid><int:proposalid>')
+@app.route('/fbmsaccounts/ajax/delete/<int:fbmsid>&<int:proposalid>')
 @login_required
 def delete_fbmsaccount(fbmsid, proposalid):
-	return ""
+	account = FBMSAccounts.get_one(filters = [FBMSAccounts.fbmsid == fbmsid,
+											  FBMSAccounts.proposalid == proposalid])
+
+	if not account:
+		return "null"
+
+	text = "account number: " + account.accountno
+	return text
 
 @app.route('/fbmsaccounts/ajax/edit/<int:fbmsid>')
 @login_required
@@ -239,9 +246,9 @@ def save_fbmsaccounts(fbmsid):
 
 # FUNDING
 
-@app.route('/funding/ajax/delete')
+@app.route('/funding/ajax/delete/<int:fundingid>&<int:proposalid>')
 @login_required
-def delete_funding():
+def delete_funding(fundingid, proposalid):
 	# need to figure out how to remove items from the database with sqlalchemy
 
 	# requirements:
@@ -249,8 +256,17 @@ def delete_funding():
 		# will the whole table need to be looked through and changed?
 			# could it be filtered by the name of the funding program?
 
+	to_be_deleted = Funding.get_one(filters = [Funding.fundingid == fundingid,
+											   Funding.proposalid == proposalid])
+
+	if not to_be_deleted:
+		return "null"
+
+	text = "fiscalyear: " + fyformat(to_be_deleted.fiscalyear) + " newfunding: " + currencyformat(to_be_deleted.newfunding) + " carryover: " + currencyformat(to_be_deleted.carryover)
+	print(text)
+
 	# return message for the div
-	return ""
+	return text
 
 @app.route('/funding/ajax/edit/<int:fundingid>')
 @login_required
@@ -268,11 +284,16 @@ def load_funding(proposalid):
 	funding = Funding.get_many(filters = [Funding.proposalid == proposalid])
 	return render_template('funding-list-ajax.json', funding = funding)
 
-@app.route('/funding/ajax/save')
+@app.route('/funding/ajax/save/<int:fundingid>')
 @login_required
-def save_funding():
+def save_funding(fundingid):
 	# update if already existing
 	# make a new one if it is a new funding program
+
+	if fundingid == 0:
+		print("new funding")
+	else:
+		print("existing funding")
 
 	funding_proposalid = request.args.get('proposalid')
 	funding_fundingid = request.args.get('fundingid')
@@ -291,16 +312,25 @@ def save_funding():
 def overhead():
 	return render_template('overheads.html')
 
-@app.route('/overhead/ajax/delete/<int:overheadid>')
+@app.route('/overhead/ajax/delete/<int:overheadid>&<int:proposalid>')
 @login_required
-def delete_overhead(overheadid):
+def delete_overhead(overheadid, proposalid):
 	# use the get arguments methods to get the elements in the url
 	# return a message saying that this specific overhead was deleted?
 	# make sure all parameters have been filled out for this delete, make sure
 	# not to try to delete something that doesn't exist
 		# might be how a whole table got deleted before
 
-	return ""
+	overhead = OverheadRates.get_one(filters = [OverheadRates.overheadid == overheadid,
+												OverheadRates.proposalid == proposalid])
+
+	#overhead = OverheadRates.get_one(filters = [OverheadRates.overheadid == overheadid])
+
+	if not overhead:
+		return "null"
+
+	text = "description: " + overhead.description
+	return text
 
 @app.route('/overhead/ajax/edit/<int:overheadid>')
 @login_required

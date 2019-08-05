@@ -1,7 +1,7 @@
 {"draw":0,"recordsTotal":{{ fbmsaccounts|length }},"recordsFiltered":{{ fbmsaccounts|length }},"data":[
 {% for fbmsaccount in fbmsaccounts %}
 ["<a href='javascript:void(0)' onclick='editDialog(\"/fbmsaccounts/ajax/edit/{{ fbmsaccount.fbmsid }}\", {{ fbmsaccount.proposalid }}, $(\"#fbmsTable\"))'>{{ fbmsaccount.accountno }}</a>",
-"<a href='javascript:void(0)' onclick='deleteDialog(\"/fbmsaccounts/ajax/delete/{{ fbmsaccount.fbmsid }}\", {{ fbmsaccount.proposalid }}, $(\"#FBMSTable\"), \"{{ fbmsaccount.accountno }}\" )'><img src='{{ url_for("static", filename="images/trash-2-32.png") }}' title='Delete FBMS account'></a>"]
+"<a href='javascript:void(0)' onclick='deleteDialog(\"/fbmsaccounts/ajax/delete/{{ fbmsaccount.fbmsid }}\", {{ fbmsaccount.proposalid }}, $(\"#fbmsTable\"), \"{{ fbmsaccount.accountno }}\" )'><img src='{{ url_for("static", filename="images/trash-2-32.png") }}' title='Delete FBMS account'></a>"]
 {% if loop.last != true %},{% endif %}
 {% endfor %}
 ]}

@@ -67,6 +67,9 @@ class Funding(Base):
   newfunding = Column(NUMERIC(6,2))
   carryover  = Column(NUMERIC(6,2))
 
+  def __repr__(self):
+      return "<Funding(newfunding='%d', carryover='%d')>" % (self.newfunding, self.carryover)
+
 class FundingPrograms(Base):
   __tablename__ = 'fundingprograms'
 

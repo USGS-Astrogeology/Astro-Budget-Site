@@ -41,7 +41,7 @@ function editDialog(ajax, proposalid, table) {
     dialog.dialog("open");
 }
 
-// TODO: generalize dialog for delete
+
 function deleteDialog(ajax, proposalid, table, description) {
   //$.getJSON(ajax, function(data) {
     $("#editDialog").html("<html><head><title>Confirm Deletion</title></head>" +
@@ -60,7 +60,11 @@ function deleteDialog(ajax, proposalid, table, description) {
 
   dialog.dialog("open");
 
+  console.log(ajax);
+
 }
+
+
 
 // TODO: generalize a save call
 function callSave(ajax, proposalid, table) {
@@ -78,7 +82,7 @@ function callSave(ajax, proposalid, table) {
   });
 }
 
-// TODO: generalize a delete call
+
 function callDelete(ajax, proposalid, table) {
   $.get(ajax + '&' + proposalid)
     .always (function() {
@@ -86,12 +90,26 @@ function callDelete(ajax, proposalid, table) {
       $("#warningDiv").html("<p>Successfully Deleted</p>");
       $("#warningDiv").show();
 
-      console.log(ajax);
+      //console.log(ajax);
 
       var load_ajax = ajax.replace('delete', 'list');
 
-      // see if proposalid is provided in the ajax call already
-      loadTable(load_ajax, true, table);
+      var elements = load_ajax.split('/');
+      var elements_size = elements.length;
+      //console.log(elements);
+      if (elements[1] === "conferenceattendees")
+      {
+        //console.log(true);
+        var new_ajax = load_ajax.replace(elements[elements_size - 1],
+          ("byproposal/" + proposalid));
+        //console.log(new_ajax);
+      }
+      else
+      {
+        var new_ajax = load_ajax.replace(elements[elements_size - 1], proposalid);
+      }
+
+      loadTable(new_ajax, true, table);
     });
 }
 
