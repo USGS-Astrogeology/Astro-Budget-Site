@@ -125,6 +125,18 @@ def load_conferences():
 
 # CONFERENCE ATTENDEES
 
+@app.route('/conferenceattendees/ajax/delete/<int:conferenceattendeeid>&<proposalid>')
+@login_required
+def delete_conferenceattendee(conferenceattendeeid, proposalid):
+	conference_attendee = ConferenceAttendee.get_one(filters = [ConferenceAttendee.conferenceattendeeid == conferenceattendeeid,
+																 ConferenceAttendee.proposalid == proposalid])
+
+	if not conference_attendee:
+		return "null"
+
+	text = "Start date: " + dateformat(conference_attendee.startdate) + " meeting: " + conference_attendee.conference.meeting
+	return text
+
 @app.route('/conferenceattendees/ajax/edit/<int:conferenceattendeeid>')
 @login_required
 def edit_conferenceattendee(conferenceattendeeid):
@@ -148,6 +160,38 @@ def load_conferenceattendees(id):
 	conferenceattendees = ConferenceAttendee.get_many(joins = [], filters = filters, orders = [])
 	return render_template('conference-attendee-list-ajax.json', conferenceattendees = conferenceattendees)
 
+@app.route('/conferenceattendees/ajax/save/<int:conferenceattendeeid>', methods = ['GET','POST'])
+@login_required
+def save_conferenceattendee(conferenceattendeeid):
+	meeting = request.form.get("meeting")
+	meeting_days = request.form.get("meetingdays")
+	travel_days = request.form.get("traveldays")
+	travelers = request.form.get("travelers")
+	start_date = request.form.get("tripstartdate")
+	rental_cars = request.form.get("rentalcars")
+	ground_transport = request.form.get("groundtransport")
+	airfare = request.form.get("airfare")
+	lodging = request.form.get("lodging")
+	other = request.form.get("other")
+	per_diem = request.form.get("perdium")
+	registration = request.form.get("registration")
+	city = request.args.get("city")
+	state = request.args.get("state")
+	country = request.args.get("country")
+
+	if not meeting:
+		return "meeting is null"
+	elif not travelers:
+		return "travelers is null"
+	elif not meeting_days:
+		return "meeting days is null"
+	else:
+		text = meeting + " " + travelers + " " + meeting_days
+		#text = travelers + " " + meeting_days
+
+		#return "conferenceattendees save request"
+		return text
+
 
 # CONFERENCE RATES
 
@@ -167,6 +211,18 @@ def load_conferencerates(conferenceid):
 
 
 # EXPENSES
+
+@app.route('/expenses/ajax/delete/<int:expenseid>&<int:proposalid>')
+@login_required
+def delete_expense(expenseid, proposalid):
+	expense = Expenses.get_one(filters = [Expenses.expenseid == expenseid,
+										  Expenses.proposalid == proposalid])
+
+	if not expense:
+		return "null"
+
+	text = "expense: " + expense.description + " amount: " + currencyformat(expense.amount) + " fiscal year: " + fyformat(expense.fiscalyear)
+	return text
 
 @app.route('/expenses/ajax/edit/<int:expenseid>')
 @login_required
@@ -237,11 +293,14 @@ def load_fbmsaccounts(proposalid):
 	fbmsaccounts = FBMSAccounts.get_many(filters = [FBMSAccounts.proposalid == proposalid])
 	return render_template('fbms-list-ajax.json', fbmsaccounts = fbmsaccounts)
 
-@app.route('/fbmsaccounts/ajax/save/<int:fbmsid>')
+@app.route('/fbmsaccounts/ajax/save/<int:fbmsid>', methods = ['GET', 'POST'])
 @login_required
 def save_fbmsaccounts(fbmsid):
-	fbmsaccount = FBMSAccounts.get_one(filters = [FBMSAccounts.fbmsid == fbmsid])
-	return ""
+	account = request.form.get('accountno')
+
+	text = "" + account
+
+	return text
 
 
 # FUNDING
@@ -284,7 +343,7 @@ def load_funding(proposalid):
 	funding = Funding.get_many(filters = [Funding.proposalid == proposalid])
 	return render_template('funding-list-ajax.json', funding = funding)
 
-@app.route('/funding/ajax/save/<int:fundingid>')
+@app.route('/funding/ajax/save/<int:fundingid>', methods = ['GET','POST'])
 @login_required
 def save_funding(fundingid):
 	# update if already existing
@@ -295,14 +354,16 @@ def save_funding(fundingid):
 	else:
 		print("existing funding")
 
-	funding_proposalid = request.args.get('proposalid')
-	funding_fundingid = request.args.get('fundingid')
-	funding_fiscalyear = request.args.get('fiscalyear')
-	funding_newfunding = request.args.get('newfunding')
-	funding_carryover = request.args.get("carryover")
+	#funding_proposalid = request.form.get('proposalid')
+	#funding_fundingid = request.form.get('fundingid')
+	funding_fiscalyear = request.form.get('fiscalyear')
+	funding_newfunding = request.form.get('newfunding')
+	funding_carryover = request.form.get("carryover")
+
+	text = funding_fiscalyear + " " + funding_newfunding + " " + funding_carryover
 
 	# return the message for the div
-	return ""
+	return text
 
 
 # OVERHEAD
@@ -354,13 +415,16 @@ def load_overhead(proposalid):
 		overheadrates = OverheadRates.get_many(filters = [OverheadRates.proposalid == None])
 	return render_template('overhead-list-ajax.json', overheadrates = overheadrates)
 
-@app.route('/overhead/ajax/save/<int:overheadid>')
+@app.route('/overhead/ajax/save/<int:overheadid>', methods = ['GET', 'POST'])
 @login_required
-def save_overhead():
-	# check for all elements in the path before editing?
-	# use if statements and the get arguments method to get the parameters
+def save_overhead(overheadid):
+	overhead_rate = request.form.get("rate")
+	description = request.form.get("description")
+	effective_date = request.form.get("effectivedate")
 
-	return ""
+	text = overhead_rate + " " + description + " " + effective_date
+
+	return text
 
 
 # PEOPLE

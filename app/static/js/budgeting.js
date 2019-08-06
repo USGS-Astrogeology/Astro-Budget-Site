@@ -1,19 +1,23 @@
 // TODO: update references throughout application (outside of proposal-edit.html)
 function loadTable(ajax, reload, table) {
-    let html =$(table).html();
+    //let html =$(table).html();
 
     if (reload) {
-        $(table).dataTable().fnDestroy();
-        $(table).html(html);
+        //$(table).dataTable().fnDestroy();
+        //$(table).html(html);
+        $(table).DataTable().ajax.reload();
     }
-
-    $(table).dataTable( {
-        'processing': true,
-        'serverSide': false,
-        'autoWidth': false,
-        'ajax': ajax,
-        'lengthMenu': [[5, 10, 20, -1], [5,10, 20, 'All']]
-    });
+    else
+    {
+      // creates the table if it doesn't already exist
+      $(table).dataTable( {
+          'processing': true,
+          'serverSide': false,
+          'autoWidth': false,
+          'ajax': ajax,
+          'lengthMenu': [[5, 10, 20, -1], [5,10, 20, 'All']]
+        });
+    }
 
     check_row_preference($(table).DataTable());
     /*
@@ -25,15 +29,17 @@ function loadTable(ajax, reload, table) {
 
 
 // TODO: update references throughout application
-function editDialog(ajax, proposalid, table) {
+function editDialog(ajax, proposalid, table, form) {
     $('#editDialog').load(ajax);
+
+    var save_ajax = ajax.replace('edit', 'save');
 
     dialog = $('#editDialog').dialog({
       autoOpen: false,
       width: 'auto',
       modal: true,
       buttons: {
-        "Save": function () { callSave(proposalid, ajax, table); },
+        "Save": function () { callSave(save_ajax, proposalid, table, form); },
         Cancel: function () { dialog.dialog("close"); }
       }
     });
@@ -67,18 +73,33 @@ function deleteDialog(ajax, proposalid, table, description) {
 
 
 // TODO: generalize a save call
-function callSave(ajax, proposalid, table) {
-  $.post("index.php", $("#fbmsForm").serialize())
+function callSave(ajax, proposalid, table, form) {
+  $.post(ajax, $(form).serialize())
     .always(function(){
 
     dialog.dialog("close");
     $("#warningDiv").html("<p>Save Successful</p>");
     $("#warningDiv").show();
 
-    var load_ajax = ajax.replace('edit', 'list');
+    console.log(ajax);
+    var load_ajax = ajax.replace('save', 'list');
 
-    // see if proposalid is provided in the ajax call already
-    loadTable(load_ajax + proposalid, true, ('#' + table));
+    var elements = load_ajax.split('/');
+    var elements_size = elements.length;
+    //console.log(elements);
+    if (elements[1] === "conferenceattendees")
+    {
+      //console.log(true);
+      var new_ajax = load_ajax.replace(elements[elements_size - 1],
+        ("byproposal/" + proposalid));
+      //console.log(new_ajax);
+    }
+    else
+    {
+      var new_ajax = load_ajax.replace(elements[elements_size - 1], proposalid);
+    }
+
+    loadTable(new_ajax, true, table);
   });
 }
 
