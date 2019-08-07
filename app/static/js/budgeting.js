@@ -30,21 +30,18 @@ function loadTable(ajax, reload, table) {
 
 // TODO: update references throughout application
 function editDialog(ajax, proposalid, table, form) {
-    $('#editDialog').load(ajax);
+  var save_ajax = ajax.replace('edit', 'save');
 
-    var save_ajax = ajax.replace('edit', 'save');
-
-    dialog = $('#editDialog').dialog({
-      autoOpen: false,
+  $('#editDialog').load(ajax, function() {
+    $(this).dialog({
       width: 'auto',
       modal: true,
       buttons: {
         "Save": function () { callSave(save_ajax, proposalid, table, form); },
-        Cancel: function () { dialog.dialog("close"); }
+        Cancel: function () { $(this).dialog("close"); }
       }
     });
-
-    dialog.dialog("open");
+  });
 }
 
 
@@ -54,17 +51,14 @@ function deleteDialog(ajax, proposalid, table, description) {
                         "<body><h2>Are you sure you want to delete " + description + "?</h2></body></html>");
   //});
 
-  dialog = $("#editDialog").dialog({
-    autoOpen: false,
+  $("#editDialog").dialog({
     width: 'auto',
     modal: true,
     buttons: {
       "Delete": function () { callDelete(ajax, proposalid, table); },
-      Cancel: function () { dialog.dialog("close"); }
+      Cancel: function () { $(this).dialog("close"); }
     }
   });
-
-  dialog.dialog("open");
 
   console.log(ajax);
 
@@ -74,11 +68,12 @@ function deleteDialog(ajax, proposalid, table, description) {
 
 // TODO: generalize a save call
 function callSave(ajax, proposalid, table, form) {
-  $.post(ajax, $(form).serialize())
-    .always(function(){
+  $.post(ajax, $('form').serialize())
+    .always(function(data){
 
-    dialog.dialog("close");
-    $("#warningDiv").html("<p>Save Successful</p>");
+    //dialog.dialog("close");
+    //$("#warningDiv").html("<p>Save Successful</p>");
+    $("#warningDiv").html(data);
     $("#warningDiv").show();
 
     console.log(ajax);

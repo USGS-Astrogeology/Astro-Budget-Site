@@ -2,123 +2,47 @@
 <html>
     <head>
         <title>Editing Conferences</title>
-        <script src="{{ url_for('static', filename='js/row_setting.js') }}"></script>
     </head>
     <body>
-    <div id="conferenceedittabs">
-      <ul>
-        <li><a href="#conferencetab">Conference</a></li>
-        {% if g.user.admin %}
-          <li><a href="#ratetab">Rates</a></li>
+      <form id="conferenceForm" action="index.php" method="GET">
+        <input type="hidden" name="act" value="save"/>
+        <input type="hidden" name="view" value="conference-save"/>
+        <input type="hidden" id="conferenceid" name="conferenceid"
+        {% if not conference %} value=""/>
+        {% else %} value="{{ conference.conferenceid }}"/>
         {% endif %}
-      </ul>
-
-      <div id='conferencetab'>
-          <form id="conferenceForm" action="index.php" method="GET">
-            <input type="hidden" name="act" value="save"/>
-            <input type="hidden" name="view" value="conference-save"/>
-            <input type="hidden" id="conferenceid" name="conferenceid"
-            {% if not conference %} value="new"/>
-            {% else %} value="{{ conference.conferenceid }}"/>
-            {% endif %}
-            <table>
-            <tr><th align="left">Conference/Meeting/Travel</th></tr>
-            <tr><td><input type="text" name="meeting" id="meeting" value="{{ conference.meeting }}" size="40"/></td></tr>
-            <tr><td><a href='javascript:void(0)' onClick="rateEdit('new')" id='newRateButton'>New Rate</a></td><td></td></tr>
-
-            </table>
-          </form>
-        <div id="rateTableDiv">
+        <table>
+          <tr><th align="left">Conference/Meeting/Travel</th></tr>
+          <tr><td><input type="text" name="meeting" id="meeting" value="{{ conference.meeting }}" size="40"/></td></tr>
+          <tr><td><a href='javascript:void(0)' onClick="editDialog('/conferencerates/ajax/edit/0', null, $('#rateTable'))" id='newRateButton'>New Rate</a></td><td></td></tr>
+        </table>
+      </form>
+      
+      <div id="rateTableDiv">
         <table id="rateTable" class="display" cellspacing="0" width="100%">
           <thead><tr><th>Action</th><th>Per Diem</th><th>Lodging</th><th>Registration</th><th>Ground<br/>Transport</th>
-                     <th>Airfare</th><th>City</th><th>State</th><th>Country</th><th>Effective<br/>Date</tr></thead>
+                    <th>Airfare</th><th>City</th><th>State</th><th>Country</th><th>Effective<br/>Date</tr></thead>
         </table>
-        </div>
       </div>
-        {% if g.user.admin %}
-        <div id="ratetab">
-          <form id="rateForm" action="index.php" method="GET">
-            <input type="hidden" name="act" value="save"/>
-            <input type="hidden" name="view" value="conference-rate-save"/>
-            <input type="hidden" id="conferenceid" name="conferenceid" value="{{ conference.conferenceid }}"/>
-            <input type="hidden" id="conferencerateid" name="conferencerateid" value=""/>
-            <table>
-              <tr><th>Per Diem</th><td><input type="text" id="perdiem" name="perdiem" size="12"/></td>
-                  <th>Registration</th><td><input type="text" id="registration" name="registration" size="12"/></td></tr>
-              <tr><th>Lodging</th><td><input type="text" id="lodging" name="lodging" size="12"/></td>
-                  <th>&nbsp;</th><td>&nbsp;</td></tr>
-              <tr><th>Ground Transport</th><td><input type="text" id="groundtransport" name="groundtransport" size="12"/></td>
-                  <th>Airfare</th><td><input type="text" id="airfare" name="airfare" size="12"/></td></tr>
-              <tr><th>City</th><td><input type="text" id="city" name="city" size="30"/></td>
-                  <th>State</th><td><input type="text" id="state" name="state" size="12"/></td></tr>
-              <tr><th>Country</th><td><input type="text" id="country" name="country" size="20"</td>
-                  <th>Effective Date</th><td><input type="text" id="effectivedate" name="effectivedate" size="12"
-                      onchange="updateDropdown('effectivedate');"/>
-                      {% with dropdown_name = 'effectivedate',
-                              dropdown_id = 'effectivedate',
-                              selected_fy = '' %}
-                        {% include 'fiscalyear-dropdown.html' %}
-                      {% endwith %}
-                      </td></tr>
-              <tr><th></th><td></td>
-                  <th></th><td><a href='javascript:void(0)' onClick="callSave()" id='rateSaveButton'>Save Rate</a></td></tr>
-            </table>
-        </div>
-        {% endif %}
+
 
     <script>
       $(document).ready(function() {
-        $("#conferenceedittabs").tabs();
-        $("#effectivedate").datepicker();
-        $("#rateSaveButton").button();
         $("#newRateButton").button();
-        loadTable('/conferencerates/ajax/list/' + {{ conference.conferenceid }}, false, $('#rateTable'));
-        updateDropdown('effectivedate');
+        loadTable('/conferencerates/ajax/list/{{ conference.conferenceid if conference else "0" }}', false, $('#rateTable'));
       });
 
-      function rateEdit(conferencerateid) {
-        $("#conferenceedittabs").tabs( "option", "active", 1 );
-        $("#conferencerateid").val(conferencerateid);
-        if (conferencerateid == 'new') {
-          $("#conferenceid").val({{ conference.conferenceid }});
-          $("#perdiem").val('');
-          $("#lodging").val('');
-          $("#registration").val('');
-          $("#groundtransport").val('');
-          $("#airfare").val('');
-          $("#city").val('');
-          $("#state").val('');
-          $("#country").val('');
-          $("#effectivedate").val(Date());
-        }
-        else {
-          $.getJSON( "/conferencerates/ajax/edit/" + conferencerateid, function( data ) {
-            $("#conferencerateid").val(data.data[0][0]);
-            $("#conferenceid").val(data.data[0][1]);
-            $("#perdiem").val(data.data[0][2]);
-            $("#lodging").val(data.data[0][3]);
-            $("#registration").val(data.data[0][4]);
-            $("#groundtransport").val(data.data[0][5]);
-            $("#airfare").val(data.data[0][6]);
-            $("#city").val(data.data[0][7]);
-            $("#state").val(data.data[0][8]);
-            $("#country").val(data.data[0][9]);
-            $("#effectivedate").val(data.data[0][10]);
-          });
-        }
-      }
-
       function conferenceRateSave() {
-        console.log($("#rateForm").serialize());
+        //console.log($("#rateForm").serialize());
         $.post("index.php", $("#rateForm").serialize())
           .always( function () {
 
             $("#warningDiv").html("<p>Updated [" + $("#conferencerateid").val() + "]</p>");
             $("#warningDiv").show();
 
-            loadRateTable(true);
+            loadTable(true);
 
-            $("#conferenceedittabs").tabs( "option", "active", 0 );
+            //$("#conferenceedittabs").tabs( "option", "active", 0 );
           });
       }
     </script>

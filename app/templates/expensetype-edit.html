@@ -5,15 +5,13 @@
     </head>
     <body>
     <div>
-          <form id="expensetypeForm" action="index.php" method="GET">
-            <input type="hidden" name="act" value="save"/>
-            <input type="hidden" name="view" value="expensetype-save"/>
+          <form id="expensetypeForm" action='' method="POST">
             <input type="hidden" id="expensetypeid" name="expensetypeid" 
-              {% if not expensetype %} value="new"/>
+              {% if not expensetype %} value=""/>
               {% else %} value="{{ expensetype.expensetypeid }}"/>
               {% endif %}
             <table><tr><th align="left">Expense Description</th></tr>
-            <tr><td><input type="text" name="description" id="desciption" 
+            <tr><td><input type="text" name="description" id="description" 
               {% if not expensetype %} value='' size="40"/>
               {% else %} value="{{ expensetype.description }}" size="40"/>
               {% endif %}

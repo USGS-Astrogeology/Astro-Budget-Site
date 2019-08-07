@@ -7,8 +7,8 @@ from database import (db, Conferences, ConferenceRates, ConferenceAttendee, Expe
 
 # Jinja Filters ------------------>
 def currencyformat(value):
-	if value is None:
-		return '$0.00'
+	if not value:
+		return ''
 	return "${:,.2f}".format(value)
 
 def dateformat(datestring):
@@ -18,13 +18,13 @@ def dateformat(datestring):
 		return datestring.strftime('%m/%d/%Y')
 
 def floatformat(value):
-	if value is None:
-		return '0.00'
+	if not value:
+		return ''
 	return "{:,.2f}".format(value)
 
 def intformat(value):
-	if value is None:
-		return '0'
+	if not value:
+		return ''
 	return "{:,}".format(value)
 
 def jsonformat(string):
@@ -198,8 +198,10 @@ def save_conferenceattendee(conferenceattendeeid):
 @app.route('/conferencerates/ajax/edit/<int:conferencerateid>')
 @login_required
 def edit_conferencerate(conferencerateid):
-	conferencerates = ConferenceRates.get_many(joins = [], filters = [ConferenceRates.conferencerateid == conferencerateid], orders = [])
-	return render_template('conference-rate-edit-ajax.json', conferencerates = conferencerates)
+	conferencerate = ConferenceRates.get_one(filters = [ConferenceRates.conferencerateid == conferencerateid])
+	return render_template('conference-rate-edit.html', conferencerate = conferencerate,
+														dd_fiscalyears = fiscal_years(),
+														dd_startdates = start_dates())
 
 @app.route('/conferencerates/ajax/list/<int:conferenceid>')
 @login_required
@@ -260,11 +262,38 @@ def load_expensetypes():
 	expensetypes = ExpenseTypes.get_many(joins = [], filters = [], orders = [])
 	return render_template('expensetypes-list-ajax.json', expensetypes = expensetypes)
 
-@app.route('/expensetypes/save/<int:expensetypeid>')
+@app.route('/expensetypes/ajax/save/<int:expensetypeid>', methods = ['POST'])
 @login_required
 def save_expensetype(expensetypeid):
 	expensetype = ExpenseTypes.get_one(filters = [ExpenseTypes.expensetypeid == expensetypeid])
+	description = request.form['description']
 
+	try:
+		if not expensetype:
+			print('create new')
+			expensetype = ExpenseTypes(description=description)
+			db.session.add(expensetype)
+		else:
+			print('update existing')
+			expensetype.description = description
+		db.session.commit()
+	except:
+		return 'error: expensetype not added/edited'
+
+	return 'success: expensetype added/edited'
+
+@app.route('/expensetypes/ajax/delete/<int:expensetypeid>', methods = ['GET', 'POST'])
+@login_required
+def delete_expensetype(expensetypeid):
+	expensetype = ExpenseTypes.get_one(filters = [ExpenseTypes.expensetypeid == expensetypeid])
+
+	try:
+		db.session.delete(expensetype)
+		db.session.commit()
+	except:
+		return 'error: expensetype could not be deleted'
+	
+	return 'success: expensetype deleted'
 
 
 # FBMSACCOUNTS

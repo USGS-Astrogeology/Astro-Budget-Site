@@ -8,14 +8,15 @@
       {% endif %}
 
       {% if conference.conferencerates %}
-       "{{ conference.conferencerates[0].city }}, {{ conference.conferencerates[0].state }}, {{ conference.conferencerates[0].country }}", 
-       "{{ conference.conferencerates[0].perdiem|currencyformat }}", 
-       "{{ conference.conferencerates[0].lodging|currencyformat }}", 
-       "{{ conference.conferencerates[0].registration|currencyformat }}", 
-       "{{ conference.conferencerates[0].groundtransport|currencyformat }}", 
-       "{{ conference.conferencerates[0].airfare|currencyformat }}"]
+       {% set conferencerate = conference.conferencerates|geteffective %}
+       "{{ conferencerate.city }}, {{ conferencerate.state }}, {{ conferencerate.country }}", 
+       "{{ conferencerate.perdiem|currencyformat }}", 
+       "{{ conferencerate.lodging|currencyformat }}", 
+       "{{ conferencerate.registration|currencyformat }}", 
+       "{{ conferencerate.groundtransport|currencyformat }}", 
+       "{{ conferencerate.airfare|currencyformat }}"]
       {% else %}
-       "", "-", "-", "-", "-", "-"]
+       "", "", "", "", "", ""]
       {% endif %}
       {% if loop.last != true %},{% endif %}
   {% endfor %}
