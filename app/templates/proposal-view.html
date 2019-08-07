@@ -29,7 +29,7 @@
               <a href="/proposal-basis/{{ proposal.proposalid }}"
                 target='report' id="basisButton">BASIS+</a>
               <p/>
-              <form id="proposalForm" action="index.php" method="GET">
+              <form id="proposalForm" action="" method="POST">
               <input type='hidden' name='proposalid' value='{{ proposal.proposalid }}'/>
               <input type='hidden' name='view' value='proposal-save'/>
               <table>
@@ -78,7 +78,7 @@
                   </td></tr>
                 </tr>
                 <tr><th></th>
-                    <td><a href='javascript:void(0)' onClick='saveProposal()' id='saveProposalButton'>Save</a></td>
+                    <td><a href='javascript:void(0)' onClick='callSave("/proposals/ajax/save/{{proposal.proposalid}}", {{proposal.proposalid}}, $("proposalsTable")' id='saveProposalButton'>Save</a></td>
                 </tr>
               </table>
               </form>
@@ -187,19 +187,19 @@
 
           // load funding
           loadTable('/funding/ajax/list/{{ proposal.proposalid }}', false, $('#fundingTable'));
-          
+
           // load fbmsaccounts
           loadTable('/fbmsaccounts/ajax/list/{{ proposal.proposalid }}', false, $('#fbmsTable'));
-          
+
           // load overhead
           loadTable('/overhead/ajax/list/{{ proposal.proposalid }}', false, $('#overheadTable'));
-          
+
           // load tasks previous way for now
           loadTasksTable(false, '{{ proposal.proposalid }}');
 
           // load conferenceattendees
           loadTable('/conferenceattendees/ajax/list/byproposal/{{ proposal.proposalid }}', false, $('#conferenceattendeesTable'));
-          
+
           // load expenses
           loadTable('/expenses/ajax/list/{{ proposal.proposalid }}', false, $('#expensesTable'));
 

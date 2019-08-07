@@ -1,7 +1,7 @@
 {"draw":0,"recordsTotal":{{ salaries|length }},"recordsFiltered":{{ salaries|length }},"data":[
 {% for salary in salaries %}
   {% if g.user.admin %}
-["<a href='javascript:void(0)' onclick='salaryEdit({{ salary.salaryid }})'>Edit</a>",
+["<a href='javascript:void(0)' onclick='editDialog(\"/salaries/ajax/edit{{ salary.salaryid }}\", null, $(\"#salaryTable\"))'>Edit</a>",
   {% else %}
 ["",
   {% endif %}
@@ -10,7 +10,7 @@
 "${{ salary.estbenefits }}", "{{ salary.leavecategory }}",
 "{{ salary.laf }}",
 {% if g.user.admin %}
-"<a href='javascript:void(0)' onclick='deleteSalary({{ salary.salaryid }})'><img src={{url_for('static', filename='images/trash-2-32.png') }} title='Delete Salary Entry'></a>"
+"<a href='javascript:void(0)' onclick='deleteDialog(\"/salaries/ajax/delete/{{ salary.salaryid }}\", null, $(\"#salaryTable\"))'><img src={{url_for('static', filename='images/trash-2-32.png') }} title='Delete Salary Entry'></a>"
 {% else %}""{% endif %}]
 {% if loop.last != true %},{% endif %}
 {% endfor %}

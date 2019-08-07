@@ -101,9 +101,10 @@ function callSave(ajax, proposalid, table, form) {
 
 function callDelete(ajax, proposalid, table) {
   $.get(ajax + '&' + proposalid)
-    .always (function() {
-      dialog.dialog("close");
-      $("#warningDiv").html("<p>Successfully Deleted</p>");
+    .always (function(data) {
+      //dialog.dialog("close");
+      //$("#warningDiv").html("<p>Successfully Deleted</p>");
+      $("#warningDiv").html(data);
       $("#warningDiv").show();
 
       //console.log(ajax);

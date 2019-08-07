@@ -160,7 +160,7 @@ def load_conferenceattendees(id):
 	conferenceattendees = ConferenceAttendee.get_many(joins = [], filters = filters, orders = [])
 	return render_template('conference-attendee-list-ajax.json', conferenceattendees = conferenceattendees)
 
-@app.route('/conferenceattendees/ajax/save/<int:conferenceattendeeid>', methods = ['GET','POST'])
+@app.route('/conferenceattendees/ajax/save/<int:conferenceattendeeid>', methods = ['POST'])
 @login_required
 def save_conferenceattendee(conferenceattendeeid):
 	meeting = request.form.get("meeting")
@@ -242,6 +242,18 @@ def load_expenses(proposalid):
 	expenses = Expenses.get_many(filters = [Expenses.proposalid == proposalid])
 	return render_template('expense-list-ajax.json', expenses = expenses)
 
+@app.route('/expenses/ajax/save/<int:expenseid>', methods = ['POST'])
+@login_required
+def save_expense(expenseid):
+	description = request.form.get("description")
+	expense_type = request.form.get("expensetypedropdown")
+	amount = request.form.get("amount")
+	fiscal_year = request.form.get("fiscalyear")
+
+	text = description + " " + amount + " " + fiscal_year
+
+	return text
+
 
 # EXPENSE TYPES
 
@@ -292,7 +304,7 @@ def delete_expensetype(expensetypeid):
 		db.session.commit()
 	except:
 		return 'error: expensetype could not be deleted'
-	
+
 	return 'success: expensetype deleted'
 
 
@@ -322,7 +334,7 @@ def load_fbmsaccounts(proposalid):
 	fbmsaccounts = FBMSAccounts.get_many(filters = [FBMSAccounts.proposalid == proposalid])
 	return render_template('fbms-list-ajax.json', fbmsaccounts = fbmsaccounts)
 
-@app.route('/fbmsaccounts/ajax/save/<int:fbmsid>', methods = ['GET', 'POST'])
+@app.route('/fbmsaccounts/ajax/save/<int:fbmsid>', methods = ['POST'])
 @login_required
 def save_fbmsaccounts(fbmsid):
 	account = request.form.get('accountno')
@@ -348,13 +360,18 @@ def delete_funding(fundingid, proposalid):
 											   Funding.proposalid == proposalid])
 
 	if not to_be_deleted:
-		return "null"
+		return "object could not be found"
+
+	try:
+		db.session.delete(to_be_deleted)
+		db.session.commit()
+	except:
+		return "delete failed"
 
 	text = "fiscalyear: " + fyformat(to_be_deleted.fiscalyear) + " newfunding: " + currencyformat(to_be_deleted.newfunding) + " carryover: " + currencyformat(to_be_deleted.carryover)
-	print(text)
 
 	# return message for the div
-	return text
+	return "successfully deleted"
 
 @app.route('/funding/ajax/edit/<int:fundingid>')
 @login_required
@@ -372,27 +389,41 @@ def load_funding(proposalid):
 	funding = Funding.get_many(filters = [Funding.proposalid == proposalid])
 	return render_template('funding-list-ajax.json', funding = funding)
 
-@app.route('/funding/ajax/save/<int:fundingid>', methods = ['GET','POST'])
+@app.route('/funding/ajax/save/<int:fundingid>', methods = ['POST'])
 @login_required
 def save_funding(fundingid):
 	# update if already existing
 	# make a new one if it is a new funding program
 
-	if fundingid == 0:
-		print("new funding")
-	else:
-		print("existing funding")
+	funding = Funding.get_one(filters = [Funding.fundingid == fundingid])
 
-	#funding_proposalid = request.form.get('proposalid')
+	funding_proposalid = request.form.get('proposalid')
 	#funding_fundingid = request.form.get('fundingid')
 	funding_fiscalyear = request.form.get('fiscalyear')
 	funding_newfunding = request.form.get('newfunding')
 	funding_carryover = request.form.get("carryover")
 
-	text = funding_fiscalyear + " " + funding_newfunding + " " + funding_carryover
 
-	# return the message for the div
-	return text
+	try:
+		if not funding:
+			print("new funding")
+			funding = Funding(proposalid = funding_proposalid,
+							  fiscalyear = funding_fiscalyear,
+							  newfunding = funding_newfunding,
+							  carryover = funding_carryover)
+			db.session.add(funding)
+		else:
+			print("existing funding")
+			funding.fiscalyear = funding_fiscalyear
+			funding.newfunding = funding_newfunding
+			funding.carryover = funding_carryover
+
+		db.session.commit()
+	except:
+		return "an error occurred"
+		#return funding_proposalid + " " + funding_fiscalyear + " " + funding_newfunding + " " + funding_carryover
+
+	return "successfully added/edited"
 
 
 # OVERHEAD
@@ -444,7 +475,7 @@ def load_overhead(proposalid):
 		overheadrates = OverheadRates.get_many(filters = [OverheadRates.proposalid == None])
 	return render_template('overhead-list-ajax.json', overheadrates = overheadrates)
 
-@app.route('/overhead/ajax/save/<int:overheadid>', methods = ['GET', 'POST'])
+@app.route('/overhead/ajax/save/<int:overheadid>', methods = ['POST'])
 @login_required
 def save_overhead(overheadid):
 	overhead_rate = request.form.get("rate")
@@ -545,6 +576,44 @@ def view_proposal(proposalid):
 def load_proposals():
 	proposals = Proposals.get_all()
 	return render_template('proposal-list-ajax.json', proposals = proposals)
+
+@app.route('/proposals/ajax/save/<int:proposalid>', methods = ['POST'])
+@login_required
+def save_proposal(proposalid):
+	proposal = Proposals.get_one(filters = [Proposals.proposalid == proposalid])
+
+	name = request.form.get("projectname")
+	principal_investigator = request.form.get("peopleid")
+	program_id = request.form.get("programid")
+	status = request.form.get("status")
+	proposal_number = request.form.get("proposalnumber")
+	award_number = request.form.get("award_number")
+	starting = request.form.get("perfperiodstart")
+	ending = request.form.get("perfperiodend")
+
+	try:
+		if not proposal:
+			print("new proposal")
+			proposal = Proposals(projectname = name, peopleid = principal_investigator,
+								 proposalnumber = proposal_number, awardnumber = award_number,
+								 programid = program_id, perfperiodstart = starting,
+								 perfperiodend = ending, status = status)
+			db.session.add(proposal)
+		else:
+			proposal.projectname = name
+			proposal.peopleid = principal_investigator
+			proposal.proposalnumber = proposal_number
+			proposal.awardnumber = award_number
+			proposal.programid = program_id
+			proposal.perfperiodstart = starting
+			proposal.perfperiodend = ending
+			proposal.status = status
+
+		db.session.commit()
+	except:
+		return "could not add/edit proposal"
+
+	return "proposal added/edited"
 
 
 @app.route('/proposal-basis/<int:proposalid>')
