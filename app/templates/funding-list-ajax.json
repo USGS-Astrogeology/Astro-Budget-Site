@@ -1,7 +1,7 @@
 {"draw":0,"recordsTotal":{{ funding|length }},"recordsFiltered":{{ funding|length }},"data":[
 {% for fund in funding %}
   {% if g.user.admin %}
-    ["<a href='javascript:void(0)' onclick='editDialog(\"/funding/ajax/edit/{{ fund.fundingid }}\", {{ fund.proposalid }}, $(\"#fundingTable\"), $(\"#fundingForm\"))'>{{ fund.fiscalyear|fyformat }}</a>",
+    ["<a href='javascript:void(0)' onclick='editDialog(\"/funding/ajax/edit/{{ fund.fundingid }}\", {{ fund.proposalid }}, $(\"#fundingTable\"))'>{{ fund.fiscalyear|fyformat }}</a>",
   {% else %}
     ["{{ fund.fiscalyear|fyformat }}",
   {% endif %}

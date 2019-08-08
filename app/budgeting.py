@@ -163,6 +163,11 @@ def load_conferenceattendees(id):
 @app.route('/conferenceattendees/ajax/save/<int:conferenceattendeeid>', methods = ['POST'])
 @login_required
 def save_conferenceattendee(conferenceattendeeid):
+	conference = ConferenceAttendee.get_one(filters = [ConferenceAttendee.conferenceattendeeid == conferenceattendeeid])
+
+	proposal = request.form.get("proposalid")
+	conferenceid = request.form.get("conferenceid")
+
 	meeting = request.form.get("meeting")
 	meeting_days = request.form.get("meetingdays")
 	travel_days = request.form.get("traveldays")
@@ -179,18 +184,25 @@ def save_conferenceattendee(conferenceattendeeid):
 	state = request.args.get("state")
 	country = request.args.get("country")
 
-	if not meeting:
-		return "meeting is null"
-	elif not travelers:
-		return "travelers is null"
-	elif not meeting_days:
-		return "meeting days is null"
-	else:
-		text = meeting + " " + travelers + " " + meeting_days
-		#text = travelers + " " + meeting_days
+	try:
+		if not conference:
+			print("new conference")
+			conference = ConferenceAttendee(proposalid = proposal, )
+			db.session.add(account)
+		else:
+			print("existing account")
+			account.accountno = account_no
 
-		#return "conferenceattendees save request"
-		return text
+		db.session.commit()
+	except:
+		db.session.rollback()
+		return "an error occurred"
+
+	return "successfully added/edited"
+
+
+	#text = meeting + " " + travelers + " " + meeting_days
+	#return text
 
 
 # CONFERENCE RATES
@@ -222,10 +234,17 @@ def delete_expense(expenseid, proposalid):
 										  Expenses.proposalid == proposalid])
 
 	if not expense:
-		return "null"
+		return "object could not be found"
 
-	text = "expense: " + expense.description + " amount: " + currencyformat(expense.amount) + " fiscal year: " + fyformat(expense.fiscalyear)
-	return text
+	try:
+		db.session.delete(expense)
+		db.session.commit()
+	except:
+		db.session.rollback()
+		return "delete failed"
+
+	# return message for the div
+	return "successfully deleted"
 
 @app.route('/expenses/ajax/edit/<int:expenseid>')
 @login_required
@@ -246,14 +265,39 @@ def load_expenses(proposalid):
 @app.route('/expenses/ajax/save/<int:expenseid>', methods = ['POST'])
 @login_required
 def save_expense(expenseid):
+	expense = Expenses.get_one(filters = [Expenses.expenseid == expenseid])
+
+	proposal = request.form.get("proposalid")
 	description = request.form.get("description")
-	expense_type = request.form.get("expensetypedropdown")
-	amount = request.form.get("amount")
+	expense_type = request.form.get("expensetypeid")
+	amount = request.form.get("amount").replace("$", "")
 	fiscal_year = request.form.get("fiscalyear")
 
-	text = description + " " + amount + " " + fiscal_year
+	#text = description + " " + amount + " " + fiscal_year
 
-	return text
+	#return text
+
+	try:
+		if not expense:
+			print("new expense")
+			expense = Expenses(proposalid = proposal, expensetypeid = expense_type,
+								description = description, amount = amount,
+								fiscalyear = fiscal_year)
+			db.session.add(expense)
+		else:
+			print("existing expense")
+			expense.description = description
+			expense.expensetypeid = expense_type
+			expense.amount = amount
+			expense.fiscalyear = fiscal_year
+
+		db.session.commit()
+	except:
+		db.session.rollback()
+		return "an error occurred"
+
+	return "successfully added/edited"
+
 
 
 # EXPENSE TYPES
@@ -320,10 +364,18 @@ def delete_fbmsaccount(fbmsid, proposalid):
 											  FBMSAccounts.proposalid == proposalid])
 
 	if not account:
-		return "null"
+		return "object could not be found"
 
-	text = "account number: " + account.accountno
-	return text
+	try:
+		db.session.delete(account)
+		db.session.commit()
+	except:
+		db.session.rollback()
+		return "delete failed"
+
+	# return message for the div
+	return "successfully deleted"
+
 
 @app.route('/fbmsaccounts/ajax/edit/<int:fbmsid>')
 @login_required
@@ -340,11 +392,28 @@ def load_fbmsaccounts(proposalid):
 @app.route('/fbmsaccounts/ajax/save/<int:fbmsid>', methods = ['POST'])
 @login_required
 def save_fbmsaccounts(fbmsid):
-	account = request.form.get('accountno')
+	account = FBMSAccounts.get_one(filters = [FBMSAccounts.fbmsid == fbmsid])
 
-	text = "" + account
+	proposal = request.form.get('proposalid')
+	account_no = request.form.get('accountno')
 
-	return text
+	#text = "" + account
+
+	try:
+		if not account:
+			print("new account")
+			account = FBMSAccounts(proposalid = proposal, accountno = account_no)
+			db.session.add(account)
+		else:
+			print("existing account")
+			account.accountno = account_no
+
+		db.session.commit()
+	except:
+		db.session.rollback()
+		return "an error occurred"
+
+	return "successfully added/edited"
 
 
 # FUNDING
@@ -369,6 +438,7 @@ def delete_funding(fundingid, proposalid):
 		db.session.delete(to_be_deleted)
 		db.session.commit()
 	except:
+		db.session.rollback()
 		return "delete failed"
 
 	text = "fiscalyear: " + fyformat(to_be_deleted.fiscalyear) + " newfunding: " + currencyformat(to_be_deleted.newfunding) + " carryover: " + currencyformat(to_be_deleted.carryover)
@@ -403,8 +473,8 @@ def save_funding(fundingid):
 	funding_proposalid = request.form.get('proposalid')
 	#funding_fundingid = request.form.get('fundingid')
 	funding_fiscalyear = request.form.get('fiscalyear')
-	funding_newfunding = request.form.get('newfunding')
-	funding_carryover = request.form.get("carryover")
+	funding_newfunding = request.form.get('newfunding').replace("$", "")
+	funding_carryover = request.form.get("carryover").replace("$", "")
 
 
 	try:
@@ -423,10 +493,12 @@ def save_funding(fundingid):
 
 		db.session.commit()
 	except:
+		db.session.rollback()
 		return "an error occurred"
-		#return funding_proposalid + " " + funding_fiscalyear + " " + funding_newfunding + " " + funding_carryover
+		#return "error: " + funding_proposalid + " " + funding_fiscalyear + " " + funding_newfunding + " " + funding_carryover
 
 	return "successfully added/edited"
+	#return funding_proposalid + " " + funding_fiscalyear + " " + funding_newfunding + " " + funding_carryover
 
 
 # OVERHEAD
@@ -448,13 +520,19 @@ def delete_overhead(overheadid, proposalid):
 	overhead = OverheadRates.get_one(filters = [OverheadRates.overheadid == overheadid,
 												OverheadRates.proposalid == proposalid])
 
-	#overhead = OverheadRates.get_one(filters = [OverheadRates.overheadid == overheadid])
-
 	if not overhead:
-		return "null"
+		return "object could not be found"
 
-	text = "description: " + overhead.description
-	return text
+	try:
+		db.session.delete(overhead)
+		db.session.commit()
+	except:
+		db.session.rollback()
+		return "delete failed"
+
+	# return message for the div
+	return "successfully deleted"
+
 
 @app.route('/overhead/ajax/edit/<int:overheadid>')
 @login_required
@@ -481,13 +559,36 @@ def load_overhead(proposalid):
 @app.route('/overhead/ajax/save/<int:overheadid>', methods = ['POST'])
 @login_required
 def save_overhead(overheadid):
-	overhead_rate = request.form.get("rate")
+	overhead = OverheadRates.get_one(filters = [OverheadRates.overheadid == overheadid])
+
+	proposal = request.form.get('proposalid')
+	overhead_rate = request.form.get("rate").replace("%", "")
 	description = request.form.get("description")
 	effective_date = request.form.get("effectivedate")
 
-	text = overhead_rate + " " + description + " " + effective_date
+	try:
+		if not overhead:
+			print("new overhead")
+			overhead = OverheadRates(proposalid = proposal, rate = overhead_rate,
+									 description = description,
+									 effectivedate = effective_date)
+			db.session.add(overhead)
+		else:
+			print("existing overhead")
+			overhead.rate = overhead_rate
+			overhead.description = description
+			overhead.effectivedate = effective_date
 
-	return text
+		db.session.commit()
+	except:
+		db.session.rollback()
+		return "an error occurred"
+
+	return "successfully added/edited"
+
+	#text = overhead_rate + " " + description + " " + effective_date
+
+	#return text
 
 
 # PEOPLE
@@ -564,7 +665,7 @@ def save_program(programid):
 
 	try:
 		if not program:
-			program = FundingPrograms(programname=programname, agency=agency, pocname=pocname, 
+			program = FundingPrograms(programname=programname, agency=agency, pocname=pocname,
 			                          pocemail=pocemail, startdate=startdate, enddate=enddate)
 			db.session.add(program)
 		else:

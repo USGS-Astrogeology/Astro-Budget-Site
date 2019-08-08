@@ -86,7 +86,7 @@
             </div>
           <h3 id='fundingTitle'>Funding</h3>
             <div id='fundingDiv' style='height: 400px;'>
-              <a href='javascript:void(0)' onClick="editDialog('/funding/ajax/edit/0', {{ proposal.proposalid }}, 300, 450)" id='newFundingButton'>New</a><p/>
+              <a href='javascript:void(0)' onClick="editDialog('/funding/ajax/edit/0', {{ proposal.proposalid }}, $('#fundingTable'))" id='newFundingButton'>New</a><p/>
               <br>
 
               <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#fundingTable').DataTable())">Save Row Preference</button>

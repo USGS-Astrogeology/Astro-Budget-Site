@@ -34,13 +34,16 @@ function editDialog(ajax, proposalid, table) {
       title: $(data).find('#title').val(),
       close: function() { $(this).dialog("destroy") },
       buttons: {
-        "Save": function () { 
+        "Save": function () {
           dialog = $(this);
           callSave(save_ajax, proposalid, table, dialog) },
         Cancel: function () { $(this).dialog("destroy"); }
       }
     });
   });
+
+  console.log(save_ajax);
+  console.log(table);
 }
 
 
@@ -52,7 +55,7 @@ function deleteDialog(ajax, proposalid, table, description) {
     modal: true,
     close: function() { $(this).dialog("destroy") },
     buttons: {
-      "Delete": function () { 
+      "Delete": function () {
         dialog = $(this);
         callDelete(ajax, proposalid, table, dialog) },
       Cancel: function () { $(this).dialog("destroy"); }
@@ -86,6 +89,8 @@ function callSave(ajax, proposalid, table, dialog) {
       }
 
       dialog.dialog('destroy');
+      console.log("ajax: " + new_ajax);
+      console.log("table " + table);
       loadTable(new_ajax, true, table);
 
   });
@@ -118,6 +123,8 @@ function callDelete(ajax, proposalid, table, dialog) {
       {
         var new_ajax = load_ajax.replace(elements[elements_size - 1], proposalid);
       }
+
+      console.log(table);
       
       dialog.dialog('destroy');
       loadTable(new_ajax, true, table);
