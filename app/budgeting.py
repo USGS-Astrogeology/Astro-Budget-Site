@@ -61,7 +61,7 @@ def fyformat(datestring):
 def geteffective(list, cutoff_date = date.today()):
 	effective_item = None
 	if cutoff_date != date.today():
-		cutoff_date = datetime.strptime(cuttoff_date)
+		cutoff_date = datetime.strptime(cutoff_date)
 
 	for item in list:
 		if item.effectivedate.date() <= cutoff_date:
@@ -212,6 +212,7 @@ def load_conferencerates(conferenceid):
 	return render_template('conference-rate-list-ajax.json', conferencerates = conferencerates)
 
 
+
 # EXPENSES
 
 @app.route('/expenses/ajax/delete/<int:expenseid>&<int:proposalid>')
@@ -278,18 +279,19 @@ def load_expensetypes():
 @login_required
 def save_expensetype(expensetypeid):
 	expensetype = ExpenseTypes.get_one(filters = [ExpenseTypes.expensetypeid == expensetypeid])
-	description = request.form['description']
+	criteria = {'description': request.form['description']}
+	#description = request.form['description']
 
 	try:
 		if not expensetype:
-			print('create new')
-			expensetype = ExpenseTypes(description=description)
+			expensetype = ExpenseTypes(**criteria)
 			db.session.add(expensetype)
 		else:
-			print('update existing')
-			expensetype.description = description
+			for key,value in criteria.items():
+				setattr(expensetype, key, value)
 		db.session.commit()
 	except:
+		db.session.rollback()
 		return 'error: expensetype not added/edited'
 
 	return 'success: expensetype added/edited'
@@ -303,6 +305,7 @@ def delete_expensetype(expensetypeid):
 		db.session.delete(expensetype)
 		db.session.commit()
 	except:
+		db.session.rollback()
 		return 'error: expensetype could not be deleted'
 
 	return 'success: expensetype deleted'
@@ -547,6 +550,50 @@ def edit_program(programid):
 def load_programs():
 	programs = FundingPrograms.get_many(joins = [], filters = [], orders = [])
 	return render_template('programs-list-ajax.json', programs = programs)
+
+@app.route('/programs/ajax/save/<int:programid>', methods = ['POST'])
+@login_required
+def save_program(programid):
+	program = FundingPrograms.get_one(filters = [FundingPrograms.programid == programid])
+	programname = request.form['programname']
+	agency = request.form['agency']
+	pocname = request.form['pocname']
+	pocemail = request.form['pocemail']
+	startdate = datetime.strptime(request.form['startdate'], '%m/%d/%Y')
+	enddate = datetime.strptime(request.form['enddate'], '%m/%d/%Y')
+
+	try:
+		if not program:
+			program = FundingPrograms(programname=programname, agency=agency, pocname=pocname, 
+			                          pocemail=pocemail, startdate=startdate, enddate=enddate)
+			db.session.add(program)
+		else:
+			program.programname = programname
+			program.agency = agency
+			program.pocname = pocname
+			program.pocemail = pocemail
+			program.startdate = startdate
+			program.enddate = enddate
+		db.session.commit()
+	except:
+		db.session.rollback()
+		return 'error: Funding Program not added/edited'
+
+	return 'success: Funding Program added/edited'
+
+@app.route('/programs/ajax/delete/<int:programid>', methods = ['GET', 'POST'])
+@login_required
+def delete_program(programid):
+	program = FundingPrograms.get_one(filters = [FundingPrograms.programid == programid])
+
+	try:
+		db.session.delete(program)
+		db.session.commit()
+	except:
+		db.session.rollback()
+		return 'error: Funding Program could not be deleted'
+
+	return 'success: Funding Program deleted'
 
 
 # PROPOSALS

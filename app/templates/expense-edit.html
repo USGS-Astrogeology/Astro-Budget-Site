@@ -6,8 +6,7 @@
     <body>
     <div id="expenseeditdiv">
        <form id="expenseForm" action="" method="POST">
-            <input type="hidden" name="act" value="save"/>
-            <input type="hidden" name="view" value="expense-save"/>
+            <input type="hidden" autofocus />
             <input type="hidden" id="proposalid" name="proposalid" value="{{ expense.proposalid }}"/>
             <input type="hidden" id="expenseid" name="expenseid"
             {% if not expense %} value="new"/>

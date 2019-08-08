@@ -15,8 +15,7 @@
     <div id="peopleedittab1">
         {% for person in people %}
           <form id="peopleForm" action="index.php" method="GET">
-            <input type="hidden" name="act" value="save"/>
-            <input type="hidden" name="view" value="people-save"/>
+            <input type="hidden" autofocus />
             <input type="hidden" id="peopleid" name="peopleid" value="{{ person.peopleid }}"/>
             <table><tr><th>Name</th>
             <td><input type="text" name="name" id="name" value="{{ person.name }}" size="40"/></td></tr>

@@ -10,19 +10,16 @@
     <body>
         {% include 'menu-tags.html' %}
       <div class="container">
-        <div id="title">
-          <h2>List of Conferences/Meetings/Travel
+        <div class="title">
+          <div>
+            <h1>List of Conferences/Meetings/Travel</h1>
             {% if g.user.admin %}
               <a href='javascript:void(0)' onClick="editDialog('/conferences/ajax/edit/0', null, $('#conferencesTable'))" id='newButton'>New</a>
             {% endif %}
-            <br>
-
-            <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#conferencesTable').DataTable())">Save Row Preference</button>
-
-          </h2>
+          </div>
+          <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#conferencesTable').DataTable())">Save Row Preference</button>
         </div>
-        <div id="warningDiv" class="ui-corner-all ui-state-highlight" style="width=100px;align=right;"></div>
-        <div id="editDialog" class="ui-widget"></div>
+        <div id="warningDiv" class="ui-corner-all ui-state-highlight" style="display: none;"></div>
         <div id="conferencesTableDiv">
         <table id="conferencesTable" class="display" cellspacing="0" width="100%">
           <thead><tr><th>Meeting</th><th>Location</th><th>Per<br/>Diem</th><th>Lodging</th><th>Registration</th>
@@ -46,7 +43,6 @@
 
         $(document).ready(function() {
           $("#newButton").button();
-          $("#warningDiv").hide();
           loadTable('/conferences/ajax/list', false, $('#conferencesTable'));
         } );
       </script>

@@ -6,9 +6,8 @@
     <body>
     {% if g.user.admin %}
       <div>
-        <form id="programForm" action="index.php" method="GET">
-          <input type="hidden" name="act" value="save"/>
-          <input type="hidden" name="view" value="program-save"/>
+        <form id="programForm" action="" method="POST">
+          <input type="hidden" autofocus />
           <input type="hidden" id="programid" name="programid" value="{{ programid }}"/>
           <table><tr><th>Name</th>
             <td><input type="text" name="programname" id="programname" value="{{ program.programname }}" size="40"/></td></tr>

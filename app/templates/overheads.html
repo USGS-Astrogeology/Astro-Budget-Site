@@ -3,9 +3,6 @@
     <head>
         <title>Proposal Budget Overhead Rates</title>
         {% include 'menu-header.html' %}
-        <script src="{{url_for('static', filename='js/proposal-edit.js') }}"></script>
-        <script src="{{url_for('static', filename='js/row_setting.js') }}"></script>
-        <script src="{{url_for('static', filename='js/budgeting.js') }}"></script>
     </head>
     {% for error in debug %}
       <pre>error.msg</pre>
@@ -13,16 +10,14 @@
     <body>
         {% include 'menu-tags.html' %}
       <div class="container">
-        <div id="title">
-          <h2>List of Overhead Rates</h2>
-          {% if g.user.admin %}
-            <a href='javascript:void(0)' onClick="editDialog('/overhead/ajax/edit/0', null, $('#overheadTable'))" id='newButton'>New</a><p/>
-          {% endif %}
-          <br>
-
+        <div class="title">
+          <div>
+            <h1>List of Overhead Rates</h1>
+            {% if g.user.admin %}
+              <a href='javascript:void(0)' onClick="editDialog('/overhead/ajax/edit/0', null, $('#overheadTable'))" id='newButton'>New</a><p/>
+            {% endif %}
+          </div>
           <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#overheadTable').DataTable())">Save Row Preference</button>
-
-          </h2>
         </div>
         <div id="warningDiv" class="ui-corner-all ui-state-highlight" style="width=100px;align=right;"></div>
         <div id="editDialog" class="ui-widget"></div>

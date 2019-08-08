@@ -1,12 +1,11 @@
 <div id="deleteDialog"></div>
 <form id="rateForm" action="index.php" method="GET">
-  <input type="hidden" name="act" value="save"/>
-  <input type="hidden" name="view" value="conference-rate-save"/>
+  <input type="hidden" autofocus />
   <input type="hidden" id="conferenceid" name="conferenceid"
-  {% if not conference %} value=""/>
-  {% else %} value="{{ conference.conferenceid }}"/>
-  {% endif %}
-  <input type="hidden" id="conferencerateid" name="conferencerateid" value=""/>
+    {% if not conference %} value=""/>
+    {% else %} value="{{ conferencerate.conference.conferenceid }}"/>
+    {% endif %}
+  <!--<input type="hidden" id="conferencerateid" name="conferencerateid" value=""/>-->
   <table>
     <tr><th>Per Diem</th><td><input type="text" id="perdiem" name="perdiem" size="12" value="{{ conferencerate.perdiem|currencyformat }}"/></td>
         <th>Registration</th><td><input type="text" id="registration" name="registration" size="12" value="{{ conferencerate.registration|currencyformat }}"/></td></tr>

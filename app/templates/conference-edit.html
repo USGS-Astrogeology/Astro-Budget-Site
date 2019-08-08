@@ -4,16 +4,16 @@
         <title>Editing Conferences</title>
     </head>
     <body>
-      <form id="conferenceForm" action="index.php" method="GET">
-        <input type="hidden" name="act" value="save"/>
-        <input type="hidden" name="view" value="conference-save"/>
+      <div class="editDialog ui-widget"></div>
+      <form id="conferenceForm" action="" method="POST">
+        <input type="hidden" autofocus />
         <input type="hidden" id="conferenceid" name="conferenceid"
-        {% if not conference %} value=""/>
-        {% else %} value="{{ conference.conferenceid }}"/>
-        {% endif %}
+          {% if not conference %} value=""/>
+          {% else %} value="{{ conference.conferenceid }}"/>
+          {% endif %}
         <table>
           <tr><th align="left">Conference/Meeting/Travel</th></tr>
-          <tr><td><input type="text" name="meeting" id="meeting" value="{{ conference.meeting }}" size="40"/></td></tr>
+          <tr><td><input type="text" name="meeting" id="meeting" value="{{ conference.meeting }}" size="40" required/></td></tr>
           <tr><td><a href='javascript:void(0)' onClick="editDialog('/conferencerates/ajax/edit/0', null, $('#rateTable'))" id='newRateButton'>New Rate</a></td><td></td></tr>
         </table>
       </form>

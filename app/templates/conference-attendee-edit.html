@@ -20,12 +20,11 @@
     </div>
     <div id="conferenceattendeeeditdiv">
        <form id="conferenceAttendeeForm" action="" method="POST">
-            <input type="hidden" name="act" value="save"/>
-            <input type="hidden" name="view" value="conference-attendee-save"/>
+            <input type="hidden" autofocus />
             <input type="hidden" id="travelid" name="travelid"
-            {% if not conferenceattendee %} value="new"/>
-            {% else %} value="{{ conferenceattendee.travelid }}"/>
-            {% endif %}
+              {% if not conferenceattendee %} value="new"/>
+              {% else %} value="{{ conferenceattendee.travelid }}"/>
+              {% endif %}
 
             <input type="hidden" id="proposalid" name="proposalid" value="{{ proposalid }}"/>
             <table><tr><th>Meeting/Conference/Training</th>
