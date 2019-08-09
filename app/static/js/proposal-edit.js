@@ -679,10 +679,12 @@ function deleteAttendee(travelid, proposalid) {
     });
 }
 
+
 function loadConferenceRate() {
   $("#meeting").val($("#conferenceiddropdown option:selected").text());
   $.getJSON("index.php?view=conference-rate-list-json&conferenceid=" + $("#conferenceiddropdown").val() +
       "&effectivedate=" + $("#tripstartdate").val(), function( data ) {
+    //$.getJSON("/conferencerates/ajax/list/" + $(#conferenceiddropdown), function(data){
     $("#perdiem").val(data.data[0][1]);
     $("#lodging").val(data.data[0][2]);
     $("#registration").val(data.data[0][3]);
@@ -693,6 +695,7 @@ function loadConferenceRate() {
     $("#country").val(data.data[0][8]);
   });
 }
+
 
 function saveExpense(proposalid) {
   $.post("index.php", $("#expenseForm").serialize())

@@ -32,10 +32,17 @@
               {% with dropdown_name = 'conferenceid', dropdown_id = 'conferenceiddropdown', selected_conferenceid = conferenceattendee.conferenceid %}
                 {% include 'conferences-dropdown.html' %}
               {% endwith %}
+              {% if selected_conferenceid %}
+                {% set conference = true %}
+              {% else %}
+                {% set conference = false %}
+              {% endif %}
 
             </td></tr>
             <tr><th>Meeting</th><td colspan="3">
-            <input type="text" name="meeting" id="meeting" size=48 value="{{ conferenceattendee.conference.meeting }}"/></td></tr>
+            <input type="text" name="meeting" id="meeting" size=48
+            {% if conference == true %} value="{{ conferenceattendee.conference.meeting }}"
+            {% else %} value="" {% endif %}/></td></tr>
             <tr><th>Meeting Days</th>
             <td><input type="text" name="meetingdays" id="meetingdays" size="4" value="{{ conferenceattendee.meetingdays}}"/></td>
             <th>Travel Days</th>
@@ -50,6 +57,7 @@
               {% endwith %}
             </td></tr>
             <tr><th>How Many Rental Cars</th>
+            {% if conferenceattendee %}
             {% set conferencerate = conferenceattendee.conference.conferencerates|geteffective %}
             <td><input type="text" name="rentalcars" id="rentalcars" size="12" value="{{ conferenceattendee.rentalcars }}"/></td>
             <th>Ground Transport</th><td><input type="text" name="groundtransport" id="groundtransport" size="9" value="{{ conferencerate.groundtransport|floatformat }}"/></td></tr>
@@ -61,6 +69,18 @@
             <tr><th>City, State</th><td><input type="text" name="city" id="city" size="20" value="{{ conferencerate.city }}"/>,
             <input type="text" name="state" id="state" size="3" value="{{ conferencerate.state }}"/></td>
             <th>Country</th><td><input type="text" name="country" id="country" size="20" value="{{ conferencerate.country }}"/></td></tr>
+            {% else %}
+            <td><input type="text" name="rentalcars" id="rentalcars" size="12" value="{{ conferenceattendee.rentalcars }}"/></td>
+            <th>Ground Transport</th><td><input type="text" name="groundtransport" id="groundtransport" size="9" value=""/></td></tr>
+            <tr><th>Airfare</th><td><input type="text" name="airfare" id="airfare" size="10" value=""/></td>
+            <th>Lodging</th><td><input type="text" name="lodging" id="lodging" size="9" value=""/></td></tr>
+            <tr><th colspan=3>Other per Traveler Costs such as CGE booking</th><td><input type="text" name="other" id="other" size="8" value="--"/></td>
+            <tr><th>Per Diem</th><td><input type="text" name="perdiem" id="perdiem" size="8" value=""/></td>
+            <th>Registration</th><td><input type="text" name="registration" id="registration" size="8" value=""/></td></tr>
+            <tr><th>City, State</th><td><input type="text" name="city" id="city" size="20" value=""/>,
+            <input type="text" name="state" id="state" size="3" value=""/></td>
+            <th>Country</th><td><input type="text" name="country" id="country" size="20" value=""/></td></tr>
+            {% endif %}
            </table>
        </form>
     </div>

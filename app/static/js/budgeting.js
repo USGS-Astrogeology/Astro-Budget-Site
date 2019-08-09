@@ -1,6 +1,6 @@
 // this will work even if the value chosen is not on the dropdown menu
 // if this is null, the code will choose the first available option for size on the dropdown menu
-var user_preference = 10;
+//var user_preference = 10;
 
 function save_row_preference(table) {
   // look up the data tables thing from wherever and figure out how to get the size from it
@@ -8,14 +8,35 @@ function save_row_preference(table) {
   // will save this somewhere
   var table_row_size = table.page.len();
   console.log("New table row preference is " + table_row_size + " rows");
+
+  $.get("/row_setting/ajax/save/" + table_row_size)
+    .always(function(data)
+    {
+      displayAlert(data);
+    });
+
 }
 
 function check_row_preference(table) {
-  if (user_preference != null) {
-    console.log(table.page.len());
-    table.page.len(user_preference).draw();
-    console.log(table.page.len());
-  }
+  var user_preference = null;
+  $.get("/row_setting/ajax/get")
+   .always(function(data)
+   {
+     //console.log(data);
+     if (data != "None")
+     {
+       user_preference = parseInt(data);
+     }
+
+     //console.log(user_preference);
+
+     if (user_preference != null) {
+       console.log(table.page.len());
+       table.page.len(user_preference).draw();
+       console.log(table.page.len());
+     }
+
+   });
 }
 
 function loadTable(ajax, reload, table) {
@@ -29,7 +50,7 @@ function loadTable(ajax, reload, table) {
           'serverSide': false,
           'autoWidth': false,
           'ajax': ajax,
-          'lengthMenu': [[5, 10, 20, -1], [5,10, 20, 'All']]
+          'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
         });
     }
 
@@ -150,7 +171,7 @@ function callDelete(ajax, proposalid, table, dialog) {
       }
 
       //console.log(table);
-      
+
       dialog.dialog('destroy');
       loadTable(new_ajax, true, table);
     });
@@ -187,4 +208,3 @@ function updateCalendar (id) {
 
   $(hid).val (newDate);
 }
-

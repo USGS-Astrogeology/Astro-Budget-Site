@@ -129,13 +129,23 @@ def load_conferences():
 @login_required
 def delete_conferenceattendee(conferenceattendeeid, proposalid):
 	conference_attendee = ConferenceAttendee.get_one(filters = [ConferenceAttendee.conferenceattendeeid == conferenceattendeeid,
-																 ConferenceAttendee.proposalid == proposalid])
+																ConferenceAttendee.proposalid == proposalid])
 
 	if not conference_attendee:
-		return "null"
+		return "object could not be found"
 
-	text = "Start date: " + dateformat(conference_attendee.startdate) + " meeting: " + conference_attendee.conference.meeting
-	return text
+	try:
+		db.session.delete(conference_attendee)
+		db.session.commit()
+	except:
+		db.session.rollback()
+		return "delete failed"
+
+		# return message for the div
+	return "successfully deleted"
+
+	#text = "Start date: " + dateformat(conference_attendee.startdate) + " meeting: " + conference_attendee.conference.meeting
+	#return text
 
 @app.route('/conferenceattendees/ajax/edit/<int:conferenceattendeeid>')
 @login_required
@@ -187,11 +197,21 @@ def save_conferenceattendee(conferenceattendeeid):
 	try:
 		if not conference:
 			print("new conference")
-			conference = ConferenceAttendee(proposalid = proposal, )
-			db.session.add(account)
+			conference = ConferenceAttendee(proposalid = proposal,
+											conferenceid = conferenceid,
+											meetingdays = meeting_days,
+											traveldays = travel_days,
+											startdate = start_date,
+											travelers = travelers,
+											rentalcars = rental_cars)
+			db.session.add(conference)
 		else:
-			print("existing account")
-			account.accountno = account_no
+			print("existing conference")
+			conference.meetingdays = meeting_days
+			conference.traveldays = travel_days
+			conference.startdate = start_date
+			conference.travelers = travelers
+			conference.rentalcars = rental_cars
 
 		db.session.commit()
 	except:
@@ -244,7 +264,7 @@ def save_conferencerate(conferencerateid):
 		db.session.rollback()
 		return 'error: Conference Rate not added/edited'
 
-	return 'success: Conference Rate added/edited'	
+	return 'success: Conference Rate added/edited'
 
 
 
@@ -807,6 +827,40 @@ def proposal_redacted(proposalid):
 @login_required
 def reports():
 	return render_template('reports.html')
+
+
+# ROW SETTING
+
+@app.route('/row_setting/ajax/get')
+@login_required
+def get_saved_preference():
+	user_preference = g.user.row_preference
+	return str(user_preference)
+
+@app.route('/row_setting/ajax/save/<int:row_preference>')
+@login_required
+def save_rows(row_preference):
+	new_setting = row_preference
+
+	try:
+		g.user.row_preference = row_preference
+		db.session.commit()
+		return ("New row preference saved")
+	except:
+		db.session.rollback()
+		return ("An error occurred")
+
+# this route is just used for testing purposes
+@app.route('/row_setting/ajax/reset')
+@login_required
+def reset_row():
+	try:
+		g.user.row_preference = None
+		db.session.commit()
+		return("row preference reset")
+	except:
+		db.session.rollback()
+		return("unsuccessful")
 
 
 # SALARIES
