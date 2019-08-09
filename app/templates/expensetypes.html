@@ -1,37 +1,33 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Proposal Budget Expense Type Listing</title>
-        {% include 'menu-header.html' %}
-    </head>
-    {% for error in debug %}
-      <pre>error.msg</pre>
-    {% endfor %}
-    <body>
-      {% include 'menu-tags.html' %}
-      <div class="container">
-        <div class="title">
-          <div>
-            <h1>List of Expense Categories</h1>
-            {% if g.user.admin %}
-              <a href='javascript:void(0)' onClick="editDialog('/expensetypes/ajax/edit/0', null, $('#expensetypesTable'))" id='newButton'>New</a>
-            {% endif %}
-          </div>
-          <button id="save_button" type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#expensetypesTable').DataTable())">Save Row Preference</button>
-        </div>
-        <div id="warningDiv" class="ui-corner-all ui-state-highlight" style="display: none;"></div>
-        <div id="expensetypesTableDiv">
-        <table id="expensetypesTable" class="display" cellspacing="0" width="100%">
-          <thead><tr><th>Description</th></tr></thead>
-        </table>
-        </div>
-      </div>
+{% extends 'page_template.html' %}
 
-      <script>
-        $(document).ready(function() {
-          $("#newButton").button();
-          loadTable('/expensetypes/ajax/list', false, $('#expensetypesTable'));
-        } );
-      </script>
-    </body>
-</html>
+{% block head %}{{ super() }}<title>Expense Categories</title>{% endblock %}
+
+{% block body %}
+  {{ super() }}
+  <div class="title">
+    <div>
+      <h1>List of Expense Categories</h1>
+      {% if g.user.admin %}
+        <a href='javascript:void(0)' onClick="editDialog('/expensetypes/ajax/edit/0', null, $('#expensetypesTable'))" id='newButton'>New</a>
+      {% endif %}
+    </div>
+    <button id="save_button" type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#expensetypesTable').DataTable())">Save Row Preference</button>
+  </div>
+  <div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
+  <div id="expensetypesTableDiv">
+    <table id="expensetypesTable" class="display" cellspacing="0" width="100%">
+      <thead><tr><th>Description</th></tr></thead>
+    </table>
+  </div>
+{% endblock %}
+
+{% block javascript %}
+  {{ super() }}
+  <script>
+    $(document).ready(function() {
+      $("#newButton").button();
+      loadTable('/expensetypes/ajax/list', false, $('#expensetypesTable'));
+    });
+  </script>
+{% endblock %}
+

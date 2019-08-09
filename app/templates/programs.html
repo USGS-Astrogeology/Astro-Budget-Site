@@ -1,50 +1,32 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Funding Programs Listing</title>
-        {% include 'menu-header.html' %}
-    </head>
-    {% for error in debug %}
-      <pre>error.msg</pre>
-    {% endfor %}
-    <body>
-      {% include 'menu-tags.html' %}
-      <div class="container">
-        <div class="title">
-          <div>
-            <h1>List of Funding Programs</h1>
-            {% if g.user.admin %}
-              <a href='javascript:void(0)' onClick="editDialog('/programs/ajax/edit/0', null, $('#programsTable'))" id='newButton'>New</a>
-            {% endif %}
-          </div>
-          <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#programsTable').DataTable())">Save Row Preference</button>
-        </div>
-        <div id="warningDiv" class="ui-corner-all ui-state-highlight" style="width=100px;align=right;"></div>
-        <div id="editDialog" class="ui-widget"></div>
-        <div id="programsTableDiv">
-        <table id="programsTable" class="display" cellspacing="0" width="100%">
-          <thead><tr><th>Name</th><th>Agency</th><th>POC</th><th>POC E-Mail</th><th>Start</th><th>End</th></tr></thead>
-        </table>
-        </div>
+{% extends 'page_template.html' %}
+
+{% block head %}{{ super() }}<title>Funding Programs</title>{% endblock %}
+
+{% block body %}
+  {{ super() }}
+    <div class="title">
+      <div>
+        <h1>List of Funding Programs</h1>
+        {% if g.user.admin %}
+          <a href='javascript:void(0)' onClick="editDialog('/programs/ajax/edit/0', null, $('#programsTable'))" id='newButton'>New</a>
+        {% endif %}
       </div>
+      <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#programsTable').DataTable())">Save Row Preference</button>
+    </div>
+    <div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
+    <div id="programsTableDiv">
+    <table id="programsTable" class="display" cellspacing="0" width="100%">
+      <thead><tr><th>Name</th><th>Agency</th><th>POC</th><th>POC E-Mail</th><th>Start</th><th>End</th></tr></thead>
+    </table>
+    </div>
+{% endblock %}
 
-      <script type="text/javascript" charset="utf-8">
-        function saveProgram() {
-          $.post("index.php", $("#programForm").serialize())
-            .always( function () {
-              loadProgramTable (true);
-              dialog.dialog("close");
-              $("#warningDiv").html("<p>Updated [" + $("#programid").val() + "] " + $("#programname").val() +
-                                    " (" + $("#agency").val() +")</p>");
-              $("#warningDiv").show();
-            });
-        }
-
-        $(document).ready(function() {
-          $("#newButton").button();
-          $("#warningDiv").hide();
-          loadTable('/programs/ajax/list', false, $('#programsTable'));
-        } );
-      </script>
-    </body>
-</html>
+{% block javascript %}
+  {{ super() }}
+  <script>
+    $(document).ready(function() {
+      $("#newButton").button();
+      loadTable('/programs/ajax/list', false, $('#programsTable'));
+    });
+  </script>
+{% endblock %}

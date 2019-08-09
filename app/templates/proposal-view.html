@@ -1,221 +1,11 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Proposal Budget for {{ proposal.projectname }} </title>
-        {% include 'menu-header.html' %}
-        {% include 'graphs-header.html' %}
-        <script src="{{ url_for('static', filename='js/proposal-edit.js') }}"></script>
-    </head>
-    {% for error in debug %}
-      <pre>error.msg</pre>
-    {% endfor %}
-    <body>
-        {% include 'menu-tags.html' %}
-      <p/>
-      <div id="budgetDashboard"></div>
-      <div id="budgetTable"></div>
-      <div class="container">
-        <div id="warningDiv" class="ui-corner-all ui-state-highlight" style="display: none;"></div>
-        <div id="editDialog" class="ui-widget"></div>
-        <div id="deleteDialog" class="ui-widget"></div>
-        <div id="accordions">
-          <h3 id='proposalTitle'>Proposal Details - {{ proposal.projectname }}</h3>
-            <div>
-              <a href="/proposal-budget/{{ proposal.proposalid }}"
-                target='report' id="budgetDetailsButton">Budget Details</a>
-              <a href="/proposal-nspires/{{ proposal.proposalid }}"
-                target='report' id="nspiresButton">NSPIRES</a>
-              <a href="/proposal-roses/{{ proposal.proposalid }}"
-                target='report' id="rosesButton">Redacted</a>
-              <a href="/proposal-basis/{{ proposal.proposalid }}"
-                target='report' id="basisButton">BASIS+</a>
-              <p/>
-              <form id="proposalForm" action="" method="POST">
-              <input type='hidden' name='proposalid' value='{{ proposal.proposalid }}'/>
-              <input type='hidden' name='view' value='proposal-save'/>
-              <table>
-                <tr><th>Project Name</th>
-                  <td colspan="3"><input type='text' name='projectname' size="70"
-                      value='{{ proposal.projectname }}'/></td></tr>
-                <tr><th>Principal Investigator</th>
-                  <td colspan="3">
-                    {% with dropdown_name = 'peopleid', dropdown_id = 'proposalpeopledropdown', selected_peopleid = proposal.peopleid %}
-                      {% include 'people-dropdown.html' %}
-                    {% endwith %}
-                  </td>
-                </tr>
-                <tr><th>Funding Program</th>
-                  <td colspan="3">
-                    {% with dropdown_name = 'programid', dropdown_id = 'programiddropdown', selected_programid = proposal.programid %}
-                      {% include 'programs-dropdown.html' %}
-                    {% endwith %}
-                  </td>
-                </tr>
-                <tr><th>Status</th>
-                  <td colspan="3">
-                    {% with dropdown_name = 'status', dropdown_id = 'statusdropdown', selected_status = proposal.status %}
-                      {% include 'status-dropdown.html' %}
-                    {% endwith %}
-                  </td>
-                </tr>
-                <tr><th>Proposal Number</th>
-                  <td><input type='text' name='proposalnumber' value='{{ proposal.proposalnumber }}'/></td>
-                  <th>Award Number</th>
-                  <td><input type='text' name='awardnumber' value='{{ proposal.awardnumber }}'/></td></tr>
-                <tr><th>Starting</th>
-                  <td><input type='text' id='proposalperfperiodstart' name='perfperiodstart'
-                       value='{{ proposal.perfperiodstart|dateformat }}' onchange='updateDropdown("proposalperfperiodstart");'/>
-                    {% with dropdown_name = 'perfperiodstart', dropdown_id = 'proposalperfperiodstart', selected_fy = proposal.perfperiodstart %}
-                      {% include 'fiscalyear-dropdown.html' %}
-                    {% endwith %}
-                  </td>
-                  <th>Ending</th>
-                  <td><input type='text' id='proposalperfperiodend' name='perfperiodend'
-                       value='{{ proposal.perfperiodend|dateformat }}' onchange='updateDropdown("proposalperfperiodend");'/>
-                    {% with dropdown_name = 'perfperiodend', dropdown_id = 'proposalperfperiodend', selected_fy = proposal.perfperiodend %}
-                      {% include 'fiscalyear-dropdown.html' %}
-                    {% endwith %}
-                  </td></tr>
-                  </td></tr>
-                </tr>
-                <tr><th></th>
-                    <td><a href='javascript:void(0)' onClick='callSave("/proposals/ajax/save/{{proposal.proposalid}}", {{proposal.proposalid}}, $("proposalsTable")' id='saveProposalButton'>Save</a></td>
-                </tr>
-              </table>
-              </form>
-            </div>
-          <h3 id='fundingTitle'>Funding</h3>
-            <div id='fundingDiv' style='height: 400px;'>
-              <a href='javascript:void(0)' onClick="editDialog('/funding/ajax/edit/0', {{ proposal.proposalid }}, $('#fundingTable'))" id='newFundingButton'>New</a><p/>
-              <br>
+{% extends 'page_template.html' %}
 
-              <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#fundingTable').DataTable())">Save Row Preference</button>
-              <div id="fundingTableDiv">
-              <table id='fundingTable' class='display' cellspacing='0' width='100%'>
-                <thead><tr><th>FY</th><th>New Funding</th><th>Carryover</th><th>&nbsp;</th></tr></thead>
-              </table>
-              </div>
-            </div>
-          <h3 id='fbmsTitle' >FMBS Accounts</h3>
-            <div id='accountingDiv' style='height: 400px;'>
-              <a href='javascript:void(0)' onClick="editDialog('/fbmsaccounts/ajax/edit/0', {{ proposal.proposalid }}, $('#fbmsTable'))" id='newFBMSButton'>New</a><p/>
-              <br>
-
-              <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#fbmsTable').DataTable())">Save Row Preference</button>
-              <div id="fbmsTableDiv">
-              <table id='fbmsTable' class='display' cellspacing='0' width='100%'>
-                <thead><tr><th>Account No.</th><th>&nbsp</th></tr></thead>
-              </table>
-              </div>
-            </div>
-          <h3 id='overheadTitle'>Overhead Rates</h3>
-            <div id='overheadDiv' style='height: 400px;'>
-              <a href='javascript:void(0)' onClick="editDialog('/overhead/ajax/edit/0', {{ proposal.proposalid }}, $('#overheadTable'))" id='newOverheadButton'>New</a><p/>
-              <br>
-
-              <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#overheadTable').DataTable())">Save Row Preference</button>
-
-              <div id="overheadTableDiv">
-              <table id='overheadTable' class='display' cellspacing='0' width='100%'>
-                <thead><tr><th>Rate</th><th>Description</th><th>Fiscal Year</th><th>&nbsp</th></tr>
-              </table>
-              </div>
-            </div>
-          <h3 id='tasksTitle' >Tasks</h3>
-            <div id='tasksdiv'>
-              <div>
-                <button type='button' class='ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only' id='AddColumn' onclick='addColumn({{ proposalid }})' >
-                  Add Column
-                </button>
-                {% with dropdown_name = 'validfiscalyears', dropdown_id = 'validfiscalyears', selected_fy = proposal.perfperiodstart %}
-                  {% include 'fiscalyear-dropdown.html' %}
-                {% endwith %}
-              </div>
-              <div>
-                <button type='button' class='ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only' id='addTaskButton' onclick='addTask()'>
-                  Add Task
-                </button>
-                <input type='text' value="" id='taskField'/>
-              </div>
-              <div id="tasksTableDiv">
-              </div>
-            </div>
-
-          <h3 id='conferencesTitle'>Conferences/Meetings/Travel</h3>
-            <div>
-              <a href='javascript:void(0)' onClick="editDialog('/conferenceattendees/ajax/edit/0', {{ proposal.proposalid }}, $('#conferenceattendeesTable'))" id='newConferenceButton'>New</a><p/>
-
-              <br>
-
-              <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#conferencesTable').DataTable())">Save Row Preference</button>
-
-              <div id="conferenceattendeesTableDiv">
-              <table id='conferenceattendeesTable' class='display' cellspace='0' width='100%'>
-                <thead><tr><th>Meeting</th><th>Travelers</th><th>Start Date</th><th>FY</th><th>Meet Days</th><th>Trav Days</th><th>Airfare</th><th>Ground Transport</th><th>Registration / Other</th><th>per diem</th><th>Lodging</th><th>Total</th><th>&nbsp</th></tr></thead>
-              </table>
-              </div>
-            </div>
-          <h3 id='expensesTitle'>Expenses</h3>
-            <div>
-              <a href='javascript:void(0)' onClick="editDialog('/expenses/ajax/edit/0', {{ proposal.proposalid }}, $('#expensesTable'))" id='newExpenseButton'>New</a><p/>
-              <br>
-
-              <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#expensesTable').DataTable())">Save Row Preference</button>
-
-              <div id="expensesTableDiv">
-              <table id='expensesTable' class='display' cellspace='0' width='100%'>
-                <thead><tr><th>Expense</th><th>Type</th><th>Amount</th><th>Fiscal</th><th>&nbsp</th></tr></thead>
-              </table>
-            </div>
-            </div>
-        </div>
-
-      <script charset="utf-8">
-        $(document).ready(function() {
-          $('#proposalperfperiodstart').datepicker();
-          $('#proposalperfperiodend').datepicker();
-          $('#saveProposalButton').button();
-          $('#newFundingButton').button();
-          $('#newTaskButton').button();
-          $('#newFBMSButton').button();
-          $('#newOverheadButton').button();
-          $('#newConferenceButton').button();
-          $('#newExpenseButton').button();
-          $('#budgetDetailsButton').button();
-          $('#nspiresButton').button();
-          $('#basisButton').button();
-          $('#rosesButton').button();
-
-          // load funding
-          loadTable('/funding/ajax/list/{{ proposal.proposalid }}', false, $('#fundingTable'));
-
-          // load fbmsaccounts
-          loadTable('/fbmsaccounts/ajax/list/{{ proposal.proposalid }}', false, $('#fbmsTable'));
-
-          // load overhead
-          loadTable('/overhead/ajax/list/{{ proposal.proposalid }}', false, $('#overheadTable'));
-
-          // load tasks previous way for now
-          loadTasksTable(false, '{{ proposal.proposalid }}');
-
-          // load conferenceattendees
-          loadTable('/conferenceattendees/ajax/list/byproposal/{{ proposal.proposalid }}', false, $('#conferenceattendeesTable'));
-
-          // load expenses
-          loadTable('/expenses/ajax/list/{{ proposal.proposalid }}', false, $('#expensesTable'));
-
-          updateDropdown('proposalperfperiodstart');
-          updateDropdown('proposalperfperiodend');
-
-          $('#accordions').accordion( {heightStyle: 'content' });
-
-          figureCosts({{ proposal.proposalid }});
-        } );
-
-      </script>
-    </body>
-
-    <style>
+{% block head %}
+  {{ super() }}
+  <title>Proposal Budget for {{ proposal.projectname }} </title>
+  {% include 'graphs-header.html' %}
+  <script src="{{ url_for('static', filename='js/proposal-edit.js') }}"></script>
+  <style>
       #AddColumn, #addTaskButton {
         background-color: DodgerBlue;
         display: block;
@@ -228,5 +18,212 @@
         cursor: pointer;
         border-radius: 16px;
       }
-    </style>
-</html>
+  </style>
+{% endblock %}
+
+{% block body %}
+  {{ super() }}
+  <p/>
+  <div id="budgetDashboard"></div>
+  <div id="budgetTable"></div>
+  <div class="container">
+    <div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
+    <div id="accordions">
+      <h3 id='proposalTitle'>Proposal Details - {{ proposal.projectname }}</h3>
+        <div>
+          <a href="/proposal-budget/{{ proposal.proposalid }}"
+            target='report' id="budgetDetailsButton">Budget Details</a>
+          <a href="/proposal-nspires/{{ proposal.proposalid }}"
+            target='report' id="nspiresButton">NSPIRES</a>
+          <a href="/proposal-roses/{{ proposal.proposalid }}"
+            target='report' id="rosesButton">Redacted</a>
+          <a href="/proposal-basis/{{ proposal.proposalid }}"
+            target='report' id="basisButton">BASIS+</a>
+          <p/>
+          <form id="proposalForm" action="" method="POST">
+          <input type='hidden' name='proposalid' value='{{ proposal.proposalid }}'/>
+          <input type='hidden' name='view' value='proposal-save'/>
+          <table>
+            <tr><th>Project Name</th>
+              <td colspan="3"><input type='text' name='projectname' size="70"
+                  value='{{ proposal.projectname }}'/></td></tr>
+            <tr><th>Principal Investigator</th>
+              <td colspan="3">
+                {% with dropdown_name = 'peopleid', dropdown_id = 'proposalpeopledropdown', selected_peopleid = proposal.peopleid %}
+                  {% include 'people-dropdown.html' %}
+                {% endwith %}
+              </td>
+            </tr>
+            <tr><th>Funding Program</th>
+              <td colspan="3">
+                {% with dropdown_name = 'programid', dropdown_id = 'programiddropdown', selected_programid = proposal.programid %}
+                  {% include 'programs-dropdown.html' %}
+                {% endwith %}
+              </td>
+            </tr>
+            <tr><th>Status</th>
+              <td colspan="3">
+                {% with dropdown_name = 'status', dropdown_id = 'statusdropdown', selected_status = proposal.status %}
+                  {% include 'status-dropdown.html' %}
+                {% endwith %}
+              </td>
+            </tr>
+            <tr><th>Proposal Number</th>
+              <td><input type='text' name='proposalnumber' value='{{ proposal.proposalnumber }}'/></td>
+              <th>Award Number</th>
+              <td><input type='text' name='awardnumber' value='{{ proposal.awardnumber }}'/></td></tr>
+            <tr><th>Starting</th>
+              <td><input type='text' id='proposalperfperiodstart' name='perfperiodstart'
+                    value='{{ proposal.perfperiodstart|dateformat }}' onchange='updateDropdown("proposalperfperiodstart");'/>
+                {% with dropdown_name = 'perfperiodstart', dropdown_id = 'proposalperfperiodstart', selected_fy = proposal.perfperiodstart %}
+                  {% include 'fiscalyear-dropdown.html' %}
+                {% endwith %}
+              </td>
+              <th>Ending</th>
+              <td><input type='text' id='proposalperfperiodend' name='perfperiodend'
+                    value='{{ proposal.perfperiodend|dateformat }}' onchange='updateDropdown("proposalperfperiodend");'/>
+                {% with dropdown_name = 'perfperiodend', dropdown_id = 'proposalperfperiodend', selected_fy = proposal.perfperiodend %}
+                  {% include 'fiscalyear-dropdown.html' %}
+                {% endwith %}
+              </td></tr>
+              </td></tr>
+            </tr>
+            <tr><th></th>
+                <td><a href='javascript:void(0)' onClick='callSave("/proposals/ajax/save/{{proposal.proposalid}}", {{proposal.proposalid}}, $("proposalsTable")' id='saveProposalButton'>Save</a></td>
+            </tr>
+          </table>
+          </form>
+        </div>
+      <h3 id='fundingTitle'>Funding</h3>
+        <div id='fundingDiv' style='height: 400px;'>
+          <a href='javascript:void(0)' onClick="editDialog('/funding/ajax/edit/0', {{ proposal.proposalid }}, 300, 450)" id='newFundingButton'>New</a><p/>
+          <br>
+
+          <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#fundingTable').DataTable())">Save Row Preference</button>
+          <div id="fundingTableDiv">
+          <table id='fundingTable' class='display' cellspacing='0' width='100%'>
+            <thead><tr><th>FY</th><th>New Funding</th><th>Carryover</th><th>&nbsp;</th></tr></thead>
+          </table>
+          </div>
+        </div>
+      <h3 id='fbmsTitle' >FMBS Accounts</h3>
+        <div id='accountingDiv' style='height: 400px;'>
+          <a href='javascript:void(0)' onClick="editDialog('/fbmsaccounts/ajax/edit/0', {{ proposal.proposalid }}, $('#fbmsTable'))" id='newFBMSButton'>New</a><p/>
+          <br>
+
+          <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#fbmsTable').DataTable())">Save Row Preference</button>
+          <div id="fbmsTableDiv">
+          <table id='fbmsTable' class='display' cellspacing='0' width='100%'>
+            <thead><tr><th>Account No.</th><th>&nbsp</th></tr></thead>
+          </table>
+          </div>
+        </div>
+      <h3 id='overheadTitle'>Overhead Rates</h3>
+        <div id='overheadDiv' style='height: 400px;'>
+          <a href='javascript:void(0)' onClick="editDialog('/overhead/ajax/edit/0', {{ proposal.proposalid }}, $('#overheadTable'))" id='newOverheadButton'>New</a><p/>
+          <br>
+
+          <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#overheadTable').DataTable())">Save Row Preference</button>
+
+          <div id="overheadTableDiv">
+          <table id='overheadTable' class='display' cellspacing='0' width='100%'>
+            <thead><tr><th>Rate</th><th>Description</th><th>Fiscal Year</th><th>&nbsp</th></tr>
+          </table>
+          </div>
+        </div>
+      <h3 id='tasksTitle' >Tasks</h3>
+        <div id='tasksdiv'>
+          <div>
+            <button type='button' class='ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only' id='AddColumn' onclick='addColumn({{ proposalid }})' >
+              Add Column
+            </button>
+            {% with dropdown_name = 'validfiscalyears', dropdown_id = 'validfiscalyears', selected_fy = proposal.perfperiodstart %}
+              {% include 'fiscalyear-dropdown.html' %}
+            {% endwith %}
+          </div>
+          <div>
+            <button type='button' class='ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only' id='addTaskButton' onclick='addTask()'>
+              Add Task
+            </button>
+            <input type='text' value="" id='taskField'/>
+          </div>
+          <div id="tasksTableDiv">
+          </div>
+        </div>
+
+      <h3 id='conferencesTitle'>Conferences/Meetings/Travel</h3>
+        <div>
+          <a href='javascript:void(0)' onClick="editDialog('/conferenceattendees/ajax/edit/0', {{ proposal.proposalid }}, $('#conferenceattendeesTable'))" id='newConferenceButton'>New</a><p/>
+
+          <br>
+
+          <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#conferencesTable').DataTable())">Save Row Preference</button>
+
+          <div id="conferenceattendeesTableDiv">
+          <table id='conferenceattendeesTable' class='display' cellspace='0' width='100%'>
+            <thead><tr><th>Meeting</th><th>Travelers</th><th>Start Date</th><th>FY</th><th>Meet Days</th><th>Trav Days</th><th>Airfare</th><th>Ground Transport</th><th>Registration / Other</th><th>per diem</th><th>Lodging</th><th>Total</th><th>&nbsp</th></tr></thead>
+          </table>
+          </div>
+        </div>
+      <h3 id='expensesTitle'>Expenses</h3>
+        <div>
+          <a href='javascript:void(0)' onClick="editDialog('/expenses/ajax/edit/0', {{ proposal.proposalid }}, $('#expensesTable'))" id='newExpenseButton'>New</a><p/>
+          <br>
+
+          <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#expensesTable').DataTable())">Save Row Preference</button>
+
+          <div id="expensesTableDiv">
+          <table id='expensesTable' class='display' cellspace='0' width='100%'>
+            <thead><tr><th>Expense</th><th>Type</th><th>Amount</th><th>Fiscal</th><th>&nbsp</th></tr></thead>
+          </table>
+        </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+  {{ super() }}
+  <script>
+    $(document).ready(function() {
+      $('#proposalperfperiodstart').datepicker();
+      $('#proposalperfperiodend').datepicker();
+      $('#saveProposalButton').button();
+      $('#newFundingButton').button();
+      $('#newTaskButton').button();
+      $('#newFBMSButton').button();
+      $('#newOverheadButton').button();
+      $('#newConferenceButton').button();
+      $('#newExpenseButton').button();
+      $('#budgetDetailsButton').button();
+      $('#nspiresButton').button();
+      $('#basisButton').button();
+      $('#rosesButton').button();
+
+      // load funding
+      loadTable('/funding/ajax/list/{{ proposal.proposalid }}', false, $('#fundingTable'));
+
+      // load fbmsaccounts
+      loadTable('/fbmsaccounts/ajax/list/{{ proposal.proposalid }}', false, $('#fbmsTable'));
+
+      // load overhead
+      loadTable('/overhead/ajax/list/{{ proposal.proposalid }}', false, $('#overheadTable'));
+
+      // load tasks previous way for now
+      loadTasksTable(false, '{{ proposal.proposalid }}');
+
+      // load conferenceattendees
+      loadTable('/conferenceattendees/ajax/list/byproposal/{{ proposal.proposalid }}', false, $('#conferenceattendeesTable'));
+
+      // load expenses
+      loadTable('/expenses/ajax/list/{{ proposal.proposalid }}', false, $('#expensesTable'));
+
+      updateDropdown('proposalperfperiodstart');
+      updateDropdown('proposalperfperiodend');
+
+      $('#accordions').accordion( {heightStyle: 'content' });
+
+      figureCosts({{ proposal.proposalid }});
+    });
+  </script>
+{% endblock %}
+

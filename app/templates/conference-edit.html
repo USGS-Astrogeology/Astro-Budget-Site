@@ -1,51 +1,26 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Editing Conferences</title>
-    </head>
-    <body>
-      <div class="editDialog ui-widget"></div>
-      <form id="conferenceForm" action="" method="POST">
-        <input type="hidden" autofocus />
-        <input type="hidden" id="conferenceid" name="conferenceid"
-          {% if not conference %} value=""/>
-          {% else %} value="{{ conference.conferenceid }}"/>
-          {% endif %}
-        <table>
-          <tr><th align="left">Conference/Meeting/Travel</th></tr>
-          <tr><td><input type="text" name="meeting" id="meeting" value="{{ conference.meeting }}" size="40" required/></td></tr>
-          <tr><td><a href='javascript:void(0)' onClick="editDialog('/conferencerates/ajax/edit/0', null, $('#rateTable'))" id='newRateButton'>New Rate</a></td><td></td></tr>
-        </table>
-      </form>
-      
-      <div id="rateTableDiv">
-        <table id="rateTable" class="display" cellspacing="0" width="100%">
-          <thead><tr><th>Action</th><th>Per Diem</th><th>Lodging</th><th>Registration</th><th>Ground<br/>Transport</th>
-                    <th>Airfare</th><th>City</th><th>State</th><th>Country</th><th>Effective<br/>Date</tr></thead>
-        </table>
-      </div>
+<form id="conferenceForm" action="" method="POST">
+  <input type="hidden" autofocus />
+  <input type="hidden" id="conferenceid" name="conferenceid"
+    {% if not conference %} value=""/>
+    {% else %} value="{{ conference.conferenceid }}"/>
+    {% endif %}
+  <table>
+    <tr><th align="left">Conference/Meeting/Travel</th></tr>
+    <tr><td><input type="text" name="meeting" id="meeting" value="{{ conference.meeting }}" size="40" required/></td></tr>
+    <tr><td><a href='javascript:void(0)' onClick="editDialog('/conferencerates/ajax/edit/0', null, $('#rateTable'))" id='newRateButton'>New Rate</a></td><td></td></tr>
+  </table>
+</form>
+<div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
+<div id="rateTableDiv">
+  <table id="rateTable" class="display" cellspacing="0" width="100%">
+    <thead><tr><th>Action</th><th>Per Diem</th><th>Lodging</th><th>Registration</th><th>Ground<br/>Transport</th>
+              <th>Airfare</th><th>City</th><th>State</th><th>Country</th><th>Effective<br/>Date</tr></thead>
+  </table>
+</div>
 
-
-    <script>
-      $(document).ready(function() {
-        $("#newRateButton").button();
-        loadTable('/conferencerates/ajax/list/{{ conference.conferenceid if conference else "0" }}', false, $('#rateTable'));
-      });
-
-      function conferenceRateSave() {
-        //console.log($("#rateForm").serialize());
-        $.post("index.php", $("#rateForm").serialize())
-          .always( function () {
-
-            $("#warningDiv").html("<p>Updated [" + $("#conferencerateid").val() + "]</p>");
-            $("#warningDiv").show();
-
-            loadTable(true);
-
-            //$("#conferenceedittabs").tabs( "option", "active", 0 );
-          });
-      }
-    </script>
-
-    </body>
-</html>
+<script>
+  $(document).ready(function() {
+    $("#newRateButton").button();
+    loadTable('/conferencerates/ajax/list/{{ conference.conferenceid if conference else "0" }}', false, $('#rateTable'));
+  });
+</script>

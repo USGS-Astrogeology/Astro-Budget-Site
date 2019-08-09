@@ -8,7 +8,7 @@ from database import (db, Conferences, ConferenceRates, ConferenceAttendee, Expe
 # Jinja Filters ------------------>
 def currencyformat(value):
 	if not value:
-		return ''
+		return '$0.00'
 	return "${:,.2f}".format(value)
 
 def dateformat(datestring):
@@ -19,12 +19,12 @@ def dateformat(datestring):
 
 def floatformat(value):
 	if not value:
-		return ''
+		return '0.00'
 	return "{:,.2f}".format(value)
 
 def intformat(value):
 	if not value:
-		return ''
+		return '0'
 	return "{:,}".format(value)
 
 def jsonformat(string):
@@ -222,6 +222,29 @@ def load_conferencerates(conferenceid):
 											   filters = [ConferenceRates.conferenceid == conferenceid],
 											   orders = [ConferenceRates.effectivedate.desc()])
 	return render_template('conference-rate-list-ajax.json', conferencerates = conferencerates)
+
+@app.route('/conferencerates/ajax/save/<int:conferencerateid>', methods = ['POST'])
+@login_required
+def save_conferencerate(conferencerateid):
+	conferencerate = ConferenceRates.get_one(filters = [ConferenceRates.conferencerateid == conferencerateid])
+	try:
+		criteria = {'conferenceid': int(request.form['conferenceid']), 'perdiem': currency_strstrp(request.form['perdiem']),
+					'registration': currency_strstrp(request.form['registration']), 'lodging': currency_strstrp(request.form['lodging']),
+					'groundtransport': currency_strstrp(request.form['groundtransport']), 'airfare': currency_strstrp(request.form['airfare']),
+					'city': request.form['city'], 'state': request.form['state'], 'country': request.form['country'],
+					'effectivedate': datetime.strptime(request.form['effectivedate'], '%m/%d/%Y')}
+		if not conferencerate:
+			conferencerate = ConferenceRates(**criteria)
+			db.session.add(conferencerate)
+		else:
+			for key,value in criteria.items():
+				setattr(conferencerate, key, value)
+		db.session.commit()
+	except:
+		db.session.rollback()
+		return 'error: Conference Rate not added/edited'
+
+	return 'success: Conference Rate added/edited'	
 
 
 
@@ -656,25 +679,18 @@ def load_programs():
 @login_required
 def save_program(programid):
 	program = FundingPrograms.get_one(filters = [FundingPrograms.programid == programid])
-	programname = request.form['programname']
-	agency = request.form['agency']
-	pocname = request.form['pocname']
-	pocemail = request.form['pocemail']
-	startdate = datetime.strptime(request.form['startdate'], '%m/%d/%Y')
-	enddate = datetime.strptime(request.form['enddate'], '%m/%d/%Y')
+	criteria = {'programname': request.form['programname'], 'agency': request.form['agency'],
+				'pocname': request.form['pocname'], 'pocemail': request.form['pocemail'],
+				'startdate': datetime.strptime(request.form['startdate'], '%m/%d/%Y'),
+				'enddate': datetime.strptime(request.form['enddate'], '%m/%d/%Y')}
 
 	try:
 		if not program:
-			program = FundingPrograms(programname=programname, agency=agency, pocname=pocname,
-			                          pocemail=pocemail, startdate=startdate, enddate=enddate)
+			program = FundingPrograms(**criteria)
 			db.session.add(program)
 		else:
-			program.programname = programname
-			program.agency = agency
-			program.pocname = pocname
-			program.pocemail = pocemail
-			program.startdate = startdate
-			program.enddate = enddate
+			for key,value in criteria.items():
+				setattr(program, key, value)
 		db.session.commit()
 	except:
 		db.session.rollback()
@@ -829,6 +845,18 @@ def edit_task(taskid):
 def load_tasks(proposalid):
 	tasks = Tasks.get_many(filters = [Tasks.proposalid == proposalid])
 	return render_template('tasks-list-ajax.json', tasks = tasks)
+
+
+# Helpers ------------------>
+def currency_strstrp(string):
+	banned_chars = ['$', ',']
+	new_string = string
+	for char in banned_chars:
+		new_string = new_string.replace(char, '')
+	if not new_string:
+		new_string = '0'
+	return float(new_string)
+# -------------------------->
 
 
 if __name__ == "__main__":

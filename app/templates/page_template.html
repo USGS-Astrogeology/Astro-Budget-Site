@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    {% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui.min.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui.theme.min.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dataTables.jqueryui.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jsgrid-theme.min.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jsgrid.min.css') }}"/>
+    <script src="{{ url_for('static', filename='js/jquery-1.10.2.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jsgrid.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery-ui-1.11.2.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.dataTables-1.10.4.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dataTables.jqueryui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/row_setting.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/budgeting.js') }}"></script>
+    
+    <style>
+      * {
+        font-family: Lucida Grande,Lucida Sans,Arial,sans-serif;
+        font-size: 100%;
+      }
+
+      h1 {
+        font-size: 1.5em;
+      }
+
+      th td {
+        font-size: .85em;
+      }
+
+      .ui-menu:after {
+        content: ".";
+        display: block;
+        clear: both;
+        visibility: hidden;
+        line-height: 0;
+        height: 0;
+      }
+      .ui-menu .ui-menu-item {
+        display: inline-block;
+        float: left;
+        margin: 0;
+        padding: 5;
+        width: auto;
+      }
+
+      #menubar {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px;
+      }
+
+      .menu-user {
+        display: flex;
+        align-items: center;
+        font-size: 1.25rem;
+        margin:
+      }
+
+      .sub-table {
+        font-size: .85em;
+      }
+      #dupeButton {
+        background: url('{{ url_for("static", filename="images/copy-32.png") }}') no-repeat;
+        background-size: cover;
+        width: 16px;
+        height: 16px;
+      }
+
+      .title {
+        display: flex;
+        height: 80px;
+        justify-content: space-between;
+        align-items: baseline;
+        padding-bottom: 5px;
+      }
+
+      .title h1 {
+        display:inline-block; 
+        margin: 40px 20px 40px 0;
+      }
+
+      .title #save_button {
+        font-size: 1rem;
+        height: 30px;
+        padding: 5px;
+      }
+
+      .alert {
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: 5px;
+        z-index: 500;
+        height: 30px;
+      }
+    </style>
+
+    {% endblock %}
+  </head>
+
+  {% block debug %}
+    {% for error in debug %}
+      <pre>error.msg</pre>
+    {% endfor %}
+  {% endblock %}
+
+  <body>
+    {% block body %}
+      {% if servername == 'elroy-dev' %} 
+        <div id="devserverDiv" class="ui-corner-all ui-state-error" style="width=100px;">
+          <p align="center">DEVELOPMENT SERVER - THIS MACHINE IS FOR TESTING USE AT YOUR OWN RISK</p>
+        </div>
+      {% endif %}
+      <div id="menubar" class="ui-widget-header ui-corner-all">
+        <div class="menu-items">
+          <a href="/proposals" class="menu-button" id="projects">Projects</a>
+          <a href="/reports" class="menu-button" id="reports">Reports</a>
+          <a href="/people" class="menu-button" id="people">People</a>
+          <a href="/conferences" class="menu-button" id="conferences">Conferences/Travel</a>
+          <a href="/expensetypes" class="menu-button" id="expensetypes">Expense Categories</a>
+          <a href="/overhead" class="menu-button" id="overhead">Overhead Rates</a>
+          <a href="/programs" class="menu-button" id="programs">Funding Programs</a>
+        </div>
+        <div class="menu-user">{{ g.user.name }}</div>
+      </div>
+    {% endblock %}
+
+    {% block javascript %}
+      <script>
+        $(document).ready( function() {
+          $('.menu-button').each( function() {
+            $(this).button();
+          });
+        });
+      </script>
+    {% endblock %}
+
+  </body>
+</html>

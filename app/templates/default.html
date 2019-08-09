@@ -1,29 +1,32 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Proposal Budgets</title>
-        {% include 'menu-header.html' %}
-        {% include 'graphs-header.html' %}
-    </head>
-    <body>
-        {% include 'menu-tags.html' %}
-        <h1>Welcome to the proposal budget web system</h1>
-        <h3>The following budget graphs are for projects that have been Submitted, Selected, or are Active</h3>
-        <div id="graphs" class="container"></div>
+{% extends 'page_template.html' %}
 
-    <script type="text/javascript" charset="utf-8">
-      var statusCodes=['Submitted', 'Selected', 'Active'];
-      $.getJSON( "/proposalcosts/ajax/get", function( data ) {
-        for (i=0; i < data.data.length; i++) {
-          for (s=0; s < statusCodes.length; s++) {
-            if (data.data[i].status === statusCodes[s]) {
-              $("#graphs").append("<div><h4>" + data.data[i].project + " (" + data.data[i].status + ")");
-              $("#graphs").append("<div id='project_" + i + "'></div></div>");
-              projectBudgetDashboard('#project_' + i, data.data[i].budget);
-            }
+{% block head %}
+  {{ super() }}
+  <title>Proposal Budgets</title>
+  {% include 'graphs-header.html' %}
+{% endblock %}
+
+{% block body %}
+  {{ super() }}
+  <h1>Welcome to the proposal budget web system</h1>
+  <h3>The following budget graphs are for projects that have been Submitted, Selected, or are Active</h3>
+  <div id="graphs" class="container"></div>
+{% endblock %}
+
+{% block javascript %}
+  {{ super() }}
+  <script>
+    var statusCodes=['Submitted', 'Selected', 'Active'];
+    $.getJSON( "/proposalcosts/ajax/get", function( data ) {
+      for (i=0; i < data.data.length; i++) {
+        for (s=0; s < statusCodes.length; s++) {
+          if (data.data[i].status === statusCodes[s]) {
+            $("#graphs").append("<div><h4>" + data.data[i].project + " (" + data.data[i].status + ")");
+            $("#graphs").append("<div id='project_" + i + "'></div></div>");
+            projectBudgetDashboard('#project_' + i, data.data[i].budget);
           }
         }
-      });
-    </script>
-    </body>
-</html>
+      }
+    });
+  </script>
+{% endblock %}

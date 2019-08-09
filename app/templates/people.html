@@ -1,46 +1,41 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Proposal Budget People Listing</title>
-        {% include 'menu-header.html' %}
-    </head>
-    {% for error in debug %}
-      <pre>error.msg</pre>
-    {% endfor %}
-    <body>
-      {% include 'menu-tags.html' %}
-      <div class="container">
-        <div class="title">
-          <div>
-            <h1>List of People</h1>
-            <a href='javascript:void(0)' onClick="editDialog('/people/ajax/edit/0', null, $('#peopleTable'))" id='newButton'>New</a>
-          </div>
-          <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#peopleTable').DataTable())">Save Row Preference</button>
-        </div>
-        <div id="warningDiv" class="ui-corner-all ui-state-highlight" style="display: none;"></div>
-        <div id="peopleTableDiv">
-        <table id="peopleTable" class="display" cellspacing="0" width="100%">
-          <thead><tr><th>Name</th><th>Title</th><th>Pay Plan</th><th>Username</th></tr></thead>
-        </table>
-        </div>
-      </div>
+{% extends 'page_template.html' %}
 
-      <script type="text/javascript" charset="utf-8">
-        function saveUser() {
-          $.post("index.php", $("#peopleForm").serialize());
+{% block head %}{{ super() }}<title>People</title>{% endblock %}
 
-          loadPeopleTable(true);
+{% block body %}
+  {{ super() }}
+  <div class="title">
+    <div>
+      <h1>List of People</h1>
+      <a href='javascript:void(0)' onClick="editDialog('/people/ajax/edit/0', null, $('#peopleTable'))" id='newButton'>New</a>
+    </div>
+    <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#peopleTable').DataTable())">Save Row Preference</button>
+  </div>
+  <div id="warningDiv" class="ui-corner-all ui-state-highlight" style="display: none;"></div>
+  <div id="peopleTableDiv">
+    <table id="peopleTable" class="display" cellspacing="0" width="100%">
+      <thead><tr><th>Name</th><th>Title</th><th>Pay Plan</th><th>Username</th></tr></thead>
+    </table>
+  </div>
+{% endblock %}
 
-          dialog.dialog("close");
-          $("#warningDiv").html("<p>Updated [" + $("#peopleid").val() + "] " + $("#name").val() +
-                                " (" + $("#username").val() +")</p>");
-          $("#warningDiv").show();
-        }
+{% block javascript %}
+  {{ super() }}
+  <script>
+    $(document).ready(function() {
+      $("#newButton").button();
+      loadTable('/people/ajax/list', false, $('#peopleTable'));
+    });
 
-        $(document).ready(function() {
-          $("#newButton").button();
-          loadTable('/people/ajax/list', false, $('#peopleTable'));
-        } );
-      </script>
-    </body>
-</html>
+    /*
+    function saveUser() {
+      $.post("index.php", $("#peopleForm").serialize());
+      loadPeopleTable(true);
+      dialog.dialog("close");
+      $("#warningDiv").html("<p>Updated [" + $("#peopleid").val() + "] " + $("#name").val() +
+                            " (" + $("#username").val() +")</p>");
+      $("#warningDiv").show();
+    }*/
+
+  </script>
+{% endblock %}

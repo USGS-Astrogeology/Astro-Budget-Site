@@ -1,4 +1,23 @@
-// TODO: update references throughout application (outside of proposal-edit.html)
+// this will work even if the value chosen is not on the dropdown menu
+// if this is null, the code will choose the first available option for size on the dropdown menu
+var user_preference = 10;
+
+function save_row_preference(table) {
+  // look up the data tables thing from wherever and figure out how to get the size from it
+  // will be called by an onClick function from the button
+  // will save this somewhere
+  var table_row_size = table.page.len();
+  console.log("New table row preference is " + table_row_size + " rows");
+}
+
+function check_row_preference(table) {
+  if (user_preference != null) {
+    console.log(table.page.len());
+    table.page.len(user_preference).draw();
+    console.log(table.page.len());
+  }
+}
+
 function loadTable(ajax, reload, table) {
 
     if (reload) {
@@ -22,8 +41,6 @@ function loadTable(ajax, reload, table) {
     */
 }
 
-
-// TODO: update references throughout application
 function editDialog(ajax, proposalid, table) {
   var save_ajax = ajax.replace('edit', 'save');
 
@@ -42,8 +59,8 @@ function editDialog(ajax, proposalid, table) {
     });
   });
 
-  console.log(save_ajax);
-  console.log(table);
+  //console.log(save_ajax);
+  //console.log(table);
 }
 
 
@@ -58,12 +75,20 @@ function deleteDialog(ajax, proposalid, table, description) {
       "Delete": function () {
         dialog = $(this);
         callDelete(ajax, proposalid, table, dialog) },
-      Cancel: function () { $(this).dialog("destroy"); }
+      Cancel: function () { $(this).dialog("destroy") }
     }
   });
-  console.log(ajax);
+  //console.log(ajax);
 }
 
+function displayAlert(data) {
+  $('.alert').last().html(data).slideDown('fast', function() {
+    alert = $(this);
+    setTimeout(function() {
+      $(alert).slideUp('fast');
+    }, 3000);
+  });
+}
 
 
 // TODO: generalize a save call
@@ -71,9 +96,9 @@ function callSave(ajax, proposalid, table, dialog) {
 
   $.post(ajax, $('form').serialize())
     .always(function(data){
-      $("#warningDiv").html(data).show();
+      displayAlert(data);
 
-      console.log(ajax);
+      //console.log(ajax);
       var load_ajax = ajax.replace('save', 'list');
 
       var elements = load_ajax.split('/');
@@ -89,8 +114,8 @@ function callSave(ajax, proposalid, table, dialog) {
       }
 
       dialog.dialog('destroy');
-      console.log("ajax: " + new_ajax);
-      console.log("table " + table);
+      //console.log("ajax: " + new_ajax);
+      //console.log("table " + table);
       loadTable(new_ajax, true, table);
 
   });
@@ -124,7 +149,7 @@ function callDelete(ajax, proposalid, table, dialog) {
         var new_ajax = load_ajax.replace(elements[elements_size - 1], proposalid);
       }
 
-      console.log(table);
+      //console.log(table);
       
       dialog.dialog('destroy');
       loadTable(new_ajax, true, table);
@@ -134,9 +159,9 @@ function callDelete(ajax, proposalid, table, dialog) {
 function updateDropdown (id) {
   var newDate = $("#" + id).datepicker("getDate");
 
-  console.log ("datepicker returned " + newDate);
+  //console.log ("datepicker returned " + newDate);
   if (newDate == null) {
-    console.log ("newDate is NULL!!!!!");
+    //console.log ("newDate is NULL!!!!!");
     newDate = new Date();
     $("#" + id).val((newDate.getMonth() + 1) + '/' + newDate.getDate() + '/' +  newDate.getFullYear());
   }
@@ -152,7 +177,6 @@ function updateDropdown (id) {
   var FYDate = '10/01/20' + (fyYear - 1);
   var hid = '#' + id + 'dd';
 
-  console.log ("Setting " + hid + " to " + FYDate);
   $(hid).val(FYDate);
 }
 
@@ -163,3 +187,4 @@ function updateCalendar (id) {
 
   $(hid).val (newDate);
 }
+
