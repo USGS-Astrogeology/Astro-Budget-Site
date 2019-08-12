@@ -132,17 +132,17 @@ def delete_conferenceattendee(conferenceattendeeid, proposalid):
 																ConferenceAttendee.proposalid == proposalid])
 
 	if not conference_attendee:
-		return "object could not be found"
+		return "Error: Conference Attendee could not be deleted"
 
 	try:
 		db.session.delete(conference_attendee)
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return "delete failed"
+		return "Error: Conference Attendee cound not be deleted"
 
 		# return message for the div
-	return "successfully deleted"
+	return "Success: Conference Attendee deleted"
 
 	#text = "Start date: " + dateformat(conference_attendee.startdate) + " meeting: " + conference_attendee.conference.meeting
 	#return text
@@ -216,9 +216,9 @@ def save_conferenceattendee(conferenceattendeeid):
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return "an error occurred"
+		return "Error: Conference Attendee not saved"
 
-	return "successfully added/edited"
+	return "Success: Conference Attendee saved"
 
 
 	#text = meeting + " " + travelers + " " + meeting_days
@@ -262,9 +262,9 @@ def save_conferencerate(conferencerateid):
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return 'error: Conference Rate not added/edited'
+		return 'Error: Conference Rate not added/edited'
 
-	return 'success: Conference Rate added/edited'
+	return 'Success: Conference Rate added/edited'
 
 
 
@@ -277,17 +277,17 @@ def delete_expense(expenseid, proposalid):
 										  Expenses.proposalid == proposalid])
 
 	if not expense:
-		return "object could not be found"
+		return "Error: Expense could not be found"
 
 	try:
 		db.session.delete(expense)
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return "delete failed"
+		return "Error: Expense could not be deleted"
 
 	# return message for the div
-	return "successfully deleted"
+	return "Success: Expense deleted"
 
 @app.route('/expenses/ajax/edit/<int:expenseid>')
 @login_required
@@ -337,9 +337,9 @@ def save_expense(expenseid):
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return "an error occurred"
+		return "Error: Expense not deleted"
 
-	return "successfully added/edited"
+	return "Success: Expense deleted"
 
 
 
@@ -379,9 +379,9 @@ def save_expensetype(expensetypeid):
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return 'error: expensetype not added/edited'
+		return 'Error: expensetype not added/edited'
 
-	return 'success: expensetype added/edited'
+	return 'Success: expensetype added/edited'
 
 @app.route('/expensetypes/ajax/delete/<int:expensetypeid>', methods = ['GET', 'POST'])
 @login_required
@@ -393,9 +393,9 @@ def delete_expensetype(expensetypeid):
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return 'error: expensetype could not be deleted'
+		return 'Error: expensetype could not be deleted'
 
-	return 'success: expensetype deleted'
+	return 'Success: expensetype deleted'
 
 
 # FBMSACCOUNTS
@@ -407,17 +407,17 @@ def delete_fbmsaccount(fbmsid, proposalid):
 											  FBMSAccounts.proposalid == proposalid])
 
 	if not account:
-		return "object could not be found"
+		return "Error: FBMS Account could not be found"
 
 	try:
 		db.session.delete(account)
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return "delete failed"
+		return "Error: FBMS Account not deleted"
 
 	# return message for the div
-	return "successfully deleted"
+	return "Success: FBMS Account deleted"
 
 
 @app.route('/fbmsaccounts/ajax/edit/<int:fbmsid>')
@@ -454,9 +454,9 @@ def save_fbmsaccounts(fbmsid):
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return "an error occurred"
+		return "Error: FBMS Account not saved"
 
-	return "successfully added/edited"
+	return "Success: FBMS Account saved"
 
 
 # FUNDING
@@ -475,19 +475,19 @@ def delete_funding(fundingid, proposalid):
 											   Funding.proposalid == proposalid])
 
 	if not to_be_deleted:
-		return "object could not be found"
+		return "Error: funding could not be found"
 
 	try:
 		db.session.delete(to_be_deleted)
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return "delete failed"
+		return "Error: funding could not be deleted"
 
 	text = "fiscalyear: " + fyformat(to_be_deleted.fiscalyear) + " newfunding: " + currencyformat(to_be_deleted.newfunding) + " carryover: " + currencyformat(to_be_deleted.carryover)
 
 	# return message for the div
-	return "successfully deleted"
+	return "Success: funding deleted"
 
 @app.route('/funding/ajax/edit/<int:fundingid>')
 @login_required
@@ -537,10 +537,10 @@ def save_funding(fundingid):
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return "an error occurred"
+		return "Error: funding not saved"
 		#return "error: " + funding_proposalid + " " + funding_fiscalyear + " " + funding_newfunding + " " + funding_carryover
 
-	return "successfully added/edited"
+	return "Success: funding saved"
 	#return funding_proposalid + " " + funding_fiscalyear + " " + funding_newfunding + " " + funding_carryover
 
 
@@ -564,17 +564,17 @@ def delete_overhead(overheadid, proposalid):
 												OverheadRates.proposalid == proposalid])
 
 	if not overhead:
-		return "object could not be found"
+		return "Error: overhead could not be found"
 
 	try:
 		db.session.delete(overhead)
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return "delete failed"
+		return "Error: overhead not deleted"
 
 	# return message for the div
-	return "successfully deleted"
+	return "Success: overhead deleted"
 
 
 @app.route('/overhead/ajax/edit/<int:overheadid>')
@@ -625,9 +625,9 @@ def save_overhead(overheadid):
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return "an error occurred"
+		return "Error: overhead not saved"
 
-	return "successfully added/edited"
+	return "Success: overhead saved"
 
 	#text = overhead_rate + " " + description + " " + effective_date
 
@@ -714,9 +714,9 @@ def save_program(programid):
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return 'error: Funding Program not added/edited'
+		return 'Error: Funding Program not added/edited'
 
-	return 'success: Funding Program added/edited'
+	return 'Success: Funding Program added/edited'
 
 @app.route('/programs/ajax/delete/<int:programid>', methods = ['GET', 'POST'])
 @login_required
@@ -728,9 +728,9 @@ def delete_program(programid):
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return 'error: Funding Program could not be deleted'
+		return 'Error: Funding Program could not be deleted'
 
-	return 'success: Funding Program deleted'
+	return 'Success: Funding Program deleted'
 
 
 # PROPOSALS
@@ -739,6 +739,39 @@ def delete_program(programid):
 @login_required
 def proposals():
 	return render_template('proposals.html')
+
+@app.route('/proposals/ajax/delete/<int:proposalid>&<int:secondproposalid>')
+@login_required
+def delete_proposal(proposalid, secondproposalid):
+	funding = Funding.get_many(filters = [Funding.proposalid == proposalid])
+	fbms = FBMSAccounts.get_many(filters = [FBMSAccounts.proposalid == proposalid])
+	overhead = OverheadRates.get_many(filters = [OverheadRates.proposalid == proposalid])
+	conferences = ConferenceAttendee.get_many(filters = [ConferenceAttendee.proposalid == proposalid])
+	expenses = Expenses.get_many(filters = [Expenses.proposalid == proposalid])
+
+	'''
+	fund_name = []
+	for fund in funding:
+		fund_name.append(fund.fundingid)
+	return str(fund_name)
+	'''
+	'''
+	account = []
+	for fbmsaccount in fbms:
+		account.append(fbmsaccount.accountno)
+	return str(account)
+	'''
+	'''
+	overheads = []
+	for account in overhead:
+		overheads.append(account.rate)
+	return str(overheads)
+	'''
+
+	expense_list = []
+	for expense in expenses:
+		expense_list.append(expense.description)
+	return str(expense_list)
 
 @app.route('/proposals/ajax/edit/<int:proposalid>')
 @app.route('/proposals/view/<int:proposalid>')
@@ -795,9 +828,9 @@ def save_proposal(proposalid):
 
 		db.session.commit()
 	except:
-		return "could not add/edit proposal"
+		return "Error: could not add/edit proposal"
 
-	return "proposal added/edited"
+	return "Success: proposal added/edited"
 
 
 @app.route('/proposal-basis/<int:proposalid>')
@@ -837,7 +870,7 @@ def get_saved_preference():
 	user_preference = g.user.row_preference
 	return str(user_preference)
 
-@app.route('/row_setting/ajax/save/<int:row_preference>')
+@app.route('/row_setting/ajax/save/<row_preference>')
 @login_required
 def save_rows(row_preference):
 	new_setting = row_preference
@@ -845,10 +878,10 @@ def save_rows(row_preference):
 	try:
 		g.user.row_preference = row_preference
 		db.session.commit()
-		return ("New row preference saved")
+		return ("Success: New row preference saved")
 	except:
 		db.session.rollback()
-		return ("An error occurred")
+		return ("Error: row preference not saved")
 
 # this route is just used for testing purposes
 @app.route('/row_setting/ajax/reset')
