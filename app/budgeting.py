@@ -58,7 +58,7 @@ def fyformat(datestring):
 		year_string = "FY" + str(year).replace("20", "", 1)
 	return year_string
 
-def geteffective(list, cutoff_date = date.today()):
+def geteffective(list = [], cutoff_date = date.today()):
 	effective_item = None
 	if cutoff_date != date.today():
 		cutoff_date = datetime.strptime(cutoff_date)
@@ -101,6 +101,7 @@ def check_login():
 def home():
 	return render_template('default.html')
 
+
 # CONFERENCES
 
 @app.route('/conferences')
@@ -122,30 +123,51 @@ def load_conferences():
 	conferences = Conferences.get_many(joins = [], filters = [], orders = [])
 	return render_template('conferences-list-ajax.json', conferences = conferences)
 
+@app.route('/conferences/ajax/save/<int:conferenceid>', methods = ['POST'])
+@login_required
+def save_conference(conferenceid):
+	conference = Conferences.get_one([Conferences.conferenceid == conferenceid])
+	response = {'status': 'Error', 'description': 'Conference', 'action': 'read', 'reload_path': ''}
+
+	try:
+		meeting = request.form['meeting']
+
+		if not conference:
+			conference = Conferences(meeting = meeting)
+			db.session.add(conference)
+			response['action'] = 'created'
+		else :
+			conference.meeting = meeting
+			response['action'] = 'updated'
+		db.session.commit()
+	except:
+		db.session.rollback()
+		return response
+
+	response['status'] = 'Success'
+	return response
 
 # CONFERENCE ATTENDEES
 
 @app.route('/conferenceattendees/ajax/delete/<int:conferenceattendeeid>&<proposalid>')
 @login_required
 def delete_conferenceattendee(conferenceattendeeid, proposalid):
-	conference_attendee = ConferenceAttendee.get_one(filters = [ConferenceAttendee.conferenceattendeeid == conferenceattendeeid,
+	conferenceattendee = ConferenceAttendee.get_one(filters = [ConferenceAttendee.conferenceattendeeid == conferenceattendeeid,
 																ConferenceAttendee.proposalid == proposalid])
+	response = {'status': 'Error', 'description': 'Conference Attendee', 'action': 'found', 'reload_path': ''}
 
-	if not conference_attendee:
-		return "Error: Conference Attendee could not be deleted"
-
+	if not conferenceattendee:
+		return response
 	try:
 		db.session.delete(conference_attendee)
 		db.session.commit()
+		response['action'] = 'deleted'
 	except:
 		db.session.rollback()
-		return "Error: Conference Attendee cound not be deleted"
+		return response
 
-		# return message for the div
-	return "Success: Conference Attendee deleted"
-
-	#text = "Start date: " + dateformat(conference_attendee.startdate) + " meeting: " + conference_attendee.conference.meeting
-	#return text
+	response['status'] = 'Success'
+	return response
 
 @app.route('/conferenceattendees/ajax/edit/<int:conferenceattendeeid>')
 @login_required
@@ -173,12 +195,20 @@ def load_conferenceattendees(id):
 @app.route('/conferenceattendees/ajax/save/<int:conferenceattendeeid>', methods = ['POST'])
 @login_required
 def save_conferenceattendee(conferenceattendeeid):
-	conference = ConferenceAttendee.get_one(filters = [ConferenceAttendee.conferenceattendeeid == conferenceattendeeid])
+	conferenceattendee = ConferenceAttendee.get_one(filters = [ConferenceAttendee.conferenceattendeeid == conferenceattendeeid])
+	response = {'status': 'Error', 'description': 'Conference Attendee', 'action': 'read', 'reload_path': ''}
+
+	# Conference attributes
+	meeting = request.form['meeting']
+
+	conference = Conferences.get_one(filters = [Conferences.conferenceid == int(request.form['conferenceid'])])
+
+	# ConferenceRate attributes
 
 	proposal = request.form.get("proposalid")
 	conferenceid = request.form.get("conferenceid")
 
-	meeting = request.form.get("meeting")
+	#meeting = request.form.get("meeting")
 	meeting_days = request.form.get("meetingdays")
 	travel_days = request.form.get("traveldays")
 	travelers = request.form.get("travelers")
@@ -197,7 +227,7 @@ def save_conferenceattendee(conferenceattendeeid):
 	try:
 		if not conference:
 			print("new conference")
-			conference = ConferenceAttendee(proposalid = proposal,
+			conferenceattendee = ConferenceAttendee(proposalid = proposal,
 											conferenceid = conferenceid,
 											meetingdays = meeting_days,
 											traveldays = travel_days,
@@ -219,10 +249,6 @@ def save_conferenceattendee(conferenceattendeeid):
 		return "Error: Conference Attendee not saved"
 
 	return "Success: Conference Attendee saved"
-
-
-	#text = meeting + " " + travelers + " " + meeting_days
-	#return text
 
 
 # CONFERENCE RATES
@@ -247,25 +273,36 @@ def load_conferencerates(conferenceid):
 @login_required
 def save_conferencerate(conferencerateid):
 	conferencerate = ConferenceRates.get_one(filters = [ConferenceRates.conferencerateid == conferencerateid])
+	conference = Conferences.get_one(filters = [Conferences.conferenceid == request.form['conferenceid']])
+	response = {'status': 'Error', 'description': 'Conference Rate', 'action': 'read', 'reload_path': ''}
+
 	try:
-		criteria = {'conferenceid': int(request.form['conferenceid']), 'perdiem': currency_strstrp(request.form['perdiem']),
+		if not conference:
+			conference = Conferences(meeting = request.form['meeting'])
+			db.session.add(conference)
+			db.session.commit()
+
+		criteria = {'conferenceid': conference.conferenceid, 'perdiem': currency_strstrp(request.form['perdiem']),
 					'registration': currency_strstrp(request.form['registration']), 'lodging': currency_strstrp(request.form['lodging']),
 					'groundtransport': currency_strstrp(request.form['groundtransport']), 'airfare': currency_strstrp(request.form['airfare']),
 					'city': request.form['city'], 'state': request.form['state'], 'country': request.form['country'],
 					'effectivedate': datetime.strptime(request.form['effectivedate'], '%m/%d/%Y')}
+		
 		if not conferencerate:
 			conferencerate = ConferenceRates(**criteria)
 			db.session.add(conferencerate)
+			response['action'] = 'created'
 		else:
 			for key,value in criteria.items():
 				setattr(conferencerate, key, value)
+			response['action'] = 'updated'
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return 'Error: Conference Rate not added/edited'
-
-	return 'Success: Conference Rate added/edited'
-
+		return response
+	
+	response.update({'status': 'Success', 'reload_path': '/conferencerates/ajax/list/' + str(conferencerate.conferenceid)})
+	return response
 
 
 # EXPENSES
@@ -275,19 +312,20 @@ def save_conferencerate(conferencerateid):
 def delete_expense(expenseid, proposalid):
 	expense = Expenses.get_one(filters = [Expenses.expenseid == expenseid,
 										  Expenses.proposalid == proposalid])
+	response = {'status': 'Error', 'description': 'Expense', 'action': 'found', 'reload_path': ''}
 
 	if not expense:
-		return "Error: Expense could not be found"
-
+		return response
 	try:
 		db.session.delete(expense)
 		db.session.commit()
+		response['action'] = 'deleted'
 	except:
 		db.session.rollback()
-		return "Error: Expense could not be deleted"
+		return response
 
-	# return message for the div
-	return "Success: Expense deleted"
+	response['status'] = 'Success'
+	return response
 
 @app.route('/expenses/ajax/edit/<int:expenseid>')
 @login_required
@@ -309,38 +347,27 @@ def load_expenses(proposalid):
 @login_required
 def save_expense(expenseid):
 	expense = Expenses.get_one(filters = [Expenses.expenseid == expenseid])
-
-	proposal = request.form.get("proposalid")
-	description = request.form.get("description")
-	expense_type = request.form.get("expensetypeid")
-	amount = request.form.get("amount").replace("$", "")
-	fiscal_year = request.form.get("fiscalyear")
-
-	#text = description + " " + amount + " " + fiscal_year
-
-	#return text
+	response = {'status': 'Error', 'description': 'Expense', 'action': 'read', 'reload_path': ''}
 
 	try:
+		criteria = {'proposalid': int(request.form['proposalid']), 'expensetypeid': int(request.form['expensetypeid']),
+					'description': request.form['description'], 'amount': currency_strstrp(request.form['amount']),
+					'fiscalyear': datetime.strptime(request.form['fiscalyear'], '%m/%d/%Y')}
 		if not expense:
-			print("new expense")
-			expense = Expenses(proposalid = proposal, expensetypeid = expense_type,
-								description = description, amount = amount,
-								fiscalyear = fiscal_year)
+			expense = Expenses(**criteria)
 			db.session.add(expense)
+			response['action'] = 'created'
 		else:
-			print("existing expense")
-			expense.description = description
-			expense.expensetypeid = expense_type
-			expense.amount = amount
-			expense.fiscalyear = fiscal_year
-
+			for key,value in criteria.items():
+				setattr(expense, key, value)
+			response['action'] = 'updated'
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return "Error: Expense not deleted"
+		return response
 
-	return "Success: Expense deleted"
-
+	response.update({'status': 'Success', 'description': expense.description})
+	return response
 
 
 # EXPENSE TYPES
@@ -366,58 +393,45 @@ def load_expensetypes():
 @login_required
 def save_expensetype(expensetypeid):
 	expensetype = ExpenseTypes.get_one(filters = [ExpenseTypes.expensetypeid == expensetypeid])
-	criteria = {'description': request.form['description']}
-	#description = request.form['description']
+	response = {'status': 'Error', 'description': 'Expense Category', 'action': 'read', 'reload_path': ''}
 
 	try:
+		description = request.form['description']
 		if not expensetype:
-			expensetype = ExpenseTypes(**criteria)
+			expensetype = ExpenseTypes(description = description)
 			db.session.add(expensetype)
+			response['action'] = 'created'
 		else:
-			for key,value in criteria.items():
-				setattr(expensetype, key, value)
+			expensetype.description = description
+			response['action'] = 'updated'
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return 'Error: expensetype not added/edited'
-
-	return 'Success: expensetype added/edited'
-
-@app.route('/expensetypes/ajax/delete/<int:expensetypeid>', methods = ['GET', 'POST'])
-@login_required
-def delete_expensetype(expensetypeid):
-	expensetype = ExpenseTypes.get_one(filters = [ExpenseTypes.expensetypeid == expensetypeid])
-
-	try:
-		db.session.delete(expensetype)
-		db.session.commit()
-	except:
-		db.session.rollback()
-		return 'Error: expensetype could not be deleted'
-
-	return 'Success: expensetype deleted'
-
+		return response
+	
+	response.update({'status': 'Success', 'description': expensetype.description})
+	return response
 
 # FBMSACCOUNTS
 
-@app.route('/fbmsaccounts/ajax/delete/<int:fbmsid>&<int:proposalid>')
+@app.route('/fbmsaccounts/ajax/delete/<int:fbmsid>')
 @login_required
-def delete_fbmsaccount(fbmsid, proposalid):
-	account = FBMSAccounts.get_one(filters = [FBMSAccounts.fbmsid == fbmsid,
-											  FBMSAccounts.proposalid == proposalid])
+def delete_fbmsaccount(fbmsid):
+	account = FBMSAccounts.get_one(filters = [FBMSAccounts.fbmsid == fbmsid])
+	response = {'status': 'Error', 'description': 'FBMS Account', 'action': 'found', 'reload_path': ''}
 
 	if not account:
-		return "Error: FBMS Account could not be found"
-
+		return response
 	try:
 		db.session.delete(account)
 		db.session.commit()
+		response['action'] = 'deleted'
 	except:
 		db.session.rollback()
-		return "Error: FBMS Account not deleted"
+		return response
 
-	# return message for the div
-	return "Success: FBMS Account deleted"
+	response['status'] = 'Success'
+	return response
 
 
 @app.route('/fbmsaccounts/ajax/edit/<int:fbmsid>')
@@ -436,58 +450,48 @@ def load_fbmsaccounts(proposalid):
 @login_required
 def save_fbmsaccounts(fbmsid):
 	account = FBMSAccounts.get_one(filters = [FBMSAccounts.fbmsid == fbmsid])
-
-	proposal = request.form.get('proposalid')
-	account_no = request.form.get('accountno')
-
-	#text = "" + account
+	response = {'status': 'Error', 'description': 'FBMS Account', 'action': 'read', 'reload_path': ''}
 
 	try:
-		if not account:
-			print("new account")
-			account = FBMSAccounts(proposalid = proposal, accountno = account_no)
-			db.session.add(account)
-		else:
-			print("existing account")
-			account.accountno = account_no
+		proposalid = int(request.form['proposalid'])
+		accountno = request.form['accountno']
 
+		if not account:
+			account = FBMSAccounts(proposalid = proposalid, accountno = accountno)
+			db.session.add(account)
+			response['action'] = 'created'
+		else:
+			account.accountno = accountno
+			response['updated']
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return "Error: FBMS Account not saved"
+		return response
 
-	return "Success: FBMS Account saved"
+	response.update({'status': 'Success', 'description': account.accountno})
+	return response
 
 
 # FUNDING
 
-@app.route('/funding/ajax/delete/<int:fundingid>&<int:proposalid>')
+@app.route('/funding/ajax/delete/<int:fundingid>')
 @login_required
-def delete_funding(fundingid, proposalid):
-	# need to figure out how to remove items from the database with sqlalchemy
+def delete_funding(fundingid):
+	funding = Funding.get_one(filters = [Funding.fundingid == fundingid])
+	response = {'status': 'Error', 'description': 'Funding', 'action': 'found', 'reload_path': ''}
 
-	# requirements:
-		# update any fundings using the value that's being deleted to a default
-		# will the whole table need to be looked through and changed?
-			# could it be filtered by the name of the funding program?
-
-	to_be_deleted = Funding.get_one(filters = [Funding.fundingid == fundingid,
-											   Funding.proposalid == proposalid])
-
-	if not to_be_deleted:
-		return "Error: funding could not be found"
-
+	if not funding:
+		return response
 	try:
-		db.session.delete(to_be_deleted)
+		db.session.delete(funding)
 		db.session.commit()
+		response['action'] = 'deleted'
 	except:
 		db.session.rollback()
-		return "Error: funding could not be deleted"
+		return response
 
-	text = "fiscalyear: " + fyformat(to_be_deleted.fiscalyear) + " newfunding: " + currencyformat(to_be_deleted.newfunding) + " carryover: " + currencyformat(to_be_deleted.carryover)
-
-	# return message for the div
-	return "Success: funding deleted"
+	response['status']: 'Success'
+	return response
 
 @app.route('/funding/ajax/edit/<int:fundingid>')
 @login_required
@@ -508,40 +512,28 @@ def load_funding(proposalid):
 @app.route('/funding/ajax/save/<int:fundingid>', methods = ['POST'])
 @login_required
 def save_funding(fundingid):
-	# update if already existing
-	# make a new one if it is a new funding program
-
 	funding = Funding.get_one(filters = [Funding.fundingid == fundingid])
-
-	funding_proposalid = request.form.get('proposalid')
-	#funding_fundingid = request.form.get('fundingid')
-	funding_fiscalyear = request.form.get('fiscalyear')
-	funding_newfunding = request.form.get('newfunding').replace("$", "")
-	funding_carryover = request.form.get("carryover").replace("$", "")
-
+	response = {'status': 'Error', 'description': 'Funding', 'action': 'read', 'reload_path': ''}
 
 	try:
-		if not funding:
-			print("new funding")
-			funding = Funding(proposalid = funding_proposalid,
-							  fiscalyear = funding_fiscalyear,
-							  newfunding = funding_newfunding,
-							  carryover = funding_carryover)
-			db.session.add(funding)
-		else:
-			print("existing funding")
-			funding.fiscalyear = funding_fiscalyear
-			funding.newfunding = funding_newfunding
-			funding.carryover = funding_carryover
+		criteria = {'proposalid': int(request.form['proposalid']), 'fiscalyear': datetime.strptime(request.form['fiscalyear']),
+					'newfunding': currency_strstrp(request.form['newfunding']), 'carryover': currency_strstrp(request.form['carryover'])}
 
+		if not funding:
+			funding = Funding(**criteria)
+			db.session.add(funding)
+			response['action'] = 'created'
+		else:
+			for key,value in criteria.items():
+				setattr(funding, key, value)
+			response['action'] = 'updated'
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return "Error: funding not saved"
-		#return "error: " + funding_proposalid + " " + funding_fiscalyear + " " + funding_newfunding + " " + funding_carryover
+		return response
 
-	return "Success: funding saved"
-	#return funding_proposalid + " " + funding_fiscalyear + " " + funding_newfunding + " " + funding_carryover
+	response['status'] = 'Success'
+	return response
 
 
 # OVERHEAD
@@ -551,30 +543,24 @@ def save_funding(fundingid):
 def overhead():
 	return render_template('overheads.html')
 
-@app.route('/overhead/ajax/delete/<int:overheadid>&<int:proposalid>')
+@app.route('/overhead/ajax/delete/<int:overheadid>')
 @login_required
-def delete_overhead(overheadid, proposalid):
-	# use the get arguments methods to get the elements in the url
-	# return a message saying that this specific overhead was deleted?
-	# make sure all parameters have been filled out for this delete, make sure
-	# not to try to delete something that doesn't exist
-		# might be how a whole table got deleted before
-
-	overhead = OverheadRates.get_one(filters = [OverheadRates.overheadid == overheadid,
-												OverheadRates.proposalid == proposalid])
+def delete_overhead(overheadid):
+	overhead = OverheadRates.get_one(filters = [OverheadRates.overheadid == overheadid])
+	response = {'status': 'Error', 'description': 'Overhead Rate', 'action': 'found', 'reload_path': ''}
 
 	if not overhead:
-		return "Error: overhead could not be found"
-
+		return response
 	try:
 		db.session.delete(overhead)
 		db.session.commit()
+		response['action'] = 'deleted'
 	except:
 		db.session.rollback()
-		return "Error: overhead not deleted"
+		return response
 
-	# return message for the div
-	return "Success: overhead deleted"
+	response['status'] = 'Success'
+	return response
 
 
 @app.route('/overhead/ajax/edit/<int:overheadid>')
@@ -603,36 +589,27 @@ def load_overhead(proposalid):
 @login_required
 def save_overhead(overheadid):
 	overhead = OverheadRates.get_one(filters = [OverheadRates.overheadid == overheadid])
-
-	proposal = request.form.get('proposalid')
-	overhead_rate = request.form.get("rate").replace("%", "")
-	description = request.form.get("description")
-	effective_date = request.form.get("effectivedate")
+	response = {'status': 'Error', 'description': 'Overhead Rate', 'action': 'read', 'reload_path': ''}
 
 	try:
-		if not overhead:
-			print("new overhead")
-			overhead = OverheadRates(proposalid = proposal, rate = overhead_rate,
-									 description = description,
-									 effectivedate = effective_date)
-			db.session.add(overhead)
-		else:
-			print("existing overhead")
-			overhead.rate = overhead_rate
-			overhead.description = description
-			overhead.effectivedate = effective_date
+		criteria = {'proposalid': int(request.form['proposalid']), 'rate': currency_strstrp(request.form['rate']),
+					'description': request.form['description'], 'effectivedate': datetime.strptime(request.form['effectivedate'], '%m/%d/%Y')}
 
+		if not overhead:
+			overhead = OverheadRates(**criteria)
+			db.session.add(overhead)
+			response['action'] = 'created'
+		else:
+			for key,value in criteria.items():
+				setattr(overhead, key, value)
+			response['action'] = 'updated'
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return "Error: overhead not saved"
+		return response
 
-	return "Success: overhead saved"
-
-	#text = overhead_rate + " " + description + " " + effective_date
-
-	#return text
-
+	response.update({'status': 'Success', 'description': overhead.description})
+	return response
 
 # PEOPLE
 
@@ -699,38 +676,28 @@ def load_programs():
 @login_required
 def save_program(programid):
 	program = FundingPrograms.get_one(filters = [FundingPrograms.programid == programid])
-	criteria = {'programname': request.form['programname'], 'agency': request.form['agency'],
-				'pocname': request.form['pocname'], 'pocemail': request.form['pocemail'],
-				'startdate': datetime.strptime(request.form['startdate'], '%m/%d/%Y'),
-				'enddate': datetime.strptime(request.form['enddate'], '%m/%d/%Y')}
-
+	response = {'status': 'Error', 'description': 'Funding Program', 'action': 'read', 'reload_path': ''}
+	
 	try:
+		criteria = {'programname': request.form['programname'], 'agency': request.form['agency'],
+					'pocname': request.form['pocname'], 'pocemail': request.form['pocemail'],
+					'startdate': datetime.strptime(request.form['startdate'], '%m/%d/%Y'),
+					'enddate': datetime.strptime(request.form['enddate'], '%m/%d/%Y')}
 		if not program:
 			program = FundingPrograms(**criteria)
 			db.session.add(program)
+			response['action'] = 'created'
 		else:
 			for key,value in criteria.items():
 				setattr(program, key, value)
+			response['action'] = 'updated'
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return 'Error: Funding Program not added/edited'
+		return response
 
-	return 'Success: Funding Program added/edited'
-
-@app.route('/programs/ajax/delete/<int:programid>', methods = ['GET', 'POST'])
-@login_required
-def delete_program(programid):
-	program = FundingPrograms.get_one(filters = [FundingPrograms.programid == programid])
-
-	try:
-		db.session.delete(program)
-		db.session.commit()
-	except:
-		db.session.rollback()
-		return 'Error: Funding Program could not be deleted'
-
-	return 'Success: Funding Program deleted'
+	response.update({'status': 'Success', 'description': program.programname})
+	return response
 
 
 # PROPOSALS
@@ -943,6 +910,9 @@ def currency_strstrp(string):
 	if not new_string:
 		new_string = '0'
 	return float(new_string)
+
+def serialize(self):
+	return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 # -------------------------->
 
 

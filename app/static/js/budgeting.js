@@ -1,12 +1,5 @@
-// this will work even if the value chosen is not on the dropdown menu
-// if this is null, the code will choose the first available option for size on the dropdown menu
-//var user_preference = 10;
-
 function save_row_preference(table) {
-  // look up the data tables thing from wherever and figure out how to get the size from it
-  // will be called by an onClick function from the button
-  // will save this somewhere
-  var table_row_size = table.page.len();
+  let table_row_size = table.page.len();
   console.log("New table row preference is " + table_row_size + " rows");
 
   $.get("/row_setting/ajax/save/" + table_row_size)
@@ -20,32 +13,28 @@ function save_row_preference(table) {
 function check_row_preference(table) {
   var user_preference = null;
   $.get("/row_setting/ajax/get")
-   .always(function(data)
-   {
-     //console.log(data);
-     if (data != "None")
-     {
+   .always(function(data) {
+     if (data != "None") {
        user_preference = parseInt(data);
      }
 
-     //console.log(user_preference);
-
      if (user_preference != null) {
-       console.log(table.page.len());
        table.page.len(user_preference).draw();
-       console.log(table.page.len());
      }
 
    });
 }
 
 function loadTable(ajax, reload, table) {
-
     if (reload) {
-      $(table).DataTable().ajax.reload();
+      if (ajax === '') {                            
+        $(table).DataTable().ajax.reload()          // if ajax argument empty, reload from instantiation path
+      } else {
+        $(table).DataTable().ajax.url(ajax).load(); // otherwise, load from the ajax argument
+      }
     } else {
       // creates the table if it doesn't already exist
-      $(table).dataTable( {
+      $(table).DataTable( {
           'processing': true,
           'serverSide': false,
           'autoWidth': false,
@@ -55,11 +44,6 @@ function loadTable(ajax, reload, table) {
     }
 
     check_row_preference($(table).DataTable());
-    /*
-    if (!reload) {
-        check_row_preference($(div).DataTable());
-    }
-    */
 }
 
 function editDialog(ajax, proposalid, table) {
@@ -69,19 +53,17 @@ function editDialog(ajax, proposalid, table) {
     $(this).dialog({
       width: 'auto',
       modal: true,
+      draggable: false,
       title: $(data).find('#title').val(),
       close: function() { $(this).dialog("destroy") },
       buttons: {
         "Save": function () {
           dialog = $(this);
-          callSave(save_ajax, proposalid, table, dialog) },
+          callSave(save_ajax, table, dialog) },
         Cancel: function () { $(this).dialog("destroy"); }
       }
     });
   });
-
-  //console.log(save_ajax);
-  //console.log(table);
 }
 
 
@@ -91,6 +73,7 @@ function deleteDialog(ajax, proposalid, table, description) {
   $(div).dialog({
     width: 'auto',
     modal: true,
+    draggable: false,
     close: function() { $(this).dialog("destroy") },
     buttons: {
       "Delete": function () {
@@ -103,7 +86,10 @@ function deleteDialog(ajax, proposalid, table, description) {
 }
 
 function displayAlert(data) {
-  $('.alert').last().html(data).slideDown('fast', function() {
+  let content = `${ data['status']}: ${data['description']} 
+                 ${(data['status'] === 'Error') ? 'not' : ''} 
+                 ${ data['action']}`;
+  $('.alert').last().html(content).slideDown('fast', function() {
     alert = $(this);
     setTimeout(function() {
       $(alert).slideUp('fast');
@@ -111,49 +97,30 @@ function displayAlert(data) {
   });
 }
 
-
-// TODO: generalize a save call
-function callSave(ajax, proposalid, table, dialog) {
-
+function callSave(ajax, table, dialog) {
   $.post(ajax, $('form').serialize())
-    .always(function(data){
-      displayAlert(data);
+    .always(function(response){
 
-      //console.log(ajax);
-      var load_ajax = ajax.replace('save', 'list');
+      if (response['status'] === 'Success') {
+        dialog.dialog('destroy');
+        loadTable(response['reload_path'], true, table);
+      }    
 
-      var elements = load_ajax.split('/');
-      var elements_size = elements.length;
-      //console.log(elements);
-      if (elements[1] === "conferenceattendees") {
-        //console.log(true);
-        var new_ajax = load_ajax.replace(elements[elements_size - 1],
-          ("byproposal/" + proposalid));
-        //console.log(new_ajax);
-      } else {
-        var new_ajax = load_ajax.replace(elements[elements_size - 1], proposalid);
-      }
-
-      dialog.dialog('destroy');
-      //console.log("ajax: " + new_ajax);
-      //console.log("table " + table);
-      loadTable(new_ajax, true, table);
-
+      displayAlert(response);
   });
 }
 
-
 function callDelete(ajax, proposalid, table, dialog) {
   $.get(ajax + '&' + proposalid)
-    .always (function(data) {
+    .always (function(response) {
       //dialog.dialog("close");
       //$("#warningDiv").html("<p>Successfully Deleted</p>");
-      $("#warningDiv").html(data);
-      $("#warningDiv").show();
-
+      //$("#warningDiv").html(data);
+      //$("#warningDiv").show();
       //console.log(ajax);
+      displayAlert(response);
 
-      var load_ajax = ajax.replace('delete', 'list');
+      //var load_ajax = ajax.replace('delete', 'list');
 
       var elements = load_ajax.split('/');
       var elements_size = elements.length;
@@ -207,4 +174,59 @@ function updateCalendar (id) {
   var newDate = $(idname).val();
 
   $(hid).val (newDate);
+}
+
+function figureCosts(proposalid) {
+  $('#budgetDashboard').html('');
+  deleteProjectBudgetDashboard('#budgetDashboard');
+  $.getJSON( "index.php?view=proposal-cost-titles-json&proposalid=" + proposalid, function( data ) {
+    var items = [];
+    $.each( data.data[0], function( key, val ) {
+      $.each( val, function( title, mesg ) {
+        $(title).html(mesg);
+      });
+    });
+  });
+  $('#fbmsTitle').html('FBMS Accounts');
+
+  // Dashboard
+  $.getJSON( "index.php?view=proposal-costs-json&proposalid=" + proposalid, function( data ) {
+    projectBudgetDashboard('#budgetDashboard',data.data[0].budget);
+    projectBudgetTable('#budgetTable', data.data[0].budget);
+  });
+}
+
+function projectBudgetTable (id, data) {
+  var newTable = "<table class='display' width='100%'>";
+  newTable += "<tr><th>Year</th>";
+  $.each(data, function(i, item) {
+    newTable += "<td>" + item.fy + "</td>";
+  });
+
+  newTable += "</tr>\n<tr><th>Costs</th>";
+  $.each(data, function(i, item) {
+    newTable += "<td>$";
+    var costs = (item.costs.expenses + item.costs.staffing + item.costs.travel + item.costs.equipment + item.costs.overhead);
+    newTable += costs.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+    newTable += "</td>";
+  });
+
+  newTable += "</tr>\n<tr><th>Funding</th>";
+  $.each(data, function(i, item) {
+    newTable += "<td>$" + item.funding.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") + "</td>";
+  });
+
+  newTable += "</tr>\n<tr><th>Total</th>";
+  $.each(data, function(i, item) {
+    totals = item.funding - (item.costs.expenses + item.costs.staffing + item.costs.travel + item.costs.equipment +
+      item.costs.overhead);
+    if (totals < 0) { newTable += "<td><font color='firebrick'>$"; }
+    else { newTable += "<td><font color='darkolivegreen'>$"; }
+    newTable += totals.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+    newTable += "</td>";
+  });
+
+  newTable += "</tr><tr></table>\n";
+
+  $(id).html(newTable);
 }

@@ -1,7 +1,8 @@
+<div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
 <form id="rateForm" action="" method="POST">
   <input type="hidden" autofocus />
   <input type="hidden" id="conferenceid" name="conferenceid"
-         value="{{ conferencerate.conference.conferenceid if conferencerate else ''}}"/>
+         value="{{ conferencerate.conference.conferenceid if conferencerate else '0'}}"/>
   <table>
     <tr><th>Per Diem</th><td><input type="text" id="perdiem" name="perdiem" size="12" value="{{ conferencerate.perdiem|currencyformat }}"/></td>
         <th>Registration</th><td><input type="text" id="registration" name="registration" size="12" value="{{ conferencerate.registration|currencyformat }}"/></td></tr>

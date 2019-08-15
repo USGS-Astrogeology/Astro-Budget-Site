@@ -3,18 +3,20 @@
 <html>
   <head>
     {% block head %}
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui.min.css') }}"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui.theme.min.css') }}"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dataTables.jqueryui.css') }}"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/jsgrid-theme.min.css') }}"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/jsgrid.min.css') }}"/>
+
     <script src="{{ url_for('static', filename='js/jquery-1.10.2.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jsgrid.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery-ui-1.11.2.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery.dataTables-1.10.4.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/dataTables.jqueryui.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/row_setting.js') }}"></script>
     <script src="{{ url_for('static', filename='js/budgeting.js') }}"></script>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     
     <style>
       * {

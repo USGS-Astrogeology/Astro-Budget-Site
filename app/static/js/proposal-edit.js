@@ -1,58 +1,3 @@
-function figureCosts(proposalid) {
-  $('#budgetDashboard').html('');
-  deleteProjectBudgetDashboard('#budgetDashboard');
-  $.getJSON( "index.php?view=proposal-cost-titles-json&proposalid=" + proposalid, function( data ) {
-    var items = [];
-    $.each( data.data[0], function( key, val ) {
-      $.each( val, function( title, mesg ) {
-        $(title).html(mesg);
-      });
-    });
-  });
-  $('#fbmsTitle').html('FBMS Accounts');
-
-  // Dashboard
-  $.getJSON( "index.php?view=proposal-costs-json&proposalid=" + proposalid, function( data ) {
-    projectBudgetDashboard('#budgetDashboard',data.data[0].budget);
-    projectBudgetTable('#budgetTable', data.data[0].budget);
-  });
-}
-
-function projectBudgetTable (id, data) {
-  var newTable = "<table class='display' width='100%'>";
-  newTable += "<tr><th>Year</th>";
-  $.each(data, function(i, item) {
-    newTable += "<td>" + item.fy + "</td>";
-  });
-
-  newTable += "</tr>\n<tr><th>Costs</th>";
-  $.each(data, function(i, item) {
-    newTable += "<td>$";
-    var costs = (item.costs.expenses + item.costs.staffing + item.costs.travel + item.costs.equipment + item.costs.overhead);
-    newTable += costs.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
-    newTable += "</td>";
-  });
-
-  newTable += "</tr>\n<tr><th>Funding</th>";
-  $.each(data, function(i, item) {
-    newTable += "<td>$" + item.funding.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") + "</td>";
-  });
-
-  newTable += "</tr>\n<tr><th>Total</th>";
-  $.each(data, function(i, item) {
-    totals = item.funding - (item.costs.expenses + item.costs.staffing + item.costs.travel + item.costs.equipment +
-      item.costs.overhead);
-    if (totals < 0) { newTable += "<td><font color='firebrick'>$"; }
-    else { newTable += "<td><font color='darkolivegreen'>$"; }
-    newTable += totals.toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
-    newTable += "</td>";
-  });
-
-  newTable += "</tr><tr></table>\n";
-
-  $(id).html(newTable);
-}
-
 function loadTasksTable (reload, proposalid) {
   if (reload) {
     $('#tasksTableDiv').jsGrid("destroy");
@@ -365,164 +310,6 @@ function addTask() {
   $("#tasksTableDiv").jsGrid("fieldOption", "Task", "items", $task_items);
 }
 
-function saveProposal() {
-  $.post("index.php", $("#proposalForm").serialize());
-
-  $("#warningDiv").html("<p>Updated proposal details</p>");
-  $("#warningDiv").show();
-}
-
-function saveFunding(proposalid) {
-  $.post("index.php", $("#fundingForm").serialize())
-    .always (function() {
-
-      dialog.dialog("close");
-      $("#warningDiv").html("<p>Updated [" + $("#fiscalyear").val() + "]</p>");
-      $("#warningDiv").show();
-
-      loadTable('/funding/ajax/list/' + proposalid, true, $('#fundingTable'));
-    });
-}
-
-/*
-function deleteFundingDialog(fundingid, proposalid) {
-  var fy;
-
-  $.getJSON( "/funding/ajax/get?proposalid=" + proposalid + "&fundingid=" + fundingid, function( data ) {
-    var pattern = />(.+)<\/a>/i;
-    fy = pattern.exec(data.data[0][0])[1];
-    $("#editDialog").html("<html><head><title>Confirm Deletion</title></head>" +
-                        "<body><h2>Are you sure you want to delete funding for " + fy + "?</h2></body></html>");
-  });
-
-  dialog = $("#editDialog").dialog({
-    autoOpen: false,
-    height: 200,
-    width: 400,
-    modal: true,
-    buttons: {
-      "Delete Funding": function () { deleteFunding(fundingid, proposalid); },
-      Cancel: function () {
-        dialog.dialog("close");
-      }
-    }
-  });
-
-  dialog.dialog("open");
-}
-*/
-
-function deleteFunding(fundingid, proposalid) {
-  $.get("index.php?view=funding-delete&fundingid=" + fundingid + "&proposalid=" + proposalid)
-    .always (function() {
-      dialog.dialog("close");
-      $("#warningDiv").html("<p>Deleted [" + fundingid + "]</p>");
-      $("#warningDiv").show();
-
-      loadTable('/funding/ajax/list/' + proposalid, true, $('#fundingTable'));
-    });
-}
-
-function saveOverhead(proposalid) {
-  $.post("index.php", $("#overheadForm").serialize())
-    .always(function(){
-
-      loadTable('/overhead/ajax/list/' + proposalid, true, $('#overheadTable'));
-
-      dialog.dialog("close");
-      $("#warningDiv").html("<p>Updated [" + $("#overheadid").val() + "] (" + $("#rate").val() + ")</p>");
-      $("#warningDiv").show();
-    });
-}
-
-/*
-function deleteOverheadDialog(overheadid, proposalid) {
-  var account;
-
-  $.getJSON( "index.php?view=overhead-list-json&proposalid=" + proposalid + "&overheadid=" + overheadid, function( data ) {
-    $("#editDialog").html("<html><head><title>Confirm Deletion</title></head>" +
-                        "<body><h2>Are you sure you want to delete the overhead rate?</h2></body></html>");
-  });
-
-  dialog = $("#editDialog").dialog({
-    autoOpen: false,
-    height: 200,
-    width: 400,
-    modal: true,
-    buttons: {
-      "Delete Overhead Rate": function () { deleteOverhead(overheadid, proposalid); },
-      Cancel: function () {
-        dialog.dialog("close");
-      }
-    }
-  });
-
-  dialog.dialog("open");
-}
-*/
-
-function deleteOverhead(overheadid, proposalid) {
-  $.get("index.php?view=overhead-delete&overheadid=" + overheadid + "&proposalid=" + proposalid)
-    .always (function() {
-      dialog.dialog("close");
-      $("#warningDiv").html("<p>Deleted [" + overheadid + "]</p>");
-      $("#warningDiv").show();
-
-      loadTable('/overhead/ajax/list/' + proposalid, true, $('#overheadTable'));
-    });
-}
-
-function saveFBMS(proposalid) {
-  $.post("index.php", $("#fbmsForm").serialize())
-    .always(function(){
-
-      loadTable('/fbmsaccounts/ajax/list/' + proposalid, true, $('#fbmsTable'));
-
-      dialog.dialog("close");
-      $("#warningDiv").html("<p>Updated [" + $("#fbmsid").val() + "] (" + $("#accountno").val() + ")</p>");
-      $("#warningDiv").show();
-    });
-}
-
-/*
-function deleteFBMSDialog(fbmsid, proposalid) {
-  var account;
-
-  $.getJSON( "index.php?view=fbms-list-json&proposalid=" + proposalid + "&fbmsid=" + fbmsid, function( data ) {
-    var pattern = />(.+)<\/a>/i;
-    account = pattern.exec(data.data[0][0])[1];
-    $("#editDialog").html("<html><head><title>Confirm Deletion</title></head>" +
-                        "<body><h2>Are you sure you want to delete FBMS account " + account + "?</h2></body></html>");
-  });
-
-  dialog = $("#editDialog").dialog({
-    autoOpen: false,
-    height: 200,
-    width: 400,
-    modal: true,
-    buttons: {
-      "Delete FBMS": function () { deleteFBMS(fbmsid, proposalid); },
-      Cancel: function () {
-        dialog.dialog("close");
-      }
-    }
-  });
-
-  dialog.dialog("open");
-}
-*/
-
-function deleteFBMS(fbmsid, proposalid) {
-  $.get("index.php?view=fbms-delete&fbmsid=" + fbmsid + "&proposalid=" + proposalid)
-    .always (function() {
-      dialog.dialog("close");
-      $("#warningDiv").html("<p>Deleted [" + fbmsid + "]</p>");
-      $("#warningDiv").show();
-
-      loadTable('/fbmsaccounts/ajax/list/' + proposalid, true, $('#fbmsTable'));
-    });
-}
-
 /*
 function editTaskDialog (taskid, proposalid) {
   if (taskid == 'new') {
@@ -604,26 +391,6 @@ function deleteTask(taskid, proposalid) {
     });
 }
 
-/*
-function editAttendeeDialog(proposalid, conferenceattendeeid) {
-  $("#editDialog").load("/conferenceattendees/ajax/edit/" + conferenceattendeeid);
-
-  dialog = $("#editDialog").dialog({
-    autoOpen: false,
-    height: 500,
-    width: 1000,
-    modal: true,
-    buttons: {
-      "Save Travel": function () { saveAttendee(proposalid); },
-      Cancel: function () {
-        dialog.dialog("close");
-      }
-    }
-  });
-
-  dialog.dialog("open");
-}*/
-
 function saveAttendee(proposalid) {
   $.post("index.php", $("#conferenceAttendeeForm").serialize())
     .always (function() {
@@ -638,35 +405,6 @@ function saveAttendee(proposalid) {
     });
 }
 
-/*
-function deleteAttendeeDialog(travelid, proposalid) {
-  var description;
-
-  $.getJSON("index.php?view=conference-attendee-list-json&proposalid=" + proposalid +
-      "&travelid=" + travelid, function( data ) {
-    var pattern = />(.+)<\/a>/i;
-    description = pattern.exec(data.data[0][0])[1];
-    $("#editDialog").html("<html><head><title>Confirm Deletion</title></head>" +
-                        "<body><h2>Are you sure you want to delete trip " + description + "?</h2></body></html>");
-  });
-
-  dialog = $("#editDialog").dialog({
-    autoOpen: false,
-    height: 200,
-    width: 500,
-    modal: true,
-    buttons: {
-      "Delete Trip": function () { deleteAttendee(travelid, proposalid); },
-      Cancel: function () {
-        dialog.dialog("close");
-      }
-    }
-  });
-
-  dialog.dialog("open");
-}
-*/
-
 function deleteAttendee(travelid, proposalid) {
   $.get("index.php?view=conference-attendee-delete&travelid=" + travelid + "&proposalid=" + proposalid)
     .always (function() {
@@ -678,7 +416,6 @@ function deleteAttendee(travelid, proposalid) {
       figureCosts(proposalid);
     });
 }
-
 
 function loadConferenceRate() {
   $("#meeting").val($("#conferenceiddropdown option:selected").text());
@@ -696,7 +433,6 @@ function loadConferenceRate() {
   });
 }
 
-
 function saveExpense(proposalid) {
   $.post("index.php", $("#expenseForm").serialize())
     .always (function () {
@@ -710,34 +446,6 @@ function saveExpense(proposalid) {
       loadTable('/expenses/ajax/list/' + proposalid, true, $('#expensesTable'));
   });
 }
-
-/*
-function deleteExpenseDialog(expenseid, proposalid) {
-  var description;
-
-  $.getJSON( "index.php?view=expense-list-json&proposalid=" + proposalid + "&expenseid=" + expenseid, function( data ) {
-    var pattern = />(.+)<\/a>/i;
-    description = pattern.exec(data.data[0][0])[1];
-    $("#editDialog").html("<html><head><title>Confirm Deletion</title></head>" +
-                        "<body><h2>Are you sure you want to delete expense " + description + "?</h2></body></html>");
-  });
-
-  dialog = $("#editDialog").dialog({
-    autoOpen: false,
-    height: 200,
-    width: 400,
-    modal: true,
-    buttons: {
-      "Delete Expense": function () { deleteExpense(expenseid, proposalid); },
-      Cancel: function () {
-        dialog.dialog("close");
-      }
-    }
-  });
-
-  dialog.dialog("open");
-}
-*/
 
 function deleteExpense(expenseid, proposalid) {
   $.get("index.php?view=expense-delete&expenseid=" + expenseid + "&proposalid=" + proposalid)

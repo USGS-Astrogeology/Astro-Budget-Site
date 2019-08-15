@@ -1,9 +1,6 @@
 <form id="conferenceForm" action="" method="POST">
   <input type="hidden" autofocus />
-  <input type="hidden" id="conferenceid" name="conferenceid"
-    {% if not conference %} value=""/>
-    {% else %} value="{{ conference.conferenceid }}"/>
-    {% endif %}
+  <input type="hidden" id="conferenceid" name="conferenceid" value="{{ conference.conferenceid if conference else '0' }}"/>
   <table>
     <tr><th align="left">Conference/Meeting/Travel</th></tr>
     <tr><td><input type="text" name="meeting" id="meeting" value="{{ conference.meeting }}" size="40" required/></td></tr>
