@@ -419,18 +419,26 @@ function deleteAttendee(travelid, proposalid) {
 
 function loadConferenceRate() {
   $("#meeting").val($("#conferenceiddropdown option:selected").text());
-  $.getJSON("index.php?view=conference-rate-list-json&conferenceid=" + $("#conferenceiddropdown").val() +
-      "&effectivedate=" + $("#tripstartdate").val(), function( data ) {
+  //$.getJSON("index.php?view=conference-rate-list-json&conferenceid=" + $("#conferenceiddropdown").val() +
+      //"&effectivedate=" + $("#tripstartdate").val(), function( data ) {
     //$.getJSON("/conferencerates/ajax/list/" + $(#conferenceiddropdown), function(data){
-    $("#perdiem").val(data.data[0][1]);
-    $("#lodging").val(data.data[0][2]);
-    $("#registration").val(data.data[0][3]);
-    $("#groundtransport").val(data.data[0][4]);
-    $("#airfare").val(data.data[0][5]);
-    $("#city").val(data.data[0][6]);
-    $("#state").val(data.data[0][7]);
-    $("#country").val(data.data[0][8]);
-  });
+    //$.getJSON("/conferencerates/ajax/list" + $(#conferenceiddropdown).val(), function(data)){
+  $.get("/conferencerates/ajax/get/" + $("#conferenceiddropdown").val())
+    .always(function(data)
+    {
+      console.log(data);
+      $("#perdiem").val(data.data[0][1]);
+      $("#lodging").val(data.data[0][2]);
+      $("#registration").val(data.data[0][3]);
+      $("#groundtransport").val(data.data[0][4]);
+      $("#airfare").val(data.data[0][5]);
+      $("#city").val(data.data[0][6]);
+      $("#state").val(data.data[0][7]);
+      $("#country").val(data.data[0][8]);
+    });
+    //console.log(data);
+  //});
+  console.log($("#conferenceiddropdown").val())
 }
 
 function saveExpense(proposalid) {

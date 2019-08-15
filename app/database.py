@@ -28,7 +28,7 @@ class Base(db.Model):
   @classmethod
   def serialize(cls, self):
       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
-        
+
 
 class People(Base):
   __tablename__ = 'people'
@@ -102,12 +102,12 @@ class Proposals(Base):
   perfperiodstart     = Column(DateTime(timezone=False))
   perfperiodend       = Column(DateTime(timezone=False))
   status              = Column(Integer, ForeignKey("statuses.status"))
-  fbmsaccounts        = relationship('FBMSAccounts', backref='proposal')
-  conferenceattendees = relationship('ConferenceAttendee', backref='proposal')
-  tasks               = relationship('Tasks', backref='proposal')
-  expenses            = relationship('Expenses', backref='proposal')
-  funding             = relationship('Funding', backref='proposal')
-  overheadrates       = relationship('OverheadRates', backref='proposal')
+  fbmsaccounts        = relationship('FBMSAccounts', backref='proposal', cascade="all,delete")
+  conferenceattendees = relationship('ConferenceAttendee', backref='proposal', cascade="all,delete")
+  tasks               = relationship('Tasks', backref='proposal', cascade="all,delete")
+  expenses            = relationship('Expenses', backref='proposal', cascade="all,delete")
+  funding             = relationship('Funding', backref='proposal', cascade="all,delete")
+  overheadrates       = relationship('OverheadRates', backref='proposal', cascade="all,delete")
 
   def __repr__(self):
     return "<Proposals(project='%s', proposalnumber='%s', awardnumber='%s')>" % (self.projectname, self.proposalnumber, self.awardnumber)

@@ -39,9 +39,33 @@ function loadTable(ajax, reload, table) {
           'serverSide': false,
           'autoWidth': false,
           'ajax': ajax,
+          //'dom': 'Hl<"save-rows ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">frtipF',
+          //'dom': 'Hl<button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($(table).DataTable())">Save Row Preference</button>>frtipF',
+          'buttons': [
+            {
+              text: 'save row preference',
+              action: function(e, dt, node, config){
+                save_row_preference();
+              }
+            }],
           'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
         });
+        /*
+        $(table).DataTable({
+          'buttons': {
+            buttons: [
+            {
+              text: 'save row preference',
+              action: function(e, dt, node, config){
+                save_row_preference();
+              }
+            }]
+        }
+      });
+      */
     }
+
+  //  $('.save-rows').setattr('onClick', 'save_row_preference($(table).DataTable())').html('Save Row Preference');
 
     check_row_preference($(table).DataTable());
 }

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, g, request, abort, session
+from flask import Flask, render_template, url_for, g, request, abort, session, jsonify
 from flask_cas import CAS, login_required, login
 from datetime import datetime, date
 from database import (db, Conferences, ConferenceRates, ConferenceAttendee, Expenses, ExpenseTypes, FBMSAccounts,
@@ -142,10 +142,10 @@ def save_conference(conferenceid):
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return response
+		return jsonify(response)
 
 	response['status'] = 'Success'
-	return response
+	return jsonify(response)
 
 # CONFERENCE ATTENDEES
 
@@ -157,17 +157,17 @@ def delete_conferenceattendee(conferenceattendeeid, proposalid):
 	response = {'status': 'Error', 'description': 'Conference Attendee', 'action': 'found', 'reload_path': ''}
 
 	if not conferenceattendee:
-		return response
+		return jsonify(response)
 	try:
 		db.session.delete(conference_attendee)
 		db.session.commit()
 		response['action'] = 'deleted'
 	except:
 		db.session.rollback()
-		return response
+		return jsonify(response)
 
 	response['status'] = 'Success'
-	return response
+	return jsonify(response)
 
 @app.route('/conferenceattendees/ajax/edit/<int:conferenceattendeeid>')
 @login_required
@@ -218,7 +218,7 @@ def save_conferenceattendee(conferenceattendeeid):
 	airfare = request.form.get("airfare")
 	lodging = request.form.get("lodging")
 	other = request.form.get("other")
-	per_diem = request.form.get("perdium")
+	per_diem = request.form.get("perdiem")
 	registration = request.form.get("registration")
 	city = request.args.get("city")
 	state = request.args.get("state")
@@ -261,6 +261,17 @@ def edit_conferencerate(conferencerateid):
 														dd_fiscalyears = fiscal_years(),
 														dd_startdates = start_dates())
 
+@app.route('/conferencerates/ajax/get/<int:conferenceid>')
+@login_required
+def get_conferencerate_list(conferenceid):
+	conferencerates = ConferenceRates.get_many(filters = [ConferenceRates.conferenceid == conferenceid])
+	most_recent = geteffective(conferencerates)
+	result_tuple = [most_recent.perdiem, most_recent.lodging, most_recent.registration,
+	most_recent.groundtransport, most_recent.airfare, most_recent.city, most_recent.state,
+	most_recent.country]
+	#return str(most_recent)
+	return str(result_tuple)
+
 @app.route('/conferencerates/ajax/list/<int:conferenceid>')
 @login_required
 def load_conferencerates(conferenceid):
@@ -287,7 +298,7 @@ def save_conferencerate(conferencerateid):
 					'groundtransport': currency_strstrp(request.form['groundtransport']), 'airfare': currency_strstrp(request.form['airfare']),
 					'city': request.form['city'], 'state': request.form['state'], 'country': request.form['country'],
 					'effectivedate': datetime.strptime(request.form['effectivedate'], '%m/%d/%Y')}
-		
+
 		if not conferencerate:
 			conferencerate = ConferenceRates(**criteria)
 			db.session.add(conferencerate)
@@ -299,10 +310,10 @@ def save_conferencerate(conferencerateid):
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return response
-	
+		return jsonify(response)
+
 	response.update({'status': 'Success', 'reload_path': '/conferencerates/ajax/list/' + str(conferencerate.conferenceid)})
-	return response
+	return jsonify(response)
 
 
 # EXPENSES
@@ -315,17 +326,17 @@ def delete_expense(expenseid, proposalid):
 	response = {'status': 'Error', 'description': 'Expense', 'action': 'found', 'reload_path': ''}
 
 	if not expense:
-		return response
+		return jsonify(response)
 	try:
 		db.session.delete(expense)
 		db.session.commit()
 		response['action'] = 'deleted'
 	except:
 		db.session.rollback()
-		return response
+		return jsonify(response)
 
 	response['status'] = 'Success'
-	return response
+	return jsonify(response)
 
 @app.route('/expenses/ajax/edit/<int:expenseid>')
 @login_required
@@ -364,10 +375,10 @@ def save_expense(expenseid):
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return response
+		return jsonify(response)
 
 	response.update({'status': 'Success', 'description': expense.description})
-	return response
+	return jsonify(response)
 
 
 # EXPENSE TYPES
@@ -407,10 +418,10 @@ def save_expensetype(expensetypeid):
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return response
-	
+		return jsonify(response)
+
 	response.update({'status': 'Success', 'description': expensetype.description})
-	return response
+	return jsonify(response)
 
 # FBMSACCOUNTS
 
@@ -421,17 +432,17 @@ def delete_fbmsaccount(fbmsid):
 	response = {'status': 'Error', 'description': 'FBMS Account', 'action': 'found', 'reload_path': ''}
 
 	if not account:
-		return response
+		return jsonify(response)
 	try:
 		db.session.delete(account)
 		db.session.commit()
 		response['action'] = 'deleted'
 	except:
 		db.session.rollback()
-		return response
+		return jsonify(response)
 
 	response['status'] = 'Success'
-	return response
+	return jsonify(response)
 
 
 @app.route('/fbmsaccounts/ajax/edit/<int:fbmsid>')
@@ -466,10 +477,10 @@ def save_fbmsaccounts(fbmsid):
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return response
+		return jsonify(response)
 
 	response.update({'status': 'Success', 'description': account.accountno})
-	return response
+	return jsonify(response)
 
 
 # FUNDING
@@ -481,17 +492,17 @@ def delete_funding(fundingid):
 	response = {'status': 'Error', 'description': 'Funding', 'action': 'found', 'reload_path': ''}
 
 	if not funding:
-		return response
+		return jsonify(response)
 	try:
 		db.session.delete(funding)
 		db.session.commit()
 		response['action'] = 'deleted'
 	except:
 		db.session.rollback()
-		return response
+		return jsonify(response)
 
 	response['status']: 'Success'
-	return response
+	return fsonify(response)
 
 @app.route('/funding/ajax/edit/<int:fundingid>')
 @login_required
@@ -516,24 +527,24 @@ def save_funding(fundingid):
 	response = {'status': 'Error', 'description': 'Funding', 'action': 'read', 'reload_path': ''}
 
 	try:
-		criteria = {'proposalid': int(request.form['proposalid']), 'fiscalyear': datetime.strptime(request.form['fiscalyear']),
+		criteria = {'proposalid': int(request.form['proposalid']), 'fiscalyear': datetime.strptime(request.form['fiscalyear'], '%m/%d/%Y'),
 					'newfunding': currency_strstrp(request.form['newfunding']), 'carryover': currency_strstrp(request.form['carryover'])}
 
 		if not funding:
+			response['action'] = 'created'
 			funding = Funding(**criteria)
 			db.session.add(funding)
-			response['action'] = 'created'
 		else:
+			response['action'] = 'updated'
 			for key,value in criteria.items():
 				setattr(funding, key, value)
-			response['action'] = 'updated'
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return response
+		return jsonify(response)
 
 	response['status'] = 'Success'
-	return response
+	return jsonify(response)
 
 
 # OVERHEAD
@@ -550,17 +561,17 @@ def delete_overhead(overheadid):
 	response = {'status': 'Error', 'description': 'Overhead Rate', 'action': 'found', 'reload_path': ''}
 
 	if not overhead:
-		return response
+		return jsonify(response)
 	try:
 		db.session.delete(overhead)
 		db.session.commit()
 		response['action'] = 'deleted'
 	except:
 		db.session.rollback()
-		return response
+		return jsonify(response)
 
 	response['status'] = 'Success'
-	return response
+	return jsonify(response)
 
 
 @app.route('/overhead/ajax/edit/<int:overheadid>')
@@ -606,10 +617,10 @@ def save_overhead(overheadid):
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return response
+		return jsonify(response)
 
 	response.update({'status': 'Success', 'description': overhead.description})
-	return response
+	return jsonify(response)
 
 # PEOPLE
 
@@ -677,7 +688,7 @@ def load_programs():
 def save_program(programid):
 	program = FundingPrograms.get_one(filters = [FundingPrograms.programid == programid])
 	response = {'status': 'Error', 'description': 'Funding Program', 'action': 'read', 'reload_path': ''}
-	
+
 	try:
 		criteria = {'programname': request.form['programname'], 'agency': request.form['agency'],
 					'pocname': request.form['pocname'], 'pocemail': request.form['pocemail'],
@@ -694,10 +705,10 @@ def save_program(programid):
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return response
+		return jsonify(response)
 
 	response.update({'status': 'Success', 'description': program.programname})
-	return response
+	return jsonify(response)
 
 
 # PROPOSALS
@@ -717,28 +728,56 @@ def delete_proposal(proposalid, secondproposalid):
 	expenses = Expenses.get_many(filters = [Expenses.proposalid == proposalid])
 
 	'''
-	fund_name = []
+	#fund_name = []
+	delete_returns = []
 	for fund in funding:
-		fund_name.append(fund.fundingid)
-	return str(fund_name)
+		delete_returns.append(delete_funding(fund.fundingid, proposalid))
+		#fund_name.append(fyformat(fund.fiscalyear))
+	return str(delete_returns)
 	'''
 	'''
-	account = []
+	#account = []
+	account_delete = []
 	for fbmsaccount in fbms:
-		account.append(fbmsaccount.accountno)
-	return str(account)
+		account_delete.append(delete_fbmsaccount(fbmsaccount.fbmsid, proposalid))
+		#account.append(fbmsaccount.accountno)
+	return str(account_delete)
 	'''
 	'''
-	overheads = []
+	#overheads = []
+	overhead_delete = []
 	for account in overhead:
-		overheads.append(account.rate)
-	return str(overheads)
+		overhead_delete.append(delete_overhead(account.overheadid, proposalid))
+		#overheads.append(account.rate)
+	return str(overhead_delete)
 	'''
-
+	'''
 	expense_list = []
 	for expense in expenses:
-		expense_list.append(expense.description)
+		expense_list.append(delete_expense(expense.expenseid, proposalid))
+		#expense_list.append(expense.description)
 	return str(expense_list)
+	'''
+
+	proposal = Proposals.get_one(filters = [Proposals.proposalid == proposalid])
+
+	response = {'status': 'Error', 'description': 'Proposal', 'action': 'found', 'reload_path': ''}
+
+	if not proposal:
+		return jsonify(response)
+	try:
+		db.session.delete(proposal)
+		db.session.commit()
+		response['action'] = 'deleted'
+	except:
+		db.session.rollback()
+		return jsonify(response)
+
+	response['status'] = 'Success'
+	return jsonify(response)
+
+	# still need to do conference attendee
+
 
 @app.route('/proposals/ajax/edit/<int:proposalid>')
 @app.route('/proposals/view/<int:proposalid>')
@@ -765,6 +804,7 @@ def load_proposals():
 @login_required
 def save_proposal(proposalid):
 	proposal = Proposals.get_one(filters = [Proposals.proposalid == proposalid])
+	response = {'status': 'Error', 'description': 'Proposal', 'action': 'found', 'reload_path': ''}
 
 	name = request.form.get("projectname")
 	principal_investigator = request.form.get("peopleid")
@@ -783,6 +823,7 @@ def save_proposal(proposalid):
 								 programid = program_id, perfperiodstart = starting,
 								 perfperiodend = ending, status = status)
 			db.session.add(proposal)
+			response['action'] = 'created'
 		else:
 			proposal.projectname = name
 			proposal.peopleid = principal_investigator
@@ -792,12 +833,17 @@ def save_proposal(proposalid):
 			proposal.perfperiodstart = starting
 			proposal.perfperiodend = ending
 			proposal.status = status
+			response['action'] = 'updated'
 
 		db.session.commit()
 	except:
-		return "Error: could not add/edit proposal"
+		#return "Error: could not add/edit proposal"
+		db.session.rollback()
+		return jsonify(response)
 
-	return "Success: proposal added/edited"
+	response.update({'status': 'Success', 'description': proposal.projectname})
+	#return "Success: proposal added/edited"
+	return jsonify(response)
 
 
 @app.route('/proposal-basis/<int:proposalid>')
