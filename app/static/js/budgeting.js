@@ -26,8 +26,9 @@ function check_row_preference(table) {
 }
 
 function loadTable(ajax, reload, table) {
+    console.log(table)
     if (reload) {
-      if (ajax === '') {                            
+      if (ajax === '') {
         $(table).DataTable().ajax.reload()          // if ajax argument empty, reload from instantiation path
       } else {
         $(table).DataTable().ajax.url(ajax).load(); // otherwise, load from the ajax argument
@@ -110,8 +111,8 @@ function deleteDialog(ajax, proposalid, table, description) {
 }
 
 function displayAlert(data) {
-  let content = `${ data['status']}: ${data['description']} 
-                 ${(data['status'] === 'Error') ? 'not' : ''} 
+  let content = `${ data['status']}: ${data['description']}
+                 ${(data['status'] === 'Error') ? 'not' : ''}
                  ${ data['action']}`;
   $('.alert').last().html(content).slideDown('fast', function() {
     alert = $(this);
@@ -128,14 +129,15 @@ function callSave(ajax, table, dialog) {
       if (response['status'] === 'Success') {
         dialog.dialog('destroy');
         loadTable(response['reload_path'], true, table);
-      }    
+      }
 
       displayAlert(response);
   });
 }
 
 function callDelete(ajax, proposalid, table, dialog) {
-  $.get(ajax + '&' + proposalid)
+  //$.get(ajax + '&' + proposalid)
+    $.get(ajax)
     .always (function(response) {
       //dialog.dialog("close");
       //$("#warningDiv").html("<p>Successfully Deleted</p>");
@@ -144,7 +146,8 @@ function callDelete(ajax, proposalid, table, dialog) {
       //console.log(ajax);
       displayAlert(response);
 
-      //var load_ajax = ajax.replace('delete', 'list');
+      /*
+      var load_ajax = ajax.replace('delete', 'list');
 
       var elements = load_ajax.split('/');
       var elements_size = elements.length;
@@ -156,15 +159,21 @@ function callDelete(ajax, proposalid, table, dialog) {
           ("byproposal/" + proposalid));
         //console.log(new_ajax);
       }
+      else if (elements[1] === "proposals")
+      {
+        var new_ajax = load_ajax.replace("/" + elements[elements_size -1], "");
+      }
       else
       {
         var new_ajax = load_ajax.replace(elements[elements_size - 1], proposalid);
       }
 
       //console.log(table);
+      */
 
       dialog.dialog('destroy');
-      loadTable(new_ajax, true, table);
+      //loadTable(new_ajax, true, table);
+      loadTable(response['reload_path'], true, table);
     });
 }
 

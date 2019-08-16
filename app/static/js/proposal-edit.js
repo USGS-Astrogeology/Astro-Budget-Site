@@ -427,6 +427,26 @@ function loadConferenceRate() {
     .always(function(data)
     {
       console.log(data);
+
+      elements = data.replace('[', '');
+      elements = elements.replace(']', '');
+      elements_array = elements.split(',');
+      console.log(elements_array);
+
+      console.log(elements_array[0]);
+      //console.log(data.city);
+
+      $("#perdiem").val(elements_array[0]);
+      $("#lodging").val(elements_array[1]);
+      $("#registration").val(elements_array[2]);
+      $("#groundtransport").val(elements_array[3]);
+      $("#airfare").val(elements_array[4]);
+      $("#city").val(elements_array[5]);
+      $("#state").val(elements_array[6]);
+      $("#country").val(elements_array[7]);
+
+
+      /*
       $("#perdiem").val(data.data[0][1]);
       $("#lodging").val(data.data[0][2]);
       $("#registration").val(data.data[0][3]);
@@ -435,6 +455,7 @@ function loadConferenceRate() {
       $("#city").val(data.data[0][6]);
       $("#state").val(data.data[0][7]);
       $("#country").val(data.data[0][8]);
+      */
     });
     //console.log(data);
   //});

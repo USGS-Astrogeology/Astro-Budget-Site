@@ -149,11 +149,10 @@ def save_conference(conferenceid):
 
 # CONFERENCE ATTENDEES
 
-@app.route('/conferenceattendees/ajax/delete/<int:conferenceattendeeid>&<proposalid>')
+@app.route('/conferenceattendees/ajax/delete/<int:conferenceattendeeid>')
 @login_required
 def delete_conferenceattendee(conferenceattendeeid, proposalid):
-	conferenceattendee = ConferenceAttendee.get_one(filters = [ConferenceAttendee.conferenceattendeeid == conferenceattendeeid,
-																ConferenceAttendee.proposalid == proposalid])
+	conferenceattendee = ConferenceAttendee.get_one(filters = [ConferenceAttendee.conferenceattendeeid == conferenceattendeeid])
 	response = {'status': 'Error', 'description': 'Conference Attendee', 'action': 'found', 'reload_path': ''}
 
 	if not conferenceattendee:
@@ -264,13 +263,16 @@ def edit_conferencerate(conferencerateid):
 @app.route('/conferencerates/ajax/get/<int:conferenceid>')
 @login_required
 def get_conferencerate_list(conferenceid):
-	conferencerates = ConferenceRates.get_many(filters = [ConferenceRates.conferenceid == conferenceid])
+	conferencerates = ConferenceRates.get_many(filters = [ConferenceRates.conferenceid == conferenceid],
+											   orders = [ConferenceRates.effectivedate.asc()])
 	most_recent = geteffective(conferencerates)
-	result_tuple = [most_recent.perdiem, most_recent.lodging, most_recent.registration,
+	result_list = [most_recent.perdiem, most_recent.lodging, most_recent.registration,
 	most_recent.groundtransport, most_recent.airfare, most_recent.city, most_recent.state,
 	most_recent.country]
+	#info = serialize(conferencerates)
 	#return str(most_recent)
-	return str(result_tuple)
+	return str(result_list)
+	#return info
 
 @app.route('/conferencerates/ajax/list/<int:conferenceid>')
 @login_required
@@ -318,11 +320,10 @@ def save_conferencerate(conferencerateid):
 
 # EXPENSES
 
-@app.route('/expenses/ajax/delete/<int:expenseid>&<int:proposalid>')
+@app.route('/expenses/ajax/delete/<int:expenseid>')
 @login_required
-def delete_expense(expenseid, proposalid):
-	expense = Expenses.get_one(filters = [Expenses.expenseid == expenseid,
-										  Expenses.proposalid == proposalid])
+def delete_expense(expenseid):
+	expense = Expenses.get_one(filters = [Expenses.expenseid == expenseid])
 	response = {'status': 'Error', 'description': 'Expense', 'action': 'found', 'reload_path': ''}
 
 	if not expense:
@@ -501,8 +502,8 @@ def delete_funding(fundingid):
 		db.session.rollback()
 		return jsonify(response)
 
-	response['status']: 'Success'
-	return fsonify(response)
+	response['status'] = 'Success'
+	return jsonify(response)
 
 @app.route('/funding/ajax/edit/<int:fundingid>')
 @login_required
@@ -544,6 +545,7 @@ def save_funding(fundingid):
 		return jsonify(response)
 
 	response['status'] = 'Success'
+	#response['reload_path'] = "/funding/ajax/list/" + str(criteria['proposalid'])
 	return jsonify(response)
 
 
@@ -718,9 +720,9 @@ def save_program(programid):
 def proposals():
 	return render_template('proposals.html')
 
-@app.route('/proposals/ajax/delete/<int:proposalid>&<int:secondproposalid>')
+@app.route('/proposals/ajax/delete/<int:proposalid>')
 @login_required
-def delete_proposal(proposalid, secondproposalid):
+def delete_proposal(proposalid):
 	funding = Funding.get_many(filters = [Funding.proposalid == proposalid])
 	fbms = FBMSAccounts.get_many(filters = [FBMSAccounts.proposalid == proposalid])
 	overhead = OverheadRates.get_many(filters = [OverheadRates.proposalid == proposalid])
