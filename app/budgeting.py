@@ -109,13 +109,35 @@ def home():
 def conferences():
 	return render_template('conferences.html')
 
+@app.route('/conferences/ajax/delete/<int:conferenceid>', methods = ['POST'])
+@login_required
+def delete_conference(conferenceid):
+	conference = Conferences.get_one([Conferences.conferenceid == conferenceid])
+	response = {'status': 'Success', 'description': 'Conference', 'action': 'found'}
+	
+	if not conference:
+		return jsonify(response)
+	try:
+		response['action'] = 'deleted'
+		db.session.delete(conference)
+		db.session.commit()
+	except:
+		db.session.rollback()
+		response['status'] = 'Error'
+
+	return jsonify(response)
+
 @app.route('/conferences/ajax/edit/<int:conferenceid>')
+@app.route('/conferences/ajax/new/<int:conferenceid>')
 @login_required
 def edit_conference(conferenceid):
 	conference = Conferences.get_one([Conferences.conferenceid == conferenceid])
-	return render_template('conference-edit.html', conference = conference,
-												   dd_fiscalyears = fiscal_years(),
-												   dd_startdates = start_dates())
+	params = {'conference': conference, 'dd_fiscalyears': fiscal_years(), 'dd_startdates': start_dates()}
+
+	if 'edit' in request.url_rule.rule:
+		return render_template('conference-edit.html', **params)
+	else:
+		return render_template('conference-new.html', **params)
 
 @app.route('/conferences/ajax/list')
 @login_required
@@ -127,24 +149,18 @@ def load_conferences():
 @login_required
 def save_conference(conferenceid):
 	conference = Conferences.get_one([Conferences.conferenceid == conferenceid])
-	response = {'status': 'Error', 'description': 'Conference', 'action': 'read', 'reload_path': ''}
+	response = {'status': 'Success', 'description': 'Conference', 'action': 'read'}
 
+	if not conference:		
+		return save_conferencerate(0)
 	try:
-		meeting = request.form['meeting']
-
-		if not conference:
-			conference = Conferences(meeting = meeting)
-			db.session.add(conference)
-			response['action'] = 'created'
-		else :
-			conference.meeting = meeting
-			response['action'] = 'updated'
+		response['action'] = 'updated'
+		conference.meeting = request.form['meeting']
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return jsonify(response)
+		response['status'] = 'Error'
 
-	response['status'] = 'Success'
 	return jsonify(response)
 
 # CONFERENCE ATTENDEES
@@ -252,6 +268,24 @@ def save_conferenceattendee(conferenceattendeeid):
 
 # CONFERENCE RATES
 
+@app.route('/conferencerates/ajax/delete/<int:conferencerateid>', methods = ['POST'])
+@login_required
+def delete_conferencerate(conferencerateid):
+	conferencerate = ConferenceRates.get_one(filters = [ConferenceRates.conferencerateid == conferencerateid])
+	response = {'status': 'Success', 'description': 'Conference Rate', 'action': 'found'}
+
+	if not conferencerate:
+		return jsonify(response)
+	try:
+		response['action'] = 'deleted'
+		db.session.delete(conferencerate)
+		db.session.commit()
+	except:
+		db.session.rollback()
+		response['status'] = 'Error'
+
+	return jsonify(response)
+
 @app.route('/conferencerates/ajax/edit/<int:conferencerateid>')
 @login_required
 def edit_conferencerate(conferencerateid):
@@ -287,34 +321,47 @@ def load_conferencerates(conferenceid):
 def save_conferencerate(conferencerateid):
 	conferencerate = ConferenceRates.get_one(filters = [ConferenceRates.conferencerateid == conferencerateid])
 	conference = Conferences.get_one(filters = [Conferences.conferenceid == request.form['conferenceid']])
-	response = {'status': 'Error', 'description': 'Conference Rate', 'action': 'read', 'reload_path': ''}
+	response = {'status': 'Error', 'description': 'Conference Rate', 'action': 'read'}
 
 	try:
-		if not conference:
-			conference = Conferences(meeting = request.form['meeting'])
-			db.session.add(conference)
-			db.session.commit()
-
-		criteria = {'conferenceid': conference.conferenceid, 'perdiem': currency_strstrp(request.form['perdiem']),
+		criteria = {'conferenceid': int(request.form['conferenceid']), 'perdiem': currency_strstrp(request.form['perdiem']),
 					'registration': currency_strstrp(request.form['registration']), 'lodging': currency_strstrp(request.form['lodging']),
 					'groundtransport': currency_strstrp(request.form['groundtransport']), 'airfare': currency_strstrp(request.form['airfare']),
 					'city': request.form['city'], 'state': request.form['state'], 'country': request.form['country'],
-					'effectivedate': datetime.strptime(request.form['effectivedate'], '%m/%d/%Y')}
+					'effectivedate': datetime.strptime(request.form['effectivedate'], '%m/%d/%Y')}	
+		response['description'] = 'Conference'
+	except:
+		return jsonify(response) # we could not read the inputs
 
-		if not conferencerate:
+	if not conferencerate:
+		if not conference:
+			try: 
+				conference = Conferences(meeting = request.form['meeting'])
+				db.session.add(conference)
+				db.session.commit()
+			except:
+				db.session.rollback()
+				return jsonify(response) # there was not a conference and we could not create one
+		try:
+			response.update({'description': 'Conference Rate', 'action': 'created'})
+			criteria['conferenceid'] = conference.conferenceid
 			conferencerate = ConferenceRates(**criteria)
 			db.session.add(conferencerate)
-			response['action'] = 'created'
-		else:
+			db.session.commit()
+		except:
+			db.session.rollback()
+			db.session.delete(conference)
+			return jsonify(response) # we could not make a conferencerate	
+	else:
+		response.update({'description': 'Conference Rate', 'action': 'updated'})
+		try:
 			for key,value in criteria.items():
 				setattr(conferencerate, key, value)
-			response['action'] = 'updated'
-		db.session.commit()
-	except:
-		db.session.rollback()
-		return jsonify(response)
+			db.session.commit()
+		except:
+			db.session.rollback() # we could not update an existing conferencerate
 
-	response.update({'status': 'Success', 'reload_path': '/conferencerates/ajax/list/' + str(conferencerate.conferenceid)})
+	response['status'] = 'Success'
 	return jsonify(response)
 
 

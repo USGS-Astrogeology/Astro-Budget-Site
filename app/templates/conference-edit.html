@@ -4,14 +4,14 @@
   <table>
     <tr><th align="left">Conference/Meeting/Travel</th></tr>
     <tr><td><input type="text" name="meeting" id="meeting" value="{{ conference.meeting }}" size="40" required/></td></tr>
-    <tr><td><a href='javascript:void(0)' onClick="editDialog('/conferencerates/ajax/edit/0', null, $('#rateTable'))" id='newRateButton'>New Rate</a></td><td></td></tr>
+    <tr><td><a href='javascript:void(0)' onClick="editDialog('/conferencerates/ajax/edit/0', $('#rateTable'))" id='newRateButton'>New Rate</a></td><td></td></tr>
   </table>
 </form>
 <div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
 <div id="rateTableDiv">
   <table id="rateTable" class="display" cellspacing="0" width="100%">
-    <thead><tr><th>Action</th><th>Per Diem</th><th>Lodging</th><th>Registration</th><th>Ground<br/>Transport</th>
-              <th>Airfare</th><th>City</th><th>State</th><th>Country</th><th>Effective<br/>Date</tr></thead>
+    <thead><tr><th>Action</th><th>Per Diem</th><th>Lodging</th><th>Registration</th><th>Ground Transport</th>
+              <th>Airfare</th><th>City</th><th>State</th><th>Country</th><th>Effective Date</th><th>&nbsp;</th></tr></thead>
   </table>
 </div>
 

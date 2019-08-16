@@ -1,6 +1,6 @@
 {"draw":0,"recordsTotal":{{ conferencerates|length }},"recordsFiltered":{{ conferencerates|length }},"data":[
     {% for rate in conferencerates %}
-    ["<a href='javascript:void(0)' onclick='editDialog(\"/conferencerates/ajax/edit/{{ rate.conferencerateid }}\", null, $(\"#rateTable\"))'>Edit</a>", 
+    ["<a href='javascript:void(0)' onclick='editDialog(\"/conferencerates/ajax/edit/{{ rate.conferencerateid }}\", $(\"#rateTable\"))'>Edit</a>", 
         "{{ rate.perdiem|currencyformat }}", 
         "{{ rate.lodging|currencyformat }}", 
         "{{ rate.registration|currencyformat }}", 
@@ -9,7 +9,8 @@
         "{{ rate.city }}", 
         "{{ rate.state }}", 
         "{{ rate.country }}", 
-        "{{ rate.effectivedate|dateformat }}"]
+        "{{ rate.effectivedate|dateformat }}",
+        "<a href='javascript:void(0)' onclick='deleteDialog(\"/conferencerates/ajax/delete/{{ rate.conferencerateid }}\", $(\"#rateTable\"), \"this conference rate\" )'><img src='{{ url_for("static", filename="images/trash-2-16.png") }}'></a>"]
         {% if loop.last != true %},{% endif %}
     {% endfor %}
 ]}

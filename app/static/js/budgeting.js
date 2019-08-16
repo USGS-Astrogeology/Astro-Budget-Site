@@ -26,13 +26,8 @@ function check_row_preference(table) {
 }
 
 function loadTable(ajax, reload, table) {
-    console.log(table)
     if (reload) {
-      if (ajax === '') {
-        $(table).DataTable().ajax.reload()          // if ajax argument empty, reload from instantiation path
-      } else {
-        $(table).DataTable().ajax.url(ajax).load(); // otherwise, load from the ajax argument
-      }
+        $(table).DataTable().ajax.reload()
     } else {
       // creates the table if it doesn't already exist
       $(table).DataTable( {
@@ -40,41 +35,18 @@ function loadTable(ajax, reload, table) {
           'serverSide': false,
           'autoWidth': false,
           'ajax': ajax,
-          //'dom': 'Hl<"save-rows ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">frtipF',
-          //'dom': 'Hl<button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($(table).DataTable())">Save Row Preference</button>>frtipF',
-          'buttons': [
-            {
-              text: 'save row preference',
-              action: function(e, dt, node, config){
-                save_row_preference();
-              }
-            }],
           'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
         });
-        /*
-        $(table).DataTable({
-          'buttons': {
-            buttons: [
-            {
-              text: 'save row preference',
-              action: function(e, dt, node, config){
-                save_row_preference();
-              }
-            }]
-        }
-      });
-      */
     }
-
-  //  $('.save-rows').setattr('onClick', 'save_row_preference($(table).DataTable())').html('Save Row Preference');
 
     check_row_preference($(table).DataTable());
 }
 
-function editDialog(ajax, proposalid, table) {
-  var save_ajax = ajax.replace('edit', 'save');
+function editDialog(ajax, table) {
+  let save_ajax = ajax.replace('edit', 'save').replace('new', 'save');
+  let div = $(`<div></div>`);
 
-  $('<div></div>').load(ajax, function(data) {
+  $(div).load(ajax, function(data) {
     $(this).dialog({
       width: 'auto',
       modal: true,
@@ -82,17 +54,15 @@ function editDialog(ajax, proposalid, table) {
       title: $(data).find('#title').val(),
       close: function() { $(this).dialog("destroy") },
       buttons: {
-        "Save": function () {
-          dialog = $(this);
-          callSave(save_ajax, table, dialog) },
-        Cancel: function () { $(this).dialog("destroy"); }
+        "Save":   function () { submitAction(save_ajax, table, $(this)) },
+        "Cancel": function () { $(this).dialog("destroy"); }
       }
     });
   });
 }
 
 
-function deleteDialog(ajax, proposalid, table, description) {
+function deleteDialog(ajax, table, description) {
   let div = $('<div><h2>Are you sure you want to delete ' + description + '?</h2></body></html></div>');
 
   $(div).dialog({
@@ -101,10 +71,8 @@ function deleteDialog(ajax, proposalid, table, description) {
     draggable: false,
     close: function() { $(this).dialog("destroy") },
     buttons: {
-      "Delete": function () {
-        dialog = $(this);
-        callDelete(ajax, proposalid, table, dialog) },
-      Cancel: function () { $(this).dialog("destroy") }
+      "Delete": function () { submitAction(ajax, table, $(this)) },
+      "Cancel": function () { $(this).dialog("destroy") }
     }
   });
   //console.log(ajax);
@@ -122,59 +90,17 @@ function displayAlert(data) {
   });
 }
 
-function callSave(ajax, table, dialog) {
+function submitAction(ajax, table, dialog) {
   $.post(ajax, $('form').serialize())
     .always(function(response){
 
       if (response['status'] === 'Success') {
         dialog.dialog('destroy');
-        loadTable(response['reload_path'], true, table);
-      }
+        loadTable(ajax, true, table);
+      }    
 
       displayAlert(response);
   });
-}
-
-function callDelete(ajax, proposalid, table, dialog) {
-  //$.get(ajax + '&' + proposalid)
-    $.get(ajax)
-    .always (function(response) {
-      //dialog.dialog("close");
-      //$("#warningDiv").html("<p>Successfully Deleted</p>");
-      //$("#warningDiv").html(data);
-      //$("#warningDiv").show();
-      //console.log(ajax);
-      displayAlert(response);
-
-      /*
-      var load_ajax = ajax.replace('delete', 'list');
-
-      var elements = load_ajax.split('/');
-      var elements_size = elements.length;
-      //console.log(elements);
-      if (elements[1] === "conferenceattendees")
-      {
-        //console.log(true);
-        var new_ajax = load_ajax.replace(elements[elements_size - 1],
-          ("byproposal/" + proposalid));
-        //console.log(new_ajax);
-      }
-      else if (elements[1] === "proposals")
-      {
-        var new_ajax = load_ajax.replace("/" + elements[elements_size -1], "");
-      }
-      else
-      {
-        var new_ajax = load_ajax.replace(elements[elements_size - 1], proposalid);
-      }
-
-      //console.log(table);
-      */
-
-      dialog.dialog('destroy');
-      //loadTable(new_ajax, true, table);
-      loadTable(response['reload_path'], true, table);
-    });
 }
 
 function updateDropdown (id) {

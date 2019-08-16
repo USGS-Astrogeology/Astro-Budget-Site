@@ -8,7 +8,7 @@
       <div>
         <h1>List of Conferences/Meetings/Travel</h1>
         {% if g.user.admin %}
-          <a href='javascript:void(0)' onClick="editDialog('/conferences/ajax/edit/0', null, $('#conferencesTable'))" id='newButton'>New</a>
+          <a href='javascript:void(0)' onClick="editDialog('/conferences/ajax/new/0', $('#conferencesTable'))" id='newButton'>New</a>
         {% endif %}
       </div>
       <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#conferencesTable').DataTable())">Save Row Preference</button>
@@ -16,8 +16,8 @@
     <div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
     <div id="conferencesTableDiv">
       <table id="conferencesTable" class="display" cellspacing="0" width="100%">
-        <thead><tr><th>Meeting</th><th>Location</th><th>Per<br/>Diem</th><th>Lodging</th><th>Registration</th>
-                    <th>Ground<br/>Transport</th><th>Airfare</th></tr></thead>
+        <thead><tr><th>Meeting</th><th>Location</th><th>Per Diem</th><th>Lodging</th><th>Registration</th>
+                    <th>Ground Transport</th><th>Airfare</th><th>&nbsp;</th></tr></thead>
       </table>
     </div>
 {% endblock %}
@@ -29,19 +29,6 @@
       $("#newButton").button();
       loadTable('/conferences/ajax/list', false, $('#conferencesTable'));
     });
-
-    /*
-    function saveConference() {
-      $.post("index.php", $("#conferenceForm").serialize())
-        .always( function() {
-
-          loadConferencesTable(true);
-
-          dialog.dialog("close");
-          $("#warningDiv").html("<p>Updated [" + $("#conferenceid").val() + "] " + $("#meeting").val() + "</p>");
-          $("#warningDiv").show();
-        });
-    }*/
   </script>
 {% endblock %}
 
