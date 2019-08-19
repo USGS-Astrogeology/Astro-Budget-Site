@@ -8,7 +8,7 @@
       <div>
         <h1>List of Funding Programs</h1>
         {% if g.user.admin %}
-          <a href='javascript:void(0)' onClick="editDialog('/programs/ajax/edit/0', null, $('#programsTable'))" id='newButton'>New</a>
+          <a href='javascript:void(0)' onClick="editDialog('/programs/ajax/edit/0', $('#programsTable'))" id='newButton'>New</a>
         {% endif %}
       </div>
       <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#programsTable').DataTable())">Save Row Preference</button>
@@ -16,7 +16,7 @@
     <div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
     <div id="programsTableDiv">
     <table id="programsTable" class="display" cellspacing="0" width="100%">
-      <thead><tr><th>Name</th><th>Agency</th><th>POC</th><th>POC E-Mail</th><th>Start</th><th>End</th></tr></thead>
+      <thead><tr><th>Name</th><th>Agency</th><th>POC</th><th>POC E-Mail</th><th>Start</th><th>End</th><th>&nbsp;</th></tr></thead>
     </table>
     </div>
 {% endblock %}

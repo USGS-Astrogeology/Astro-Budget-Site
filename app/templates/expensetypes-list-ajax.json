@@ -1,10 +1,15 @@
 {"draw":0,"recordsTotal":{{ expensetypes|length }},"recordsFiltered":{{ expensetypes|length }},"data":[
   {% for expensetype in expensetypes %}
     {% if g.user.admin %}
-      ["<a href='javascript:void(0)' onclick='editDialog(\"/expensetypes/ajax/edit/{{ expensetype.expensetypeid }}\", null, $(\"#expensetypesTable\"))'>{{ expensetype.description }}</a>"]
+      ["<a href='javascript:void(0)' onclick='editDialog(\"/expensetypes/ajax/edit/{{ expensetype.expensetypeid }}\", $(\"#expensetypesTable\"))'>{{ expensetype.description }}</a>",
     {% else %}
-      ["{{ expensetype.description }}"]
+      ["{{ expensetype.description }}",
     {% endif %}
-  {% if loop.last != true %},{% endif %}
+    {% if g.user.admin %}
+      "<a href='javascript:void(0)' onclick='deleteDialog(\"/expensetypes/ajax/delete/{{ expensetype.expensetypeid }}\", $(\"#expensetypesTable\"), \"{{ expensetype.description }}\" )'><img src='{{ url_for("static", filename="images/trash-2-16.png") }}'></a>"]
+    {% else %}
+      ""]
+    {% endif %}
+    {% if loop.last != true %},{% endif %}
   {% endfor %}
 ]}

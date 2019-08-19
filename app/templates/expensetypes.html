@@ -8,7 +8,7 @@
     <div>
       <h1>List of Expense Categories</h1>
       {% if g.user.admin %}
-        <a href='javascript:void(0)' onClick="editDialog('/expensetypes/ajax/edit/0', null, $('#expensetypesTable'))" id='newButton'>New</a>
+        <a href='javascript:void(0)' onClick="editDialog('/expensetypes/ajax/edit/0', $('#expensetypesTable'))" id='newButton'>New</a>
       {% endif %}
     </div>
     <button id="save_button" type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#expensetypesTable').DataTable())">Save Row Preference</button>
@@ -16,7 +16,7 @@
   <div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
   <div id="expensetypesTableDiv">
     <table id="expensetypesTable" class="display" cellspacing="0" width="100%">
-      <thead><tr><th>Description</th></tr></thead>
+      <thead><tr><th>Description</th><th>&nbsp;</tr></thead>
     </table>
   </div>
 {% endblock %}

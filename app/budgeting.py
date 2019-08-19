@@ -67,6 +67,15 @@ def geteffective(list = [], cutoff_date = date.today()):
 		if item.effectivedate.date() <= cutoff_date:
 			effective_item = item
 	return effective_item
+
+def currency_strstrp(string):
+	banned_chars = ['$', ',']
+	new_string = string
+	for char in banned_chars:
+		new_string = new_string.replace(char, '')
+	if not new_string:
+		new_string = '0'
+	return float(new_string)
 # ------------------------------
 
 def fiscal_years():
@@ -113,19 +122,8 @@ def conferences():
 @login_required
 def delete_conference(conferenceid):
 	conference = Conferences.get_one([Conferences.conferenceid == conferenceid])
-	response = {'status': 'Success', 'description': 'Conference', 'action': 'found'}
-	
-	if not conference:
-		return jsonify(response)
-	try:
-		response['action'] = 'deleted'
-		db.session.delete(conference)
-		db.session.commit()
-	except:
-		db.session.rollback()
-		response['status'] = 'Error'
-
-	return jsonify(response)
+	response = {'status': 'Error', 'description': 'Conference', 'action': 'found'}	
+	return jsonify(delete_dbobject(conference, response))
 
 @app.route('/conferences/ajax/edit/<int:conferenceid>')
 @app.route('/conferences/ajax/new/<int:conferenceid>')
@@ -149,7 +147,7 @@ def load_conferences():
 @login_required
 def save_conference(conferenceid):
 	conference = Conferences.get_one([Conferences.conferenceid == conferenceid])
-	response = {'status': 'Success', 'description': 'Conference', 'action': 'read'}
+	response = {'status': 'Error', 'description': 'Conference', 'action': 'read'}
 
 	if not conference:		
 		return save_conferencerate(0)
@@ -159,9 +157,10 @@ def save_conference(conferenceid):
 		db.session.commit()
 	except:
 		db.session.rollback()
-		response['status'] = 'Error'
 
+	response['status'] = 'Success'
 	return jsonify(response)
+
 
 # CONFERENCE ATTENDEES
 
@@ -169,20 +168,8 @@ def save_conference(conferenceid):
 @login_required
 def delete_conferenceattendee(conferenceattendeeid, proposalid):
 	conferenceattendee = ConferenceAttendee.get_one(filters = [ConferenceAttendee.conferenceattendeeid == conferenceattendeeid])
-	response = {'status': 'Error', 'description': 'Conference Attendee', 'action': 'found', 'reload_path': ''}
-
-	if not conferenceattendee:
-		return jsonify(response)
-	try:
-		db.session.delete(conference_attendee)
-		db.session.commit()
-		response['action'] = 'deleted'
-	except:
-		db.session.rollback()
-		return jsonify(response)
-
-	response['status'] = 'Success'
-	return jsonify(response)
+	response = {'status': 'Error', 'description': 'Conference Attendee', 'action': 'found'}
+	return jsonify(delete_dbobject(conferenceattendee, response))
 
 @app.route('/conferenceattendees/ajax/edit/<int:conferenceattendeeid>')
 @login_required
@@ -273,18 +260,7 @@ def save_conferenceattendee(conferenceattendeeid):
 def delete_conferencerate(conferencerateid):
 	conferencerate = ConferenceRates.get_one(filters = [ConferenceRates.conferencerateid == conferencerateid])
 	response = {'status': 'Success', 'description': 'Conference Rate', 'action': 'found'}
-
-	if not conferencerate:
-		return jsonify(response)
-	try:
-		response['action'] = 'deleted'
-		db.session.delete(conferencerate)
-		db.session.commit()
-	except:
-		db.session.rollback()
-		response['status'] = 'Error'
-
-	return jsonify(response)
+	return jsonify(delete_dbobject(conferencerate, response))
 
 @app.route('/conferencerates/ajax/edit/<int:conferencerateid>')
 @login_required
@@ -371,20 +347,8 @@ def save_conferencerate(conferencerateid):
 @login_required
 def delete_expense(expenseid):
 	expense = Expenses.get_one(filters = [Expenses.expenseid == expenseid])
-	response = {'status': 'Error', 'description': 'Expense', 'action': 'found', 'reload_path': ''}
-
-	if not expense:
-		return jsonify(response)
-	try:
-		db.session.delete(expense)
-		db.session.commit()
-		response['action'] = 'deleted'
-	except:
-		db.session.rollback()
-		return jsonify(response)
-
-	response['status'] = 'Success'
-	return jsonify(response)
+	response = {'status': 'Error', 'description': 'Expense', 'action': 'found'}
+	return jsonify(delete_dbobject(expense, response))
 
 @app.route('/expenses/ajax/edit/<int:expenseid>')
 @login_required
@@ -406,27 +370,16 @@ def load_expenses(proposalid):
 @login_required
 def save_expense(expenseid):
 	expense = Expenses.get_one(filters = [Expenses.expenseid == expenseid])
-	response = {'status': 'Error', 'description': 'Expense', 'action': 'read', 'reload_path': ''}
+	response = {'status': 'Error', 'description': 'Expense', 'action': 'read'}
 
 	try:
 		criteria = {'proposalid': int(request.form['proposalid']), 'expensetypeid': int(request.form['expensetypeid']),
 					'description': request.form['description'], 'amount': currency_strstrp(request.form['amount']),
 					'fiscalyear': datetime.strptime(request.form['fiscalyear'], '%m/%d/%Y')}
-		if not expense:
-			expense = Expenses(**criteria)
-			db.session.add(expense)
-			response['action'] = 'created'
-		else:
-			for key,value in criteria.items():
-				setattr(expense, key, value)
-			response['action'] = 'updated'
-		db.session.commit()
 	except:
-		db.session.rollback()
 		return jsonify(response)
 
-	response.update({'status': 'Success', 'description': expense.description})
-	return jsonify(response)
+	return jsonify(save_dbobject(expense, Expenses, criteria, response))
 
 
 # EXPENSE TYPES
@@ -435,6 +388,13 @@ def save_expense(expenseid):
 @login_required
 def expensetypes():
 	return render_template('expensetypes.html')
+
+@app.route('/expensetypes/ajax/delete/<int:expensetypeid>', methods = ['POST'])	
+@login_required	
+def delete_expensetype(expensetypeid):	
+	expensetype = ExpenseTypes.get_one(filters = [ExpenseTypes.expensetypeid == expensetypeid])	
+	response = {'status': 'Error', 'description': 'Expense Category', 'action': 'found'}
+	return jsonify(delete_dbobject(expensetype, response))
 
 @app.route('/expensetypes/ajax/edit/<int:expensetypeid>')
 @login_required
@@ -452,24 +412,15 @@ def load_expensetypes():
 @login_required
 def save_expensetype(expensetypeid):
 	expensetype = ExpenseTypes.get_one(filters = [ExpenseTypes.expensetypeid == expensetypeid])
-	response = {'status': 'Error', 'description': 'Expense Category', 'action': 'read', 'reload_path': ''}
+	response = {'status': 'Error', 'description': 'Expense Category', 'action': 'read'}
 
 	try:
-		description = request.form['description']
-		if not expensetype:
-			expensetype = ExpenseTypes(description = description)
-			db.session.add(expensetype)
-			response['action'] = 'created'
-		else:
-			expensetype.description = description
-			response['action'] = 'updated'
-		db.session.commit()
+		criteria = {'description': request.form['description']}
 	except:
-		db.session.rollback()
 		return jsonify(response)
 
-	response.update({'status': 'Success', 'description': expensetype.description})
-	return jsonify(response)
+	return jsonify(save_dbobject(expensetype, ExpenseTypes, criteria, response))
+
 
 # FBMSACCOUNTS
 
@@ -477,21 +428,8 @@ def save_expensetype(expensetypeid):
 @login_required
 def delete_fbmsaccount(fbmsid):
 	account = FBMSAccounts.get_one(filters = [FBMSAccounts.fbmsid == fbmsid])
-	response = {'status': 'Error', 'description': 'FBMS Account', 'action': 'found', 'reload_path': ''}
-
-	if not account:
-		return jsonify(response)
-	try:
-		db.session.delete(account)
-		db.session.commit()
-		response['action'] = 'deleted'
-	except:
-		db.session.rollback()
-		return jsonify(response)
-
-	response['status'] = 'Success'
-	return jsonify(response)
-
+	response = {'status': 'Error', 'description': 'FBMS Account', 'action': 'found'}
+	return jsonify(delete_dbobject(account, response))
 
 @app.route('/fbmsaccounts/ajax/edit/<int:fbmsid>')
 @login_required
@@ -509,26 +447,14 @@ def load_fbmsaccounts(proposalid):
 @login_required
 def save_fbmsaccounts(fbmsid):
 	account = FBMSAccounts.get_one(filters = [FBMSAccounts.fbmsid == fbmsid])
-	response = {'status': 'Error', 'description': 'FBMS Account', 'action': 'read', 'reload_path': ''}
+	response = {'status': 'Error', 'description': 'FBMS Account', 'action': 'read'}
 
 	try:
-		proposalid = int(request.form['proposalid'])
-		accountno = request.form['accountno']
-
-		if not account:
-			account = FBMSAccounts(proposalid = proposalid, accountno = accountno)
-			db.session.add(account)
-			response['action'] = 'created'
-		else:
-			account.accountno = accountno
-			response['updated']
-		db.session.commit()
+		criteria = {'proposalid': int(request.form['proposalid']), 'acccountno': request.form['accountno']}
 	except:
-		db.session.rollback()
 		return jsonify(response)
 
-	response.update({'status': 'Success', 'description': account.accountno})
-	return jsonify(response)
+	return jsonify(save_dbobject(account, FBMSAccounts, criteria, response))
 
 
 # FUNDING
@@ -537,20 +463,8 @@ def save_fbmsaccounts(fbmsid):
 @login_required
 def delete_funding(fundingid):
 	funding = Funding.get_one(filters = [Funding.fundingid == fundingid])
-	response = {'status': 'Error', 'description': 'Funding', 'action': 'found', 'reload_path': ''}
-
-	if not funding:
-		return jsonify(response)
-	try:
-		db.session.delete(funding)
-		db.session.commit()
-		response['action'] = 'deleted'
-	except:
-		db.session.rollback()
-		return jsonify(response)
-
-	response['status'] = 'Success'
-	return jsonify(response)
+	response = {'status': 'Error', 'description': 'Funding', 'action': 'found'}
+	return jsonify(delete_dbobject(funding, response))
 
 @app.route('/funding/ajax/edit/<int:fundingid>')
 @login_required
@@ -572,28 +486,15 @@ def load_funding(proposalid):
 @login_required
 def save_funding(fundingid):
 	funding = Funding.get_one(filters = [Funding.fundingid == fundingid])
-	response = {'status': 'Error', 'description': 'Funding', 'action': 'read', 'reload_path': ''}
+	response = {'status': 'Error', 'description': 'Funding', 'action': 'read'}
 
 	try:
 		criteria = {'proposalid': int(request.form['proposalid']), 'fiscalyear': datetime.strptime(request.form['fiscalyear'], '%m/%d/%Y'),
 					'newfunding': currency_strstrp(request.form['newfunding']), 'carryover': currency_strstrp(request.form['carryover'])}
-
-		if not funding:
-			response['action'] = 'created'
-			funding = Funding(**criteria)
-			db.session.add(funding)
-		else:
-			response['action'] = 'updated'
-			for key,value in criteria.items():
-				setattr(funding, key, value)
-		db.session.commit()
 	except:
-		db.session.rollback()
 		return jsonify(response)
 
-	response['status'] = 'Success'
-	#response['reload_path'] = "/funding/ajax/list/" + str(criteria['proposalid'])
-	return jsonify(response)
+	return jsonify(save_dbobject(funding, Funding, criteria, response))
 
 
 # OVERHEAD
@@ -607,21 +508,8 @@ def overhead():
 @login_required
 def delete_overhead(overheadid):
 	overhead = OverheadRates.get_one(filters = [OverheadRates.overheadid == overheadid])
-	response = {'status': 'Error', 'description': 'Overhead Rate', 'action': 'found', 'reload_path': ''}
-
-	if not overhead:
-		return jsonify(response)
-	try:
-		db.session.delete(overhead)
-		db.session.commit()
-		response['action'] = 'deleted'
-	except:
-		db.session.rollback()
-		return jsonify(response)
-
-	response['status'] = 'Success'
-	return jsonify(response)
-
+	response = {'status': 'Error', 'description': 'Overhead Rate', 'action': 'found'}
+	return jsonify(delete_dbobject(overhead, response))
 
 @app.route('/overhead/ajax/edit/<int:overheadid>')
 @login_required
@@ -649,27 +537,15 @@ def load_overhead(proposalid):
 @login_required
 def save_overhead(overheadid):
 	overhead = OverheadRates.get_one(filters = [OverheadRates.overheadid == overheadid])
-	response = {'status': 'Error', 'description': 'Overhead Rate', 'action': 'read', 'reload_path': ''}
+	response = {'status': 'Error', 'description': 'Overhead Rate', 'action': 'read'}
 
 	try:
 		criteria = {'proposalid': int(request.form['proposalid']), 'rate': currency_strstrp(request.form['rate']),
 					'description': request.form['description'], 'effectivedate': datetime.strptime(request.form['effectivedate'], '%m/%d/%Y')}
-
-		if not overhead:
-			overhead = OverheadRates(**criteria)
-			db.session.add(overhead)
-			response['action'] = 'created'
-		else:
-			for key,value in criteria.items():
-				setattr(overhead, key, value)
-			response['action'] = 'updated'
-		db.session.commit()
 	except:
-		db.session.rollback()
 		return jsonify(response)
 
-	response.update({'status': 'Success', 'description': overhead.description})
-	return jsonify(response)
+	return jsonify(save_dbobject(overhead, OverheadRates, criteria, response))
 
 # PEOPLE
 
@@ -687,20 +563,38 @@ def people_dropdown():
 	people = People.get_many(joins = [Salaries], filters = filters, orders = [])
 	return render_template('people-dropdown-list-ajax.json', people = people)
 
-
 @app.route('/people/ajax/edit/<int:peopleid>')
+@app.route('/people/ajax/new/<int:peopleid>')
 @login_required
 def edit_person(peopleid):
 	person = People.get_one(filters = [People.peopleid == peopleid])
-	return render_template('people-edit.html', person = person,
-											   dd_fiscalyears = fiscal_years(),
-											   dd_startdates = start_dates())
+
+	if 'edit' in request.url_rule.rule:
+		return render_template('people-edit.html', person = person,
+											   	   dd_fiscalyears = fiscal_years(),
+												   dd_startdates = start_dates())
+	else:
+		return render_template('people-new.html')
 
 @app.route('/people/ajax/list')
 @login_required
 def load_people():
 	people = People.get_many(joins = [Salaries], filters = [], orders = [])
 	return render_template('people-list-ajax.json', people = people)
+
+@app.route('/people/ajax/save/<int:peopleid>', methods=['POST'])
+@login_required
+def save_person(peopleid):
+	person = People.get_one(filters = [People.peopleid == peopleid])
+	response = {'status': 'Error', 'description': 'Person', 'action': 'read'}
+
+	try:
+		criteria = {'name': request.form['name'], 'username': request.form['username'],
+					'admin': True if request.form['admin'] == 'true' else False}
+	except:
+		return jsonify(response)
+
+	return jsonify(save_dbobject(person, People, criteria, response))
 
 @app.route('/people/ajax/task/<int:peopleid>')
 @login_required
@@ -717,6 +611,13 @@ def load_staffing(peopleid):
 @login_required
 def programs():
 	return render_template('programs.html')
+
+@app.route('/programs/ajax/delete/<int:programid>', methods = ['POST'])	
+@login_required	
+def delete_program(programid):	
+	program = FundingPrograms.get_one(filters = [FundingPrograms.programid == programid])	
+	response = {'status': 'Success', 'description': 'funding program', 'action': 'found'}
+	return jsonify(delete_dbobject(program, response))
 
 @app.route('/programs/ajax/edit/<int:programid>')
 @login_required
@@ -736,28 +637,18 @@ def load_programs():
 @login_required
 def save_program(programid):
 	program = FundingPrograms.get_one(filters = [FundingPrograms.programid == programid])
-	response = {'status': 'Error', 'description': 'Funding Program', 'action': 'read', 'reload_path': ''}
+	response = {'status': 'Error', 'description': 'Funding Program', 'action': 'read'}
 
 	try:
 		criteria = {'programname': request.form['programname'], 'agency': request.form['agency'],
 					'pocname': request.form['pocname'], 'pocemail': request.form['pocemail'],
 					'startdate': datetime.strptime(request.form['startdate'], '%m/%d/%Y'),
-					'enddate': datetime.strptime(request.form['enddate'], '%m/%d/%Y')}
-		if not program:
-			program = FundingPrograms(**criteria)
-			db.session.add(program)
-			response['action'] = 'created'
-		else:
-			for key,value in criteria.items():
-				setattr(program, key, value)
-			response['action'] = 'updated'
-		db.session.commit()
+					'enddate': datetime.strptime(request.form['enddate'], '%m/%d/%Y')}	
 	except:
-		db.session.rollback()
 		return jsonify(response)
 
-	response.update({'status': 'Success', 'description': program.programname})
-	return jsonify(response)
+	return jsonify(save_dbobject(program, FundingPrograms, criteria, response))
+
 
 
 # PROPOSALS
@@ -770,63 +661,9 @@ def proposals():
 @app.route('/proposals/ajax/delete/<int:proposalid>')
 @login_required
 def delete_proposal(proposalid):
-	funding = Funding.get_many(filters = [Funding.proposalid == proposalid])
-	fbms = FBMSAccounts.get_many(filters = [FBMSAccounts.proposalid == proposalid])
-	overhead = OverheadRates.get_many(filters = [OverheadRates.proposalid == proposalid])
-	conferences = ConferenceAttendee.get_many(filters = [ConferenceAttendee.proposalid == proposalid])
-	expenses = Expenses.get_many(filters = [Expenses.proposalid == proposalid])
-
-	'''
-	#fund_name = []
-	delete_returns = []
-	for fund in funding:
-		delete_returns.append(delete_funding(fund.fundingid, proposalid))
-		#fund_name.append(fyformat(fund.fiscalyear))
-	return str(delete_returns)
-	'''
-	'''
-	#account = []
-	account_delete = []
-	for fbmsaccount in fbms:
-		account_delete.append(delete_fbmsaccount(fbmsaccount.fbmsid, proposalid))
-		#account.append(fbmsaccount.accountno)
-	return str(account_delete)
-	'''
-	'''
-	#overheads = []
-	overhead_delete = []
-	for account in overhead:
-		overhead_delete.append(delete_overhead(account.overheadid, proposalid))
-		#overheads.append(account.rate)
-	return str(overhead_delete)
-	'''
-	'''
-	expense_list = []
-	for expense in expenses:
-		expense_list.append(delete_expense(expense.expenseid, proposalid))
-		#expense_list.append(expense.description)
-	return str(expense_list)
-	'''
-
 	proposal = Proposals.get_one(filters = [Proposals.proposalid == proposalid])
-
-	response = {'status': 'Error', 'description': 'Proposal', 'action': 'found', 'reload_path': ''}
-
-	if not proposal:
-		return jsonify(response)
-	try:
-		db.session.delete(proposal)
-		db.session.commit()
-		response['action'] = 'deleted'
-	except:
-		db.session.rollback()
-		return jsonify(response)
-
-	response['status'] = 'Success'
-	return jsonify(response)
-
-	# still need to do conference attendee
-
+	response = {'status': 'Error', 'description': 'Proposal', 'action': 'found'}
+	return jsonify(delete_dbobject(proposal, response))
 
 @app.route('/proposals/ajax/edit/<int:proposalid>')
 @app.route('/proposals/view/<int:proposalid>')
@@ -855,45 +692,16 @@ def save_proposal(proposalid):
 	proposal = Proposals.get_one(filters = [Proposals.proposalid == proposalid])
 	response = {'status': 'Error', 'description': 'Proposal', 'action': 'found', 'reload_path': ''}
 
-	name = request.form.get("projectname")
-	principal_investigator = request.form.get("peopleid")
-	program_id = request.form.get("programid")
-	status = request.form.get("status")
-	proposal_number = request.form.get("proposalnumber")
-	award_number = request.form.get("award_number")
-	starting = request.form.get("perfperiodstart")
-	ending = request.form.get("perfperiodend")
-
 	try:
-		if not proposal:
-			print("new proposal")
-			proposal = Proposals(projectname = name, peopleid = principal_investigator,
-								 proposalnumber = proposal_number, awardnumber = award_number,
-								 programid = program_id, perfperiodstart = starting,
-								 perfperiodend = ending, status = status)
-			db.session.add(proposal)
-			response['action'] = 'created'
-		else:
-			proposal.projectname = name
-			proposal.peopleid = principal_investigator
-			proposal.proposalnumber = proposal_number
-			proposal.awardnumber = award_number
-			proposal.programid = program_id
-			proposal.perfperiodstart = starting
-			proposal.perfperiodend = ending
-			proposal.status = status
-			response['action'] = 'updated'
-
-		db.session.commit()
+		criteria = {'projectname': request.form['projectname'], 'peopleid': request.form['peopleid'],
+					'programid': request.form['programid'], 'status': request.form['status'],
+					'proposalnumber': request.form['proposalnumber'], 'awardnumber': request.form['awardnumber'],
+					'perfperiodstart': datetime.strptime(request.form['perfperiodstart'], '%m/%d/%Y'),
+					'perfperiodend': datetime.strptime(request.form['perfperiodend', '%m/%d/%Y'])}
 	except:
-		#return "Error: could not add/edit proposal"
-		db.session.rollback()
 		return jsonify(response)
 
-	response.update({'status': 'Success', 'description': proposal.projectname})
-	#return "Success: proposal added/edited"
-	return jsonify(response)
-
+	return jsonify(save_dbobject(proposal, Proposals, criteria, response))
 
 @app.route('/proposal-basis/<int:proposalid>')
 @login_required
@@ -972,6 +780,7 @@ def load_salaries(peopleid):
 	salaries = Salaries.get_many(filters = [Salaries.peopleid == peopleid])
 	return render_template('salary-list-ajax.json', salaries = salaries)
 
+	
 # TASKS
 
 @app.route('/tasks/ajax/dropdown')
@@ -997,17 +806,40 @@ def load_tasks(proposalid):
 
 
 # Helpers ------------------>
-def currency_strstrp(string):
-	banned_chars = ['$', ',']
-	new_string = string
-	for char in banned_chars:
-		new_string = new_string.replace(char, '')
-	if not new_string:
-		new_string = '0'
-	return float(new_string)
 
 def serialize(self):
 	return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+def save_dbobject(obj, dbclass, attributes, response):
+	try:
+		if not obj:
+			response['action'] = 'created'
+			obj = dbclass(**attributes)
+			db.session.add(obj)
+		else:
+			response['action'] = 'updated'
+			for key,value in attributes.items():
+				setattr(obj, key, value)
+		db.session.commit()
+	except:
+		db.session.rollback()
+	
+	response['status'] = 'Success'
+	return response
+
+def delete_dbobject(obj, response):
+	if not obj:
+		return response
+	try:
+		response['action'] = 'deleted'
+		db.session.delete(obj)
+		db.session.commit()
+	except:
+		db.session.rollback()
+		
+	response['status'] = 'Success'
+	return response
+	
 # -------------------------->
 
 

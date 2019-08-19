@@ -25,11 +25,6 @@ class Base(db.Model):
   def get_all(cls, orders=[]):
       return cls.query.order_by(*orders).all()
 
-  @classmethod
-  def serialize(cls, self):
-      return {c.name: getattr(self, c.name) for c in self.__table__.columns}
-
-
 class People(Base):
   __tablename__ = 'people'
 
@@ -150,7 +145,6 @@ class ConferenceRates(Base):
 
   def __repr__(self):
     return "<ConferenceRates(perdiem='%d', registration='%s')>" % (self.perdiem, self.registration)
-
 
 class ConferenceAttendee(Base):
   __tablename__ = 'conferenceattendee'
