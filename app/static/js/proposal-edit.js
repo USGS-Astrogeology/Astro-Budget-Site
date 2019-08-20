@@ -441,10 +441,9 @@ function loadConferenceRate() {
       $("#registration").val(elements_array[2]);
       $("#groundtransport").val(elements_array[3]);
       $("#airfare").val(elements_array[4]);
-      $("#city").val(elements_array[5]);
-      $("#state").val(elements_array[6]);
-      $("#country").val(elements_array[7]);
-
+      $("#city").val(elements_array[5].replace(/'/g, ""));
+      $("#state").val(elements_array[6].replace(/'/g, ""));
+      $("#country").val(elements_array[7].replace(/'/g, ""));
 
       /*
       $("#perdiem").val(data.data[0][1]);

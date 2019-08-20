@@ -1,7 +1,7 @@
 {"draw":0,"recordsTotal":{{ salaries|length }},"recordsFiltered":{{ salaries|length }},"data":[
 {% for salary in salaries %}
   {% if g.user.admin %}
-["<a href='javascript:void(0)' onclick='editDialog(\"/salaries/ajax/edit{{ salary.salaryid }}\", null, $(\"#salaryTable\"))'>Edit</a>",
+["<a href='javascript:void(0)' onclick='editDialog(\"/salaries/ajax/edit{{ salary.salaryid }}\", $(\"#salaryTable\"))'>Edit</a>",
   {% else %}
 ["",
   {% endif %}

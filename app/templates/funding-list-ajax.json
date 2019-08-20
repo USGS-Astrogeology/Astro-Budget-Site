@@ -1,13 +1,13 @@
 {"draw":0,"recordsTotal":{{ funding|length }},"recordsFiltered":{{ funding|length }},"data":[
 {% for fund in funding %}
   {% if g.user.admin %}
-    ["<a href='javascript:void(0)' onclick='editDialog(\"/funding/ajax/edit/{{ fund.fundingid }}\", {{ fund.proposalid }}, $(\"#fundingTable\"))'>{{ fund.fiscalyear|fyformat }}</a>",
+    ["<a href='javascript:void(0)' onclick='editDialog(\"/funding/ajax/edit/{{ fund.fundingid }}\", $(\"#fundingTable\"))'>{{ fund.fiscalyear|fyformat }}</a>",
   {% else %}
     ["{{ fund.fiscalyear|fyformat }}",
   {% endif %}
   "{{ fund.newfunding|currencyformat }}",
   "{{ fund.carryover|currencyformat }}",
-  "<a href='javascript:void(0)' onclick='deleteDialog(\"/funding/ajax/delete/{{ fund.fundingid }}\", {{ fund.proposalid }}, $(\"#fundingTable\"), \"{{ fund.fiscalyear|fyformat}}\" )'><img src='{{ url_for("static", filename="images/trash-2-32.png") }}' title='Delete funding'></a>"]
+  "<a href='javascript:void(0)' onclick='deleteDialog(\"/funding/ajax/delete/{{ fund.fundingid }}\", $(\"#fundingTable\"), \"{{ fund.fiscalyear|fyformat}}\" )'><img src='{{ url_for("static", filename="images/trash-2-32.png") }}' title='Delete funding'></a>"]
   {% if loop.last !=true %},{% endif %}
 {% endfor %}
 ]}

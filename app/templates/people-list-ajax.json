@@ -1,6 +1,6 @@
 {"draw":0,"recordsTotal":{{ people|length }},"recordsFiltered":{{ people|length }},"data":[
 {% for person in people %}
-["<a href='javascript:void(0)' onclick='editDialog(\"/people/ajax/edit/{{ person.peopleid }}\", null, $(\"#peopleTable\"))'>{{ person.name }}</a>",
+["<a href='javascript:void(0)' onclick='editDialog(\"/people/ajax/edit/{{ person.peopleid }}\", $(\"#peopleTable\"))'>{{ person.name }}</a>",
   {% if person.salaries %}
     {% set salary = person.salaries|geteffective %}
     "{{ salary.title }}", "{{ salary.payplan }}",

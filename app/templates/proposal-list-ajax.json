@@ -7,7 +7,7 @@
          "{{ proposal.proposalstatus.statusname }}",
          "{{ proposal.perfperiodstart|dateformat }}",
          "{{ proposal.perfperiodend|dateformat }}",
-         "<a href='/proposals-copy/ajax/save?proposalid={{ proposal.proposalid }}' id='copyButton'><img src='{{ url_for("static", filename="images/copy-32.png") }}' title='Copy'></a><a href='javascript:void(0)' onclick='deleteDialog(\"/proposals/ajax/delete/{{ proposal.proposalid }}\", {{ proposal.proposalid }}, $(\"#proposalsTable\"), \"{{ proposal.projectname|jsonformat }}\")'><img src='{{ url_for("static", filename="images/trash-2-32.png") }}' title='Delete'></a>{% if g.user.admin %}{% endif %}"]
+         "<a href='proposals/ajax/copy/{{ proposal.proposalid }}' id='copyButton'><img src='{{ url_for("static", filename="images/copy-32.png") }}' title='Copy'></a><a href='javascript:void(0)' onclick='submitAction(\"/proposals/ajax/delete/{{ proposal.proposalid }}\", $(\"#proposalsTable\"), \"{{ proposal.projectname|jsonformat }}\")'><img src='{{ url_for("static", filename="images/trash-2-32.png") }}' title='Delete'></a>{% if g.user.admin %}{% endif %}"]
         {% if loop.last != true %},{% endif %}
     {% endfor %}
 ]}

@@ -46,6 +46,8 @@ function editDialog(ajax, table) {
   let save_ajax = ajax.replace('edit', 'save').replace('new', 'save');
   let div = $(`<div></div>`);
 
+  console.log(ajax);
+
   $(div).load(ajax, function(data) {
     $(this).dialog({
       width: 'auto',
@@ -97,7 +99,7 @@ function submitAction(ajax, table, dialog) {
       if (response['status'] === 'Success') {
         dialog.dialog('destroy');
         loadTable(ajax, true, table);
-      }    
+      }
 
       displayAlert(response);
   });

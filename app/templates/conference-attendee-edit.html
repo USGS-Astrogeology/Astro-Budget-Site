@@ -41,7 +41,7 @@
             </td></tr>
             <tr><th>Meeting</th><td colspan="3">
             <input type="text" name="meeting" id="meeting" size=48
-            {% if conference == true %} value="{{ conferenceattendee.conference.meeting }}"
+            {% if conferenceattendee %} value="{{ conferenceattendee.conference.meeting }}"
             {% else %} value="" {% endif %}/></td></tr>
             <tr><th>Meeting Days</th>
             <td><input type="text" name="meetingdays" id="meetingdays" size="4" value="{{ conferenceattendee.meetingdays}}"/></td>
@@ -50,14 +50,14 @@
             <tr><th>Travelers</th>
             <td><input type="text" name="travelers" id="travelers" size="4" value="{{ conferenceattendee.travelers}}"/></td>
             <th>Trip Date</th>
-            <td><input type="text" name="startdate" id="tripstartdate" size="12" value="{{ conferenceattendee.startdate|dateformat }}"
+            <td><input type="text" name="startdate" id="tripstartdate" size="12" value="{{ conferenceattendee.startdate }}"
                         onchange="updateDropdown('startdate')"/>
               {% with dropdown_name = 'startdate', dropdown_id = 'tripstartdate', selected_fy = conferenceattendee.startdate %}
                 {% include 'fiscalyear-dropdown.html' %}
               {% endwith %}
             </td></tr>
             <tr><th>How Many Rental Cars</th>
-            {% if conference == true %}
+            {% if conferenceattendee %}
             {% set conferencerate = conferenceattendee.conference.conferencerates|geteffective %}
             <td><input type="text" name="rentalcars" id="rentalcars" size="12" value="{{ conferenceattendee.rentalcars }}"/></td>
             <th>Ground Transport</th><td><input type="text" name="groundtransport" id="groundtransport" size="9" value="{{ conferencerate.groundtransport|floatformat }}"/></td></tr>

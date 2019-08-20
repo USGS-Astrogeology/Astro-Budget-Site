@@ -122,7 +122,7 @@ def conferences():
 @login_required
 def delete_conference(conferenceid):
 	conference = Conferences.get_one([Conferences.conferenceid == conferenceid])
-	response = {'status': 'Error', 'description': 'Conference', 'action': 'found'}	
+	response = {'status': 'Error', 'description': 'Conference', 'action': 'found'}
 	return jsonify(delete_dbobject(conference, response))
 
 @app.route('/conferences/ajax/edit/<int:conferenceid>')
@@ -149,7 +149,7 @@ def save_conference(conferenceid):
 	conference = Conferences.get_one([Conferences.conferenceid == conferenceid])
 	response = {'status': 'Error', 'description': 'Conference', 'action': 'read'}
 
-	if not conference:		
+	if not conference:
 		return save_conferencerate(0)
 	try:
 		response['action'] = 'updated'
@@ -164,9 +164,9 @@ def save_conference(conferenceid):
 
 # CONFERENCE ATTENDEES
 
-@app.route('/conferenceattendees/ajax/delete/<int:conferenceattendeeid>')
+@app.route('/conferenceattendees/ajax/delete/<int:conferenceattendeeid>', methods = ['POST'])
 @login_required
-def delete_conferenceattendee(conferenceattendeeid, proposalid):
+def delete_conferenceattendee(conferenceattendeeid):
 	conferenceattendee = ConferenceAttendee.get_one(filters = [ConferenceAttendee.conferenceattendeeid == conferenceattendeeid])
 	response = {'status': 'Error', 'description': 'Conference Attendee', 'action': 'found'}
 	return jsonify(delete_dbobject(conferenceattendee, response))
@@ -198,7 +198,7 @@ def load_conferenceattendees(id):
 @login_required
 def save_conferenceattendee(conferenceattendeeid):
 	conferenceattendee = ConferenceAttendee.get_one(filters = [ConferenceAttendee.conferenceattendeeid == conferenceattendeeid])
-	response = {'status': 'Error', 'description': 'Conference Attendee', 'action': 'read', 'reload_path': ''}
+	response = {'status': 'Error', 'description': 'Conference Attendee', 'action': 'read'}
 
 	# Conference attributes
 	meeting = request.form['meeting']
@@ -206,51 +206,31 @@ def save_conferenceattendee(conferenceattendeeid):
 	conference = Conferences.get_one(filters = [Conferences.conferenceid == int(request.form['conferenceid'])])
 
 	# ConferenceRate attributes
-
-	proposal = request.form.get("proposalid")
-	conferenceid = request.form.get("conferenceid")
-
-	#meeting = request.form.get("meeting")
-	meeting_days = request.form.get("meetingdays")
-	travel_days = request.form.get("traveldays")
-	travelers = request.form.get("travelers")
-	start_date = request.form.get("tripstartdate")
-	rental_cars = request.form.get("rentalcars")
-	ground_transport = request.form.get("groundtransport")
-	airfare = request.form.get("airfare")
-	lodging = request.form.get("lodging")
-	other = request.form.get("other")
 	per_diem = request.form.get("perdiem")
 	registration = request.form.get("registration")
+	ground_transport = request.form.get("groundtransport")
+	airfare = request.form.get("airfare")
 	city = request.args.get("city")
 	state = request.args.get("state")
 	country = request.args.get("country")
+	lodging = request.form.get("lodging")
 
-	try:
-		if not conference:
-			print("new conference")
-			conferenceattendee = ConferenceAttendee(proposalid = proposal,
-											conferenceid = conferenceid,
-											meetingdays = meeting_days,
-											traveldays = travel_days,
-											startdate = start_date,
-											travelers = travelers,
-											rentalcars = rental_cars)
-			db.session.add(conference)
-		else:
-			print("existing conference")
-			conference.meetingdays = meeting_days
-			conference.traveldays = travel_days
-			conference.startdate = start_date
-			conference.travelers = travelers
-			conference.rentalcars = rental_cars
+	# ConferenceAttendee attributes
+	conferenceid = request.form.get("conferenceid")
+	proposal = request.form.get("proposalid")
+	meeting_days = request.form.get("meetingdays")
+	travel_days = request.form.get("traveldays")
+	travelers = request.form.get("travelers")
+	start_date =  datetime.strptime(request.form.get("startdate"), '%m/%d/%Y')
+	rental_cars = request.form.get("rentalcars")
 
-		db.session.commit()
-	except:
-		db.session.rollback()
-		return "Error: Conference Attendee not saved"
 
-	return "Success: Conference Attendee saved"
+	other = request.form.get("other")
+
+	#return str(start_date)
+
+	criteria = {'conferenceid': conferenceid, 'proposalid': proposal, 'meetingdays': meeting_days, 'traveldays': travel_days, 'startdate': start_date, 'travelers': travelers, 'rentalcars': rental_cars}
+	return jsonify(save_dbobject(conferenceattendee, ConferenceAttendee, criteria, response))
 
 
 # CONFERENCE RATES
@@ -277,8 +257,8 @@ def get_conferencerate_list(conferenceid):
 											   orders = [ConferenceRates.effectivedate.asc()])
 	most_recent = geteffective(conferencerates)
 	result_list = [most_recent.perdiem, most_recent.lodging, most_recent.registration,
-	most_recent.groundtransport, most_recent.airfare, most_recent.city, most_recent.state,
-	most_recent.country]
+	most_recent.groundtransport, most_recent.airfare, most_recent.city.strip(), most_recent.state.strip(),
+	most_recent.country.strip()]
 	#info = serialize(conferencerates)
 	#return str(most_recent)
 	return str(result_list)
@@ -304,14 +284,14 @@ def save_conferencerate(conferencerateid):
 					'registration': currency_strstrp(request.form['registration']), 'lodging': currency_strstrp(request.form['lodging']),
 					'groundtransport': currency_strstrp(request.form['groundtransport']), 'airfare': currency_strstrp(request.form['airfare']),
 					'city': request.form['city'], 'state': request.form['state'], 'country': request.form['country'],
-					'effectivedate': datetime.strptime(request.form['effectivedate'], '%m/%d/%Y')}	
+					'effectivedate': datetime.strptime(request.form['effectivedate'], '%m/%d/%Y')}
 		response['description'] = 'Conference'
 	except:
 		return jsonify(response) # we could not read the inputs
 
 	if not conferencerate:
 		if not conference:
-			try: 
+			try:
 				conference = Conferences(meeting = request.form['meeting'])
 				db.session.add(conference)
 				db.session.commit()
@@ -327,7 +307,7 @@ def save_conferencerate(conferencerateid):
 		except:
 			db.session.rollback()
 			db.session.delete(conference)
-			return jsonify(response) # we could not make a conferencerate	
+			return jsonify(response) # we could not make a conferencerate
 	else:
 		response.update({'description': 'Conference Rate', 'action': 'updated'})
 		try:
@@ -343,7 +323,7 @@ def save_conferencerate(conferencerateid):
 
 # EXPENSES
 
-@app.route('/expenses/ajax/delete/<int:expenseid>')
+@app.route('/expenses/ajax/delete/<int:expenseid>', methods = ['POST'])
 @login_required
 def delete_expense(expenseid):
 	expense = Expenses.get_one(filters = [Expenses.expenseid == expenseid])
@@ -389,10 +369,10 @@ def save_expense(expenseid):
 def expensetypes():
 	return render_template('expensetypes.html')
 
-@app.route('/expensetypes/ajax/delete/<int:expensetypeid>', methods = ['POST'])	
-@login_required	
-def delete_expensetype(expensetypeid):	
-	expensetype = ExpenseTypes.get_one(filters = [ExpenseTypes.expensetypeid == expensetypeid])	
+@app.route('/expensetypes/ajax/delete/<int:expensetypeid>', methods = ['POST'])
+@login_required
+def delete_expensetype(expensetypeid):
+	expensetype = ExpenseTypes.get_one(filters = [ExpenseTypes.expensetypeid == expensetypeid])
 	response = {'status': 'Error', 'description': 'Expense Category', 'action': 'found'}
 	return jsonify(delete_dbobject(expensetype, response))
 
@@ -424,7 +404,7 @@ def save_expensetype(expensetypeid):
 
 # FBMSACCOUNTS
 
-@app.route('/fbmsaccounts/ajax/delete/<int:fbmsid>')
+@app.route('/fbmsaccounts/ajax/delete/<int:fbmsid>', methods = ['POST'])
 @login_required
 def delete_fbmsaccount(fbmsid):
 	account = FBMSAccounts.get_one(filters = [FBMSAccounts.fbmsid == fbmsid])
@@ -450,7 +430,7 @@ def save_fbmsaccounts(fbmsid):
 	response = {'status': 'Error', 'description': 'FBMS Account', 'action': 'read'}
 
 	try:
-		criteria = {'proposalid': int(request.form['proposalid']), 'acccountno': request.form['accountno']}
+		criteria = {'proposalid': int(request.form['proposalid']), 'accountno': request.form['accountno']}
 	except:
 		return jsonify(response)
 
@@ -459,7 +439,7 @@ def save_fbmsaccounts(fbmsid):
 
 # FUNDING
 
-@app.route('/funding/ajax/delete/<int:fundingid>')
+@app.route('/funding/ajax/delete/<int:fundingid>', methods = ['POST'])
 @login_required
 def delete_funding(fundingid):
 	funding = Funding.get_one(filters = [Funding.fundingid == fundingid])
@@ -504,7 +484,7 @@ def save_funding(fundingid):
 def overhead():
 	return render_template('overheads.html')
 
-@app.route('/overhead/ajax/delete/<int:overheadid>')
+@app.route('/overhead/ajax/delete/<int:overheadid>', methods = ['POST'])
 @login_required
 def delete_overhead(overheadid):
 	overhead = OverheadRates.get_one(filters = [OverheadRates.overheadid == overheadid])
@@ -612,10 +592,10 @@ def load_staffing(peopleid):
 def programs():
 	return render_template('programs.html')
 
-@app.route('/programs/ajax/delete/<int:programid>', methods = ['POST'])	
-@login_required	
-def delete_program(programid):	
-	program = FundingPrograms.get_one(filters = [FundingPrograms.programid == programid])	
+@app.route('/programs/ajax/delete/<int:programid>', methods = ['POST'])
+@login_required
+def delete_program(programid):
+	program = FundingPrograms.get_one(filters = [FundingPrograms.programid == programid])
 	response = {'status': 'Success', 'description': 'funding program', 'action': 'found'}
 	return jsonify(delete_dbobject(program, response))
 
@@ -643,7 +623,7 @@ def save_program(programid):
 		criteria = {'programname': request.form['programname'], 'agency': request.form['agency'],
 					'pocname': request.form['pocname'], 'pocemail': request.form['pocemail'],
 					'startdate': datetime.strptime(request.form['startdate'], '%m/%d/%Y'),
-					'enddate': datetime.strptime(request.form['enddate'], '%m/%d/%Y')}	
+					'enddate': datetime.strptime(request.form['enddate'], '%m/%d/%Y')}
 	except:
 		return jsonify(response)
 
@@ -658,7 +638,34 @@ def save_program(programid):
 def proposals():
 	return render_template('proposals.html')
 
-@app.route('/proposals/ajax/delete/<int:proposalid>')
+@app.route('/proposals/ajax/copy/<int:proposalid>')
+@login_required
+def copy_proposal(proposalid):
+	proposal = Proposals.get_one(filters = [Proposals.proposalid == proposalid])
+	projectname = "Copy of " + proposal.projectname
+	peopleid = proposal.peopleid
+	programid = proposal.programid
+	perfperiodstart = proposal.perfperiodstart
+	perfperiodend = proposal.perfperiodend
+	status = proposal.status
+	proposalnumber = proposal.proposalnumber
+	awardnumber = proposal.awardnumber
+
+	#save_dbobject()
+	# loop through each element and call the save one to make each element,
+	# make sure to change the proposal id on everything though, and that element's id
+
+	# need to load the proposal page when it is made
+
+	# create the proposal and then the elements (need a way to get the new proposal id)
+	# make sure to add - copy or something to the name unless opening the edit window
+	# they did copy of and then the name
+
+	# get everything saved and then render the template with the elements
+
+	return "copy"
+
+@app.route('/proposals/ajax/delete/<int:proposalid>', methods = ['POST'])
 @login_required
 def delete_proposal(proposalid):
 	proposal = Proposals.get_one(filters = [Proposals.proposalid == proposalid])
@@ -690,14 +697,14 @@ def load_proposals():
 @login_required
 def save_proposal(proposalid):
 	proposal = Proposals.get_one(filters = [Proposals.proposalid == proposalid])
-	response = {'status': 'Error', 'description': 'Proposal', 'action': 'found', 'reload_path': ''}
+	response = {'status': 'Error', 'description': 'Proposal', 'action': 'found'}
 
 	try:
 		criteria = {'projectname': request.form['projectname'], 'peopleid': request.form['peopleid'],
 					'programid': request.form['programid'], 'status': request.form['status'],
 					'proposalnumber': request.form['proposalnumber'], 'awardnumber': request.form['awardnumber'],
 					'perfperiodstart': datetime.strptime(request.form['perfperiodstart'], '%m/%d/%Y'),
-					'perfperiodend': datetime.strptime(request.form['perfperiodend', '%m/%d/%Y'])}
+					'perfperiodend': datetime.strptime(request.form['perfperiodend'], '%m/%d/%Y')}
 	except:
 		return jsonify(response)
 
@@ -780,7 +787,7 @@ def load_salaries(peopleid):
 	salaries = Salaries.get_many(filters = [Salaries.peopleid == peopleid])
 	return render_template('salary-list-ajax.json', salaries = salaries)
 
-	
+
 # TASKS
 
 @app.route('/tasks/ajax/dropdown')
@@ -811,11 +818,13 @@ def serialize(self):
 	return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 def save_dbobject(obj, dbclass, attributes, response):
+	#return str(dbclass)
+
 	try:
 		if not obj:
 			response['action'] = 'created'
-			obj = dbclass(**attributes)
-			db.session.add(obj)
+			new_obj = dbclass(**attributes)
+			db.session.add(new_obj)
 		else:
 			response['action'] = 'updated'
 			for key,value in attributes.items():
@@ -823,7 +832,8 @@ def save_dbobject(obj, dbclass, attributes, response):
 		db.session.commit()
 	except:
 		db.session.rollback()
-	
+		return response
+
 	response['status'] = 'Success'
 	return response
 
@@ -836,10 +846,11 @@ def delete_dbobject(obj, response):
 		db.session.commit()
 	except:
 		db.session.rollback()
-		
+		return response
+
 	response['status'] = 'Success'
 	return response
-	
+
 # -------------------------->
 
 

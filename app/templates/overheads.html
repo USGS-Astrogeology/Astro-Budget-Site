@@ -8,7 +8,7 @@
     <div>
       <h1>List of Overhead Rates</h1>
       {% if g.user.admin %}
-        <a href='javascript:void(0)' onClick="editDialog('/overhead/ajax/edit/0', null, $('#overheadTable'))" id='newButton'>New</a><p/>
+        <a href='javascript:void(0)' onClick="editDialog('/overhead/ajax/edit/0', $('#overheadTable'))" id='newButton'>New</a><p/>
       {% endif %}
     </div>
     <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#overheadTable').DataTable())">Save Row Preference</button>
