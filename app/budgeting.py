@@ -651,17 +651,85 @@ def copy_proposal(proposalid):
 	proposalnumber = proposal.proposalnumber
 	awardnumber = proposal.awardnumber
 
-	#save_dbobject()
-	# loop through each element and call the save one to make each element,
-	# make sure to change the proposal id on everything though, and that element's id
+	fbmsaccounts = proposal.fbmsaccounts
+	conferenceattendees = proposal.conferenceattendees
+	tasks = proposal.tasks
+	expenses = proposal.expenses
+	funding = proposal.funding
+	overhead = proposal.overheadrates
+
+	response = {'status': 'Error', 'description': 'Proposal', 'action': 'found'}
+
+	proposal_attributes = {'projectname': "Copy of " + proposal.projectname, 'peopleid': proposal.peopleid,
+				'programid': proposal.programid, 'status': proposal.status,
+				'proposalnumber': proposal.proposalnumber, 'awardnumber': proposal.awardnumber,
+				'perfperiodstart': proposal.perfperiodstart,
+				'perfperiodend': proposal.perfperiodend}
+
+	save_dbobject(None, Proposals, proposal_attributes, response)
+	# need a way to get the proposal id back from this before anything else can be done
+	# could I pass another parameter to the function that returns the object id? is it possible
+	# for it to even get the object id if has been passed to the database?
+	# use sqlalchemy to get the new id
+	# what if there's more than one copy?
+	# is there a way to sort by date created?/date modified?
+		# if so, then need to have the time clock too, not just the date
+	# could we look at which one has the higher id? it seems to increment every time something is added?
+
+	new_proposal = Proposals.get_many(filters = [Proposals.projectname == "Copy of " + proposal.projectname])
+	objects_found = len(new_proposal)
+	if objects_found == 1:
+		new_proposal_id = new_proposal[0].proposalid
+	else:
+		return "more than one copy"
+
+	fbms_response = {'status': 'Error', 'description': 'FBMS', 'action': 'copy'}
+	for fbms in fbmsaccounts:
+		fbms_attributes = {'proposalid': new_proposal[0].proposalid, 'accountno': fbms.accountno}
+		#return str(fbms_attributes)
+		save_dbobject(None, FBMSAccounts, fbms_attributes, fbms_response)
+
+	conference_response = {'status': 'Error', 'description': 'Conference Attendee', 'action': 'copy'}
+	for conference in conferenceattendees:
+		conference_attributes = {'conferenceid': conference.conferenceid, 'proposalid': new_proposal_id,
+		'meetingdays': conference.meetingdays, 'traveldays': conference.traveldays,
+		'startdate': conference.startdate, 'travelers': conference.travelers,
+		'rentalcars': conference.rentalcars}
+
+		save_dbobject(None, ConferenceAttendee, conference_attributes, conference_response)
+
+	#task_response = {'status': 'Error', 'description': 'Tasks', 'action': 'copy'}
+	# need to figure out how to copy the staffing and get the staffing id back for tasks
+	'''
+	for task in tasks:
+		task_attributes = {}
+	'''
+
+	expense_response = {'status': 'Error', 'description': 'Expenses', 'action': 'copy'}
+	for expense in expenses:
+		expense_attributes = {'proposalid': new_proposal_id, 'expensetypeid': expense.expensetypeid,
+		'description': expense.description, 'amount': expense.amount, 'fiscalyear': expense.fiscalyear}
+
+		save_dbobject(None, Expenses, expense_attributes, expense_response)
+
+	funding_response = {'status': 'Error', 'description': 'Funding', 'action': 'copy'}
+	for fund in funding:
+		fund_attributes = {'proposalid': new_proposal_id, 'fiscalyear': fund.fiscalyear,
+		'newfunding': fund.newfunding, 'carryover': fund.carryover}
+
+		save_dbobject(None, Funding, fund_attributes, funding_response)
+
+	overhead_response = {'status': 'Error', 'description': 'Overhead Rates', 'action': 'copy'}
+	for rate in overhead:
+		overhead_attributes = {'proposalid': new_proposal_id, 'rate': rate.rate,
+		'description': rate.description, 'effectivedate': rate.effectivedate}
+
+		save_dbobject(None, OverheadRates, overhead_attributes, overhead_response)
+
+	#save_dbobject(obj, dbclass, attributes, response)
 
 	# need to load the proposal page when it is made
 
-	# create the proposal and then the elements (need a way to get the new proposal id)
-	# make sure to add - copy or something to the name unless opening the edit window
-	# they did copy of and then the name
-
-	# get everything saved and then render the template with the elements
 
 	return "copy"
 

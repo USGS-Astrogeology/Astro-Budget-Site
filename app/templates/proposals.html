@@ -5,6 +5,7 @@
 {% block body %}
   {{ super() }}
     <div class="title">
+      <div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
       <div>
         <h1>List of Projects</h1>
         <a href='javascript:void(0)' onClick="editDialog('/proposals/ajax/edit/0', $('#proposalsTable'))" id='newProjectButton'>New</a>
