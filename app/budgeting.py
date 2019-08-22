@@ -475,6 +475,17 @@ def save_funding(fundingid):
 	except:
 		return jsonify(response)
 
+	# 'proposal.modified': datetime.now()
+
+	proposal = Proposals.get_one(filters = [Proposals.proposalid == int(request.form['proposalid'])])
+	proposal.modified = datetime.now()
+	db.session.commit()
+	'''
+	funding.proposal.modified = datetime.now()
+	db.session.commit()
+	'''
+
+	#return str(criteria)
 	return jsonify(save_dbobject(funding, Funding, criteria, response))
 
 
@@ -593,10 +604,10 @@ def load_staffing(peopleid):
 def programs():
 	return render_template('programs.html')
 
-@app.route('/programs/ajax/delete/<int:programid>', methods = ['POST'])	
-@login_required	
-def delete_program(programid):	
-	program = FundingPrograms.get_one(filters = [FundingPrograms.programid == programid])	
+@app.route('/programs/ajax/delete/<int:programid>', methods = ['POST'])
+@login_required
+def delete_program(programid):
+	program = FundingPrograms.get_one(filters = [FundingPrograms.programid == programid])
 	response = {'status': 'Error', 'description': 'funding program', 'action': 'found'}
 	return jsonify(delete_dbobject(program, response))
 
@@ -773,7 +784,8 @@ def save_proposal(proposalid):
 					'programid': request.form['programid'], 'status': request.form['status'],
 					'proposalnumber': request.form['proposalnumber'], 'awardnumber': request.form['awardnumber'],
 					'perfperiodstart': datetime.strptime(request.form['perfperiodstart'], '%m/%d/%Y'),
-					'perfperiodend': datetime.strptime(request.form['perfperiodend'], '%m/%d/%Y')}
+					'perfperiodend': datetime.strptime(request.form['perfperiodend'], '%m/%d/%Y'),
+					'modified': datetime.now()}
 	except:
 		return jsonify(response)
 
@@ -859,8 +871,8 @@ def delete_salary(salaryid):
 @login_required
 def edit_salary(salaryid):
 	salary = Salaries.get_one(filters = [Salaries.salaryid == salaryid])
-	return render_template('salary-edit.html', salary = salary, 
-											   dd_fiscalyears = fiscal_years(), 
+	return render_template('salary-edit.html', salary = salary,
+											   dd_fiscalyears = fiscal_years(),
 											   dd_startdates = start_dates())
 
 @app.route('/salaries/ajax/list/<int:peopleid>')
@@ -888,7 +900,7 @@ def save_salary(salaryid):
 	return jsonify(save_dbobject(salary, Salaries, criteria, response))
 
 
-	
+
 # TASKS
 
 @app.route('/tasks/ajax/dropdown')

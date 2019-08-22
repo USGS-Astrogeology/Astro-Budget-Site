@@ -103,6 +103,7 @@ class Proposals(Base):
   expenses            = relationship('Expenses', backref='proposal', cascade="all,delete")
   funding             = relationship('Funding', backref='proposal', cascade="all,delete")
   overheadrates       = relationship('OverheadRates', backref='proposal', cascade="all,delete")
+  modified            = Column(DateTime(timezone=False))
 
   def __repr__(self):
     return "<Proposals(project='%s', proposalnumber='%s', awardnumber='%s')>" % (self.projectname, self.proposalnumber, self.awardnumber)
