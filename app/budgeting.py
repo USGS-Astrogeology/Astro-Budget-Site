@@ -27,8 +27,9 @@ def intformat(value):
 		return '0'
 	return "{:,.0f}".format(value)
 
-def jsonformat(string):
-	string = string.replace("'", r"\'")
+def stringformat(string):
+	if not string:
+		return ""
 	string = string.replace('"', r'\"')
 	return string
 
@@ -93,7 +94,7 @@ app.jinja_env.filters['currencyformat'] = currencyformat
 app.jinja_env.filters['dateformat'] = dateformat
 app.jinja_env.filters['floatformat'] = floatformat
 app.jinja_env.filters['intformat'] = intformat
-app.jinja_env.filters['jsonformat'] = jsonformat
+app.jinja_env.filters['stringformat'] = stringformat
 app.jinja_env.filters['fyformat'] = fyformat
 app.jinja_env.filters['fydateformat'] = fydateformat
 app.jinja_env.filters['geteffective'] = geteffective
@@ -819,14 +820,17 @@ def get_saved_preference():
 @login_required
 def save_rows(row_preference):
 	new_setting = row_preference
+	response = {'status': 'Error', 'description': 'row preference', 'action': 'saved'}
 
 	try:
 		g.user.row_preference = row_preference
 		db.session.commit()
-		return ("Success: New row preference saved")
 	except:
 		db.session.rollback()
-		return ("Error: row preference not saved")
+		return jsonify(response)
+
+	response['status'] = 'Success'
+	return jsonify(response)
 
 # this route is just used for testing purposes
 @app.route('/row_setting/ajax/reset')

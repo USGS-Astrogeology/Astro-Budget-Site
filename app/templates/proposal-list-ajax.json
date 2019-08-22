@@ -1,14 +1,14 @@
 {"draw":0,"recordsTotal":{{ proposals|length }},"recordsFiltered":{{ proposals|length }},"data":[
     {% for proposal in proposals %}
-        ["<a href='/proposals/view/{{ proposal.proposalid }}'>{{ proposal.projectname|jsonformat }}</a>",
+        ["<a href='/proposals/view/{{ proposal.proposalid }}'>{{ proposal.projectname|stringformat }}</a>",
          "<a href='/proposals-budget/ajax/get?proposalid={{ proposal.proposalid }}' target='report'>Details</a>&nbsp;<a href='/proposals-nspires/ajax/get?proposalid={{ proposal.proposalid }}' target='report'>NSPIRES</a><br/><a href='/proposals-roses/ajax/get?proposalid={{ proposal.proposalid }}' target='report'>Redacted</a>&nbsp;<a href='/proposals-basis/ajax/get?proposalid={{ proposal.proposalid }}' target='report'>BASIS+</a>",
-         "{{ proposal.person.name }}",
-         "{{ proposal.fundingprogram.programname }}",
-         "{{ proposal.proposalstatus.statusname }}",
+         "{{ proposal.person.name|stringformat }}",
+         "{{ proposal.fundingprogram.programname|stringformat }}",
+         "{{ proposal.proposalstatus.statusname|stringformat }}",
          "{{ proposal.perfperiodstart|dateformat }}",
          "{{ proposal.perfperiodend|dateformat }}",
          {% if g.user.admin %}
-            "<a href='/proposals/ajax/copy/{{ proposal.proposalid }}' id='copyButton'><img src='{{ url_for("static", filename="images/copy-32.png") }}' title='Copy' width='24'></a><a href='javascript:void(0)' onclick='deleteDialog(\"/proposals/ajax/delete/{{ proposal.proposalid }}\", {{ proposal.proposalid }}, $(\"#proposalsTable\"), \"{{ proposal.projectname|jsonformat }}\")'><img src='{{ url_for("static", filename="images/trash-2-32.png") }}' title='Delete' width='24'></a>"]
+            "<a href='/proposals/ajax/copy/{{ proposal.proposalid }}' id='copyButton'><img src='{{ url_for("static", filename="images/copy-32.png") }}' title='Copy' width='24'></a><a href='javascript:void(0)' onclick='deleteDialog(\"/proposals/ajax/delete/{{ proposal.proposalid }}\", {{ proposal.proposalid }}, $(\"#proposalsTable\"), \"{{ proposal.projectname|stringformat }}\")'><img src='{{ url_for("static", filename="images/trash-2-32.png") }}' title='Delete' width='24'></a>"]
          {% else %}
             " "]
          {% endif %}

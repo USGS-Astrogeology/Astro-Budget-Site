@@ -1,13 +1,13 @@
 {"draw":0,"recordsTotal":{{ people|length }},"recordsFiltered":{{ people|length }},"data":[
 {% for person in people %}
-["<a href='javascript:void(0)' onclick='editDialog(\"/people/ajax/edit/{{ person.peopleid }}\", $(\"#peopleTable\"), 1100)'>{{ person.name }}</a>",
+["<a href='javascript:void(0)' onclick='editDialog(\"/people/ajax/edit/{{ person.peopleid }}\", $(\"#peopleTable\"), 1100)'>{{ person.name|stringformat }}</a>",
   {% if person.salaries %}
     {% set salary = person.salaries|geteffective %}
-    "{{ salary.title }}", "{{ salary.payplan }}",
+    "{{ salary.title|stringformat }}", "{{ salary.payplan|stringformat }}",
   {% else %}
     "","",
   {% endif %}
-  "{{ person.username }}"
-  ]{% if loop.last != true %},{% endif %}
+  "{{ person.username|stringformat }}"]
+  {% if loop.last != true %},{% endif %}
 {% endfor %}
 ]}

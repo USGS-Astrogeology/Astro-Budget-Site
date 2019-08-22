@@ -5,7 +5,6 @@
     {% block head %}
     <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui.min.css') }}"/>
-    <!--<link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui.theme.min.css') }}"/>-->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dataTables.jqueryui.css') }}"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/jsgrid-theme.min.css') }}"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/jsgrid.min.css') }}"/>
@@ -36,20 +35,8 @@
         padding: 5px;
       }
 
-      .ui-menu:after {
-        content: ".";
-        display: block;
-        clear: both;
-        visibility: hidden;
-        line-height: 0;
-        height: 0;
-      }
-      .ui-menu .ui-menu-item {
-        display: inline-block;
-        float: left;
-        margin: 0;
-        padding: 5;
-        width: auto;
+      input[type='checkbox'] {
+        width: 20px;
       }
 
       .sub-table {
@@ -64,9 +51,6 @@
 
       .save-rows {
         display: inline;
-      }
-
-      .button {
       }
 
       .button.save {
@@ -92,36 +76,40 @@
         display: none;
       }
 
+      .menu-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: #5E849F;
+        padding: 20px;
+        color: white;
+        margin-top: -10px;
+      }
+
       .menu-title {
         font-size: 2.5rem;
         font-weight: bold;
-        padding: 5px;
+        margin-right: 20px;
         border-top-right-radius: 5px;
         border-bottom-right-radius: 5px;
-      }
-
-      .menu-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background-color: #5E849F;
-        height: 40px;
-        margin: -10px;
-        padding: 20px;
-        color: white;
       }
 
       .menu-button {
         text-decoration: none;
         color: white;
         padding: 10px 20px;
-        margin-right: 10px;
+        margin: 5px 10px 5px 0;
         font-size: 1.1rem;
         background-color: #638fa3;
         border-radius: 2px;
         box-shadow: 0px 3px 5px 0px rgba(70,101,122,1);
         -webkit-box-shadow: 0px 3px 5px 0px rgba(70,101,122,1);
         -moz-box-shadow: 0px 3px 5px 0px rgba(70,101,122,1);
+        display: inline-block;
+      }
+
+      .menu-button:hover {
+        background-color: #456070;
       }
 
       .menu-button.active {
@@ -130,7 +118,6 @@
 
       .menu-user {
         display: flex;
-        align-items: center;
         font-size: 1.25rem;
       }
 
@@ -154,17 +141,19 @@
       {% endif %}
       {% set active_page = active_page|default('') %}
       <div id="menubar" class="menu-bar">
-        <div class="menu-title">Budgeting</div>
-        <div class="menu-items">
-          <a href="/proposals" class="menu-button {% if active_page == 'projects' %} active {% endif %}" id="projects">Projects</a>
-          <a href="/reports" class="menu-button {% if active_page == 'reports' %} active{% endif %}" id="reports">Reports</a>
-          <a href="/people" class="menu-button {% if active_page == 'people' %} active {% endif %}" id="people">People</a>
-          <a href="/conferences" class="menu-button {% if active_page == 'conferences' %} active {% endif %}" id="conferences">Conferences/Travel</a>
-          <a href="/expensetypes" class="menu-button {% if active_page == 'expensetypes' %} active{% endif %}" id="expensetypes">Expense Categories</a>
-          <a href="/overhead" class="menu-button {% if active_page == 'overhead' %} active {% endif %}" id="overhead">Overhead Rates</a>
-          <a href="/programs" class="menu-button {% if active_page == 'programs' %} active {% endif %}" id="programs">Funding Programs</a>
+        <div class="menu-section">
+          <div class="menu-title">Budgeting</div>
+          <div class="menu-user">{{ g.user.name }}</div>
         </div>
-        <div class="menu-user">{{ g.user.name }}</div>
+        <div class="menu-items">
+          <a href="/proposals"    class="menu-button {% if active_page == 'projects' %}     active {% endif %}" id="projects">Projects</a>
+          <a href="/reports"      class="menu-button {% if active_page == 'reports' %}      active {% endif %}" id="reports">Reports</a>
+          <a href="/people"       class="menu-button {% if active_page == 'people' %}       active {% endif %}" id="people">People</a>
+          <a href="/conferences"  class="menu-button {% if active_page == 'conferences' %}  active {% endif %}" id="conferences">Conferences/Travel</a>
+          <a href="/expensetypes" class="menu-button {% if active_page == 'expensetypes' %} active {% endif %}" id="expensetypes">Expense Categories</a>
+          <a href="/overhead"     class="menu-button {% if active_page == 'overhead' %}     active {% endif %}" id="overhead">Overhead Rates</a>
+          <a href="/programs"     class="menu-button {% if active_page == 'programs' %}     active {% endif %}" id="programs">Funding Programs</a>
+        </div>
       </div>
       <div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
     {% endblock %}

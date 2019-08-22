@@ -1,13 +1,13 @@
 {"draw":0,"recordsTotal":{{ programs|length }},"recordsFiltered":{{ programs|length }},"data":[
   {% for program in programs %}
     {% if g.user.admin %}
-      ["<a href='javascript:void(0)' onclick='editDialog(\"/programs/ajax/edit/{{ program.programid }}\", $(\"#programsTable\"))'>{{ program.programname }}</a>",
+      ["<a href='javascript:void(0)' onclick='editDialog(\"/programs/ajax/edit/{{ program.programid }}\", $(\"#programsTable\"))'>{{ program.programname|stringformat }}</a>",
     {% else %}
-      ["{{ program.programname }}",
+      ["{{ program.programname|stringformat }}",
     {% endif %}
-      "{{ program.agency }}",
-      "{{ program.pocname }}",
-      "{{ program.pocemail }}",
+      "{{ program.agency|stringformat }}",
+      "{{ program.pocname|stringformat }}",
+      "{{ program.pocemail|stringformat }}",
       "{{ program.startdate|dateformat }}",
       "{{ program.enddate|dateformat }}",
       "<a href='javascript:void(0)' onclick='deleteDialog(\"/programs/ajax/delete/{{ program.programid }}\", $(\"#programsTable\"), \"this funding program\" )'><img src='{{ url_for("static", filename="images/trash-2-16.png") }}'></a>"]

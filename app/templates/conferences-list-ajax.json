@@ -2,14 +2,14 @@
 {"draw":0,"recordsTotal":{{ conferences|length }},"recordsFiltered":{{ conferences|length }},"data":[
   {% for conference in conferences %}
       {% if g.user.admin %}
-          ["<a href='javascript:void(0)' onclick='editDialog(\"/conferences/ajax/edit/{{ conference.conferenceid }}\", $(\"#conferencesTable\"))'>{{ conference.meeting }}</a>",
+          ["<a href='javascript:void(0)' onclick='editDialog(\"/conferences/ajax/edit/{{ conference.conferenceid }}\", $(\"#conferencesTable\"))'>{{ conference.meeting|stringformat }}</a>",
       {% else %}
-          ["{{ conference.meeting }}",
+          ["{{ conference.meeting|stringformat }}",
       {% endif %}
 
       {% if conference.conferencerates %}
        {% set conferencerate = conference.conferencerates|geteffective %}
-       "{{ conferencerate.city }}, {{ conferencerate.state }}, {{ conferencerate.country }}", 
+       "{{ conferencerate.city|stringformat }}, {{ conferencerate.state|stringformat }}, {{ conferencerate.country|stringformat }}", 
        "{{ conferencerate.perdiem|currencyformat }}", 
        "{{ conferencerate.lodging|currencyformat }}", 
        "{{ conferencerate.registration|currencyformat }}", 
@@ -18,7 +18,7 @@
       {% else %}
        "", "", "", "", "", "",
       {% endif %}
-      "<a href='javascript:void(0)' onclick='deleteDialog(\"/conferences/ajax/delete/{{ conference.conferenceid }}\", $(\"#conferencesTable\"), \"{{ conference.meeting }}\" )'><img src='{{ url_for("static", filename="images/trash-2-16.png") }}'></a>"]
+      "<a href='javascript:void(0)' onclick='deleteDialog(\"/conferences/ajax/delete/{{ conference.conferenceid }}\", $(\"#conferencesTable\"), \"{{ conference.meeting|stringformat }}\" )'><img src='{{ url_for("static", filename="images/trash-2-16.png") }}'></a>"]
       {% if loop.last != true %},{% endif %}
   {% endfor %}
 ]}

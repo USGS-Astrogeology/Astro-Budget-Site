@@ -1,12 +1,12 @@
 {"draw":0,"recordsTotal":{{ expensetypes|length }},"recordsFiltered":{{ expensetypes|length }},"data":[
   {% for expensetype in expensetypes %}
     {% if g.user.admin %}
-      ["<a href='javascript:void(0)' onclick='editDialog(\"/expensetypes/ajax/edit/{{ expensetype.expensetypeid }}\", $(\"#expensetypesTable\"))'>{{ expensetype.description }}</a>",
+      ["<a href='javascript:void(0)' onclick='editDialog(\"/expensetypes/ajax/edit/{{ expensetype.expensetypeid }}\", $(\"#expensetypesTable\"))'>{{ expensetype.description|stringformat }}</a>",
     {% else %}
-      ["{{ expensetype.description }}",
+      ["{{ expensetype.description|stringformat }}",
     {% endif %}
     {% if g.user.admin %}
-      "<a href='javascript:void(0)' onclick='deleteDialog(\"/expensetypes/ajax/delete/{{ expensetype.expensetypeid }}\", $(\"#expensetypesTable\"), \"{{ expensetype.description }}\" )'><img src='{{ url_for("static", filename="images/trash-2-16.png") }}'></a>"]
+      "<a href='javascript:void(0)' onclick='deleteDialog(\"/expensetypes/ajax/delete/{{ expensetype.expensetypeid }}\", $(\"#expensetypesTable\"), \"{{ expensetype.description|stringformat }}\" )'><img src='{{ url_for("static", filename="images/trash-2-16.png") }}'></a>"]
     {% else %}
       ""]
     {% endif %}

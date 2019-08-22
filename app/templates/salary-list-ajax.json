@@ -6,9 +6,9 @@
       ["",
     {% endif %}
       "{{ salary.effectivedate|dateformat }}", 
-      "{{ salary.payplan }}", 
-      "{{ salary.title }}",
-      "{{ salary.appttype }}", 
+      "{{ salary.payplan|stringformat }}", 
+      "{{ salary.title|stringformat }}",
+      "{{ salary.appttype|stringformat }}", 
       "{{ salary.authhours }}", 
       "{{ salary.estsalary|currencyformat }}",
       "{{ salary.estbenefits|currencyformat }}", 

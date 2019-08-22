@@ -1,6 +1,9 @@
-{% for error in debug %}<pre>error.msg</pre>{% endfor %}
 {"draw":0,"recordsTotal":{{ staffing|length }},"recordsFiltered":{{ staffing|length }},"data":[
-{% for staff in staffing %}
-["{{ staff.task.proposal.projectname }}","{{ staff.task.taskname }}","{{ staff.fiscalyear|dateformat }}", {{ staff.q1hours + staff.q2hours + staff.q3hours + staff.q4hours + staff.flexhours }}]{% if loop.last != true %},{% endif %}
-{% endfor %}
+    {% for staff in staffing %}
+    ["{{ staff.task.proposal.projectname|stringformat }}",
+     "{{ staff.task.taskname|stringformat }}",
+     "{{ staff.fiscalyear|dateformat }}",
+      {{ staff.q1hours + staff.q2hours + staff.q3hours + staff.q4hours + staff.flexhours }}]
+      {% if loop.last != true %},{% endif %}
+    {% endfor %}
 ]}

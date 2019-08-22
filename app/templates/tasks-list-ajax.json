@@ -2,7 +2,7 @@
 {% for task in tasks %}
   {% set current_staff = task.staffing[0].peopleid %}
   {% set cost_total = 0 %}
-  { "Task": "{{task.taskname}}", "taskid": {{ task.taskid }},
+  { "Task": "{{ task.taskname|stringformat }}", "taskid": {{ task.taskid }},
     "Staffing": 
     {% if task.staffing %}
       {{ task.staffing[0].peopleid }},
