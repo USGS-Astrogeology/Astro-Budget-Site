@@ -1,0 +1,46 @@
+<div>
+  <div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
+  {% if salary %}
+    {% set display_title = '{0} {1} ({2})'.format(salary.title, salary.payplan, salary.effectivedate|dateformat) %}
+  {% else %}
+    {% set display_title = 'Create Salary' %}
+  {% endif %}
+  <div id="displayTitle" data-content="{{ display_title }}"></div> 
+  <form id="salaryForm" action="" method="POST">
+  <input type="hidden" autofocus />
+  <input type="hidden" id="salaryid" name="salaryid" value="{{ salary.salaryid if salary else 0 }}"/>
+  <input type="hidden" id="salpeopleid" name="peopleid" value="{{ salary.person.peopleid if salary else 0 }}"/>
+  <table>
+      <tr><th>Pay Plan</th>
+          <td><input type="text" id="payplan" name="payplan" size="20" value="{{ salary.payplan }}"/></td>
+          <th>Title</th>
+          <td><input type="text" id="saltitle" name="title" size="30" value="{{ salary.title }}"/></td></tr>
+      <tr><th>Appointment Type</th>
+          <td><input type="text" id="appttype" name="appttype" size="12" value="{{ salary.appttype }}"/></td>
+          <th>Authorized Hours</th>
+          <td><input type="text" id="authhours" name="authhours" size="12" value="{{ salary.authhours|intformat }}"/></td></tr>
+      <tr><th>Estimated Salary</th>
+          <td><input type="text" id="estsalary" name="estsalary" size="12" value="{{ salary.estsalary|currencyformat }}"/></td>
+          <th>Estimated Benefits</th>
+          <td><input type="text" id="estbenefits" name="estbenefits" size="12" value="{{ salary.estbenefits|currencyformat }}"/></td></tr>
+      <tr><th>Leave Category</th>
+          <td><input type="text" id="leavecategory" name="leavecategory" size="12" value="{{ salary.leavecategory|intformat }}"/></td>
+          <th>LAF</th>
+          <td><input type="text" id="laf" name="laf" size="12" value="{{ salary.laf|currencyformat }}"/></td></tr>
+      <tr><th>Effective Date</th>
+          <td><input type="text" id="effdate" name="effectivedate" size="16" value="{{ salary.effectivedate|dateformat }}" 
+                     onchange="updateDropdown('effdate');"/>
+              {% with dropdown_name = 'effdate', dropdown_id = 'effdate', selected_fy = '' %}
+                  {% include "fiscalyear-dropdown.html" %}
+              {% endwith %}
+          </td>
+  </table>
+  </form>
+</div>
+
+<script>
+  $(document).ready(function() {
+    $('#effdate').datepicker();
+    updateDropdown('effdate');
+  });
+</script>

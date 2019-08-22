@@ -1,4 +1,5 @@
 {% extends 'page_template.html' %}
+{% set active_page = 'projects' %}
 
 {% block head %}
   {{ super() }}
@@ -96,10 +97,7 @@
         </div>
       <h3 id='fundingTitle'>Funding</h3>
         <div id='fundingDiv' style='height: 400px;'>
-          <a href='javascript:void(0)' onClick="editDialog('/funding/ajax/edit/0', $('#fundingTable'))" id='newFundingButton'>New</a><p/>
-          <br>
-
-          <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#fundingTable').DataTable())">Save Row Preference</button>
+          <a href='javascript:void(0)' onClick="editDialog('/funding/ajax/edit/0', {{ proposal.proposalid }}, $('#fundingTable'))" id='newFundingButton'>New</a><p/>
           <div id="fundingTableDiv">
           <table id='fundingTable' class='display' cellspacing='0' width='100%'>
             <thead><tr><th>FY</th><th>New Funding</th><th>Carryover</th><th>&nbsp;</th></tr></thead>
@@ -108,10 +106,7 @@
         </div>
       <h3 id='fbmsTitle' >FMBS Accounts</h3>
         <div id='accountingDiv' style='height: 400px;'>
-          <a href='javascript:void(0)' onClick="editDialog('/fbmsaccounts/ajax/edit/0', $('#fbmsTable'))" id='newFBMSButton'>New</a><p/>
-          <br>
-
-          <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#fbmsTable').DataTable())">Save Row Preference</button>
+          <a href='javascript:void(0)' onClick="editDialog('/fbmsaccounts/ajax/edit/0', {{ proposal.proposalid }}, $('#fbmsTable'))" id='newFBMSButton'>New</a><p/>
           <div id="fbmsTableDiv">
           <table id='fbmsTable' class='display' cellspacing='0' width='100%'>
             <thead><tr><th>Account No.</th><th>&nbsp</th></tr></thead>
@@ -120,11 +115,7 @@
         </div>
       <h3 id='overheadTitle'>Overhead Rates</h3>
         <div id='overheadDiv' style='height: 400px;'>
-          <a href='javascript:void(0)' onClick="editDialog('/overhead/ajax/edit/0', $('#overheadTable'))" id='newOverheadButton'>New</a><p/>
-          <br>
-
-          <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#overheadTable').DataTable())">Save Row Preference</button>
-
+          <a href='javascript:void(0)' onClick="editDialog('/overhead/ajax/edit/0', {{ proposal.proposalid }}, $('#overheadTable'))" id='newOverheadButton'>New</a><p/>
           <div id="overheadTableDiv">
           <table id='overheadTable' class='display' cellspacing='0' width='100%'>
             <thead><tr><th>Rate</th><th>Description</th><th>Fiscal Year</th><th>&nbsp</th></tr>
@@ -153,12 +144,7 @@
 
       <h3 id='conferencesTitle'>Conferences/Meetings/Travel</h3>
         <div>
-          <a href='javascript:void(0)' onClick="editDialog('/conferenceattendees/ajax/edit/0', $('#conferenceattendeesTable'))" id='newConferenceButton'>New</a><p/>
-
-          <br>
-
-          <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#conferencesTable').DataTable())">Save Row Preference</button>
-
+          <a href='javascript:void(0)' onClick="editDialog('/conferenceattendees/ajax/edit/0', {{ proposal.proposalid }}, $('#conferenceattendeesTable'))" id='newConferenceButton'>New</a><p/>
           <div id="conferenceattendeesTableDiv">
           <table id='conferenceattendeesTable' class='display' cellspace='0' width='100%'>
             <thead><tr><th>Meeting</th><th>Travelers</th><th>Start Date</th><th>FY</th><th>Meet Days</th><th>Trav Days</th><th>Airfare</th><th>Ground Transport</th><th>Registration / Other</th><th>per diem</th><th>Lodging</th><th>Total</th><th>&nbsp</th></tr></thead>
@@ -167,11 +153,7 @@
         </div>
       <h3 id='expensesTitle'>Expenses</h3>
         <div>
-          <a href='javascript:void(0)' onClick="editDialog('/expenses/ajax/edit/0', $('#expensesTable'))" id='newExpenseButton'>New</a><p/>
-          <br>
-
-          <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#expensesTable').DataTable())">Save Row Preference</button>
-
+          <a href='javascript:void(0)' onClick="editDialog('/expenses/ajax/edit/0', {{ proposal.proposalid }}, $('#expensesTable'))" id='newExpenseButton'>New</a><p/>
           <div id="expensesTableDiv">
           <table id='expensesTable' class='display' cellspace='0' width='100%'>
             <thead><tr><th>Expense</th><th>Type</th><th>Amount</th><th>Fiscal</th><th>&nbsp</th></tr></thead>

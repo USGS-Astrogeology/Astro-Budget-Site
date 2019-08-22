@@ -1,12 +1,13 @@
-<div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
-<form id="expensetypeForm" action='' method="POST">
-  <input type="hidden" autofocus />
-  <input type="hidden" value="{{ 'Edit Expense Category' if expensetype else 'New Expense Category' }}" id="title" />
-  <table><tr><th align="left">Expense Description</th></tr>
-    <tr>
-      <td><input type="text" name="description" id="description" 
-                  value='{{ expensetype.description }}' size="60"/>
-      </td>
-    </tr>
-  </table>
-</form>
+<div>
+  <div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
+  <div id="displayTitle" data-content="{{ expensetype.description if expensetype else 'Create Expense Category' }}"></div> 
+  <form id="expensetypeForm" action='' method="POST">
+    <input type="hidden" autofocus />
+    <input type="hidden" value="{{ 'Edit Expense Category' if expensetype else 'New Expense Category' }}" id="title" />
+    <table><tr><th align="left">Expense Description</th></tr>
+      <tr>
+        <td><input type="text" name="description" id="description" value='{{ expensetype.description }}' size="60"/></td>
+      </tr>
+    </table>
+  </form>
+<div>

@@ -1,17 +1,11 @@
 {% extends 'page_template.html' %}
+{% set active_page = 'projects' %}
 
 {% block head %}{{ super() }}<title>Budgeting: Projects</title>{% endblock %}
 
 {% block body %}
   {{ super() }}
-    <div class="title">
-      <div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
-      <div>
-        <h1>List of Projects</h1>
-        <a href='javascript:void(0)' onClick="editDialog('/proposals/ajax/edit/0', $('#proposalsTable'))" id='newProjectButton'>New</a>
-      </div>
-      <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#proposalsTable').DataTable())">Save Row Preference</button>
-    </div>
+    <a href='javascript:void(0)' onClick="editDialog('/proposals/ajax/edit/0', null, $('#proposalsTable'))" class="button new">New Project</a>
     <div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
     <div id="proposalsTableDiv">
       <table id="proposalsTable" class="display" cellspacing="0" width="100%">
@@ -24,74 +18,8 @@
   {{ super() }}
   <script>
     $(document).ready(function() {
-      $('#newProjectButton').button();
+      $('.button').button();
       loadTable('/proposals/ajax/list', false, $('#proposalsTable'));
     } );
-
-    /*
-    function saveProject () {
-        $.post("index.php", $("#proposalForm").serialize(), function(data){
-          console.log("Inside post: " + data);
-          var go_to_url = "index.php?view=proposal-edit&proposalid=" + data;
-          document.location.href = go_to_url;
-        });
-    }
-
-    function deleteProposalDialog(proposalid) {
-      var description;
-      // var dialog;
-
-      $.getJSON( "index.php?view=proposal-list-json&proposalid=" + proposalid, function( data ) {
-        var pattern = />(.+)<\/a>/i;
-        description = pattern.exec(data.data[0][0])[1];
-        budgetstatus = data.data[0][4];
-        if ((budgetstatus == 'Active') || (budgetstatus == 'Save')) {
-          $("#editDialog").html("<html><head><title>Active or Saved Project</title></head>" +
-                            "<body><h2>The project <p/>'" + description +
-                            "' <p/>has a status of Active or Save and cannot be deleted</h2></body></html>");
-          dialog = $("#editDialog").dialog({
-            autoOpen: false,
-            height: 300,
-            width: 500,
-            modal: true,
-            buttons: {
-              Ok: function () {
-                dialog.dialog("close");
-              }
-            }
-          });
-          dialog.dialog("open");
-        }
-        else {
-          $("#editDialog").html("<html><head><title>Confirm Deletion</title></head>" +
-                            "<body><h2>Are you sure you want to delete the project <p/>'" + description +
-                            "'?</h2></body></html>");
-          dialog = $("#editDialog").dialog({
-            autoOpen: false,
-            height: 300,
-            width: 500,
-            modal: true,
-            buttons: {
-              "Delete Project": function () { deleteProposal(proposalid); },
-              Cancel: function () {
-                dialog.dialog("close");
-              }
-            }
-          });
-          dialog.dialog("open");
-        }
-      });
-    }
-
-    function deleteProposal(proposalid) {
-      $.get("index.php?view=proposal-delete&proposalid=" + proposalid)
-        .always (function() {
-          dialog.dialog("close");
-          $("#warningDiv").html("<p>Deleted [" + proposalid + "]</p>");
-          $("#warningDiv").show();
-
-          loadProposalsTable(true);
-        });
-    }*/
   </script>
 {% endblock %}

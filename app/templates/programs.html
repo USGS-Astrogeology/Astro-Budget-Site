@@ -1,18 +1,13 @@
 {% extends 'page_template.html' %}
+{% set active_page = 'programs' %}
 
 {% block head %}{{ super() }}<title>Funding Programs</title>{% endblock %}
 
 {% block body %}
   {{ super() }}
-    <div class="title">
-      <div>
-        <h1>List of Funding Programs</h1>
-        {% if g.user.admin %}
-          <a href='javascript:void(0)' onClick="editDialog('/programs/ajax/edit/0', $('#programsTable'))" id='newButton'>New</a>
-        {% endif %}
-      </div>
-      <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#programsTable').DataTable())">Save Row Preference</button>
-    </div>
+    {% if g.user.admin %}
+      <a href='javascript:void(0)' onClick="editDialog('/programs/ajax/edit/0', $('#programsTable'))" class="button new">New Funding Program</a>
+    {% endif %}
     <div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
     <div id="programsTableDiv">
     <table id="programsTable" class="display" cellspacing="0" width="100%">
@@ -25,7 +20,7 @@
   {{ super() }}
   <script>
     $(document).ready(function() {
-      $("#newButton").button();
+      $(".button").button();
       loadTable('/programs/ajax/list', false, $('#programsTable'));
     });
   </script>

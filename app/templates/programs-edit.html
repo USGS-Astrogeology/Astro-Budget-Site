@@ -1,5 +1,7 @@
-{% if g.user.admin %}
+<div>
   <div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
+  <div id="displayTitle" data-content="{{ program.programname if program else 'Create Funding Program' }}"></div> 
+{% if g.user.admin %}
   <form id="programForm" action="" method="POST">
     <input type="hidden" autofocus />
     <table><tr><th>Name</th>
@@ -36,6 +38,7 @@
     <tr><th>End Date</th><td>{{ program.enddate }}</td></tr>
   </table>
 {% endif %}
+</div>
 
 <script>
 $(function() {

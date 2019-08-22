@@ -1,17 +1,24 @@
 {"draw":0,"recordsTotal":{{ salaries|length }},"recordsFiltered":{{ salaries|length }},"data":[
-{% for salary in salaries %}
-  {% if g.user.admin %}
-["<a href='javascript:void(0)' onclick='editDialog(\"/salaries/ajax/edit{{ salary.salaryid }}\", $(\"#salaryTable\"))'>Edit</a>",
-  {% else %}
-["",
-  {% endif %}
-"{{ salary.effectivedate|dateformat }}", "{{ salary.payplan }}", "{{ salary.title }}",
-"{{ salary.appttype }}", {{ salary.authhours }}, "${{ salary.estsalary }}",
-"${{ salary.estbenefits }}", "{{ salary.leavecategory }}",
-"{{ salary.laf }}",
-{% if g.user.admin %}
-"<a href='javascript:void(0)' onclick='deleteDialog(\"/salaries/ajax/delete/{{ salary.salaryid }}\", null, $(\"#salaryTable\"))'><img src={{url_for('static', filename='images/trash-2-32.png') }} title='Delete Salary Entry'></a>"
-{% else %}""{% endif %}]
-{% if loop.last != true %},{% endif %}
-{% endfor %}
+  {% for salary in salaries %}
+    {% if g.user.admin %}
+      ["<a href='javascript:void(0)' onclick='editDialog(\"/salaries/ajax/edit/{{ salary.salaryid }}\", $(\"#salaryTable\"))'>Edit</a>",
+    {% else %}
+      ["",
+    {% endif %}
+      "{{ salary.effectivedate|dateformat }}", 
+      "{{ salary.payplan }}", 
+      "{{ salary.title }}",
+      "{{ salary.appttype }}", 
+      "{{ salary.authhours }}", 
+      "{{ salary.estsalary|currencyformat }}",
+      "{{ salary.estbenefits|currencyformat }}", 
+      "{{ salary.leavecategory }}",
+      "{{ salary.laf|currencyformat }}",
+    {% if g.user.admin %}
+    "<a href='javascript:void(0)' onclick='deleteDialog(\"/salaries/ajax/delete/{{ salary.salaryid }}\", $(\"#salaryTable\"), \"this salary\")'><img src='{{ url_for("static", filename="images/trash-2-32.png") }}' title='Delete Salary Entry' width='24'></a>"
+    {% else %}
+      ""
+    {% endif %}]
+    {% if loop.last != true %},{% endif %}
+  {% endfor %}
 ]}

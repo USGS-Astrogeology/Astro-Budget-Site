@@ -1,18 +1,13 @@
 {% extends 'page_template.html' %}
+{% set active_page = 'overhead' %}
 
 {% block head %}{{ super() }}<title>Overhead Rates</title>{% endblock %}
 
 {% block body %}
   {{ super() }}
-  <div class="title">
-    <div>
-      <h1>List of Overhead Rates</h1>
-      {% if g.user.admin %}
-        <a href='javascript:void(0)' onClick="editDialog('/overhead/ajax/edit/0', $('#overheadTable'))" id='newButton'>New</a><p/>
-      {% endif %}
-    </div>
-    <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#overheadTable').DataTable())">Save Row Preference</button>
-  </div>
+  {% if g.user.admin %}
+    <a href='javascript:void(0)' onClick="editDialog('/overhead/ajax/edit/0', $('#overheadTable'))" class="button new">New Overhead Rate</a>
+  {% endif %}
   <div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
   <div id="overheadTableDiv">
       <table id='overheadTable' class='display' cellspacing='0' width='100%'>
@@ -25,7 +20,7 @@
   {{ super() }}
   <script>
     $(document).ready(function() {
-      $("#newButton").button();
+      $(".button").button();
       loadTable('/overhead/ajax/list', false, $('#overheadTable'));
     });
   </script>

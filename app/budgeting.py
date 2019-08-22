@@ -25,7 +25,7 @@ def floatformat(value):
 def intformat(value):
 	if not value:
 		return '0'
-	return "{:,}".format(value)
+	return "{:,.0f}".format(value)
 
 def jsonformat(string):
 	string = string.replace("'", r"\'")
@@ -570,7 +570,7 @@ def save_person(peopleid):
 
 	try:
 		criteria = {'name': request.form['name'], 'username': request.form['username'],
-					'admin': True if request.form['admin'] == 'true' else False}
+					'admin': True if request.form.get('admin') else False}
 	except:
 		return jsonify(response)
 
@@ -592,11 +592,11 @@ def load_staffing(peopleid):
 def programs():
 	return render_template('programs.html')
 
-@app.route('/programs/ajax/delete/<int:programid>', methods = ['POST'])
-@login_required
-def delete_program(programid):
-	program = FundingPrograms.get_one(filters = [FundingPrograms.programid == programid])
-	response = {'status': 'Success', 'description': 'funding program', 'action': 'found'}
+@app.route('/programs/ajax/delete/<int:programid>', methods = ['POST'])	
+@login_required	
+def delete_program(programid):	
+	program = FundingPrograms.get_one(filters = [FundingPrograms.programid == programid])	
+	response = {'status': 'Error', 'description': 'funding program', 'action': 'found'}
 	return jsonify(delete_dbobject(program, response))
 
 @app.route('/programs/ajax/edit/<int:programid>')
@@ -843,11 +843,21 @@ def reset_row():
 
 # SALARIES
 
+@app.route('/salaries/ajax/delete/<int:salaryid>', methods=['POST'])
+@login_required
+def delete_salary(salaryid):
+	salary = Salaries.get_one(filters = [Salaries.salaryid == salaryid])
+	response = {'status': 'Error', 'description': 'salary', 'action': 'found'}
+	return jsonify(delete_dbobject(salary, response))
+
+
 @app.route('/salaries/ajax/edit/<int:salaryid>')
 @login_required
 def edit_salary(salaryid):
-	salaries = Salaries.get_many(filters = [Salaries.salaryid == salaryid])
-	return render_template('salary-edit-ajax.json', salaries = salaries)
+	salary = Salaries.get_one(filters = [Salaries.salaryid == salaryid])
+	return render_template('salary-edit.html', salary = salary, 
+											   dd_fiscalyears = fiscal_years(), 
+											   dd_startdates = start_dates())
 
 @app.route('/salaries/ajax/list/<int:peopleid>')
 @login_required
@@ -855,7 +865,26 @@ def load_salaries(peopleid):
 	salaries = Salaries.get_many(filters = [Salaries.peopleid == peopleid])
 	return render_template('salary-list-ajax.json', salaries = salaries)
 
+@app.route('/salaries/ajax/save/<int:salaryid>', methods=['POST'])
+@login_required
+def save_salary(salaryid):
+	salary = Salaries.get_one(filters = [Salaries.salaryid == salaryid])
+	response = {'status': 'Error', 'description': 'Salary', 'action': 'read'}
 
+	try:
+		criteria = {'peopleid': int(request.form['peopleid']), 'payplan': request.form['payplan'],
+					'effectivedate': datetime.strptime(request.form['effectivedate'], '%m/%d/%Y'),
+					'title': request.form['title'], 'appttype': request.form['appttype'],
+					'estsalary': currency_strstrp(request.form['estsalary']), 'laf': currency_strstrp(request.form['laf']),
+					'estbenefits': currency_strstrp(request.form['estbenefits']), 'authhours': int(request.form['authhours']),
+					'leavecategory': int(request.form['leavecategory'])}
+	except:
+		return response
+
+	return jsonify(save_dbobject(salary, Salaries, criteria, response))
+
+
+	
 # TASKS
 
 @app.route('/tasks/ajax/dropdown')
@@ -901,7 +930,6 @@ def save_dbobject(obj, dbclass, attributes, response):
 	except:
 		db.session.rollback()
 		return response
-
 	response['status'] = 'Success'
 	return response
 
@@ -915,7 +943,6 @@ def delete_dbobject(obj, response):
 	except:
 		db.session.rollback()
 		return response
-
 	response['status'] = 'Success'
 	return response
 

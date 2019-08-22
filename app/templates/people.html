@@ -1,17 +1,11 @@
 {% extends 'page_template.html' %}
+{% set active_page = "people" %}
 
 {% block head %}{{ super() }}<title>People</title>{% endblock %}
 
 {% block body %}
   {{ super() }}
-  <div class="title">
-    <div>
-      <h1>List of People</h1>
-      <a href='javascript:void(0)' onClick="editDialog('/people/ajax/new/0', $('#peopleTable'))" id='newButton'>New</a>
-    </div>
-    <button id="save_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="save_row_preference($('#peopleTable').DataTable())">Save Row Preference</button>
-  </div>
-  <div id="warningDiv" class="ui-corner-all ui-state-highlight" style="display: none;"></div>
+  <a href='javascript:void(0)' onClick="editDialog('/people/ajax/new/0', $('#peopleTable'))" class="button new">New Person</a>
   <div id="peopleTableDiv">
     <table id="peopleTable" class="display" cellspacing="0" width="100%">
       <thead><tr><th>Name</th><th>Title</th><th>Pay Plan</th><th>Username</th></tr></thead>
@@ -23,7 +17,7 @@
   {{ super() }}
   <script>
     $(document).ready(function() {
-      $("#newButton").button();
+      $(".button").button();
       loadTable('/people/ajax/list', false, $('#peopleTable'));
     });
   </script>

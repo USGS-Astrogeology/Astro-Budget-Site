@@ -1,7 +1,5 @@
-function save_row_preference(table) {
-  let table_row_size = table.page.len();
-  console.log("New table row preference is " + table_row_size + " rows");
-
+function save_row_preference(dataTable) {
+  let table_row_size = dataTable.page.len();
   $.get("/row_setting/ajax/save/" + table_row_size)
     .always(function(data)
     {
@@ -10,7 +8,7 @@ function save_row_preference(table) {
 
 }
 
-function check_row_preference(table) {
+function check_row_preference(dataTable) {
   var user_preference = null;
   $.get("/row_setting/ajax/get")
    .always(function(data) {
@@ -19,7 +17,7 @@ function check_row_preference(table) {
      }
 
      if (user_preference != null) {
-       table.page.len(user_preference).draw();
+       dataTable.page.len(user_preference).draw();
      }
 
    });
@@ -30,42 +28,53 @@ function loadTable(ajax, reload, table) {
         $(table).DataTable().ajax.reload()
     } else {
       // creates the table if it doesn't already exist
-      $(table).DataTable( {
+      $(table).DataTable({
           'processing': true,
           'serverSide': false,
           'autoWidth': false,
           'ajax': ajax,
-          'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']]
-        });
+          'lengthMenu': [[5, 10, 20, -1], [5, 10, 20, 'All']],
+          'jQueryUI': true,
+          'dom': '<"H"l<"save-rows">fr>t<"F"ip>'
+      });
+
+      $('.save-rows').html(`<button type="button" role="button" class="button save ui-button ui-state-default 
+                              ui-corner-all ui-button-text-only" onclick="save_row_preference($('${table.selector}').DataTable())">save</button>`)
+
     }
 
     check_row_preference($(table).DataTable());
 }
 
-function editDialog(ajax, table) {
+function editDialog(ajax, table, width = 'auto') {
   let save_ajax = ajax.replace('edit', 'save').replace('new', 'save');
-  let div = $(`<div></div>`);
+  let div = $(`<div class="dialog"></div>`);
 
   console.log(ajax);
 
   $(div).load(ajax, function(data) {
     $(this).dialog({
-      width: 'auto',
+      width: width,
       modal: true,
       draggable: false,
-      title: $(data).find('#title').val(),
+      title: $(data).find('#displayTitle').data('content'),
       close: function() { $(this).dialog("destroy") },
       buttons: {
-        "Save":   function () { submitAction(save_ajax, table, $(this)) },
-        "Cancel": function () { $(this).dialog("destroy"); }
-      }
+                  "Save":   function () { submitAction(save_ajax, table, $(this)) },
+                  "Cancel": function () { $(this).dialog("destroy"); }
+               },
+      position: {
+                  my: 'center',
+                  at: 'center top+25%',
+                  of: window
+                }
     });
   });
 }
 
 
 function deleteDialog(ajax, table, description) {
-  let div = $('<div><h2>Are you sure you want to delete ' + description + '?</h2></body></html></div>');
+  let div = $(`<div class="dialog"><h2>Are you sure you want to delete ${description}?</h2></body></html></div>`);
 
   $(div).dialog({
     width: 'auto',
@@ -75,9 +84,13 @@ function deleteDialog(ajax, table, description) {
     buttons: {
       "Delete": function () { submitAction(ajax, table, $(this)) },
       "Cancel": function () { $(this).dialog("destroy") }
+    },
+    position: {
+      my: 'center',
+      at: 'center top+25%',
+      of: window
     }
   });
-  //console.log(ajax);
 }
 
 function displayAlert(data) {
@@ -87,7 +100,7 @@ function displayAlert(data) {
   $('.alert').last().html(content).slideDown('fast', function() {
     alert = $(this);
     setTimeout(function() {
-      $(alert).slideUp('fast');
+     $(alert).slideUp('fast');
     }, 3000);
   });
 }
