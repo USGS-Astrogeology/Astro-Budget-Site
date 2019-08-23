@@ -170,7 +170,14 @@ def save_conference(conferenceid):
 def delete_conferenceattendee(conferenceattendeeid):
 	conferenceattendee = ConferenceAttendee.get_one(filters = [ConferenceAttendee.conferenceattendeeid == conferenceattendeeid])
 	response = {'status': 'Error', 'description': 'Conference Attendee', 'action': 'found'}
-	return jsonify(delete_dbobject(conferenceattendee, response))
+
+	delete_response = delete_dbobject(conferenceattendee, response)
+	if delete_response['status'] == "Success":
+		proposal = Proposals.get_one(filters = [Proposals.proposalid == int(request.form['proposalid'])])
+		proposal.modified = datetime.now()
+		db.session.commit()
+
+	return jsonify(delete_response)
 
 @app.route('/conferenceattendees/ajax/edit/<int:conferenceattendeeid>')
 @login_required
@@ -218,7 +225,7 @@ def save_conferenceattendee(conferenceattendeeid):
 
 	# ConferenceAttendee attributes
 	conferenceid = request.form.get("conferenceid")
-	proposal = request.form.get("proposalid")
+	proposalid = request.form.get("proposalid")
 	meeting_days = request.form.get("meetingdays")
 	travel_days = request.form.get("traveldays")
 	travelers = request.form.get("travelers")
@@ -230,8 +237,13 @@ def save_conferenceattendee(conferenceattendeeid):
 
 	#return str(start_date)
 
-	criteria = {'conferenceid': conferenceid, 'proposalid': proposal, 'meetingdays': meeting_days, 'traveldays': travel_days, 'startdate': start_date, 'travelers': travelers, 'rentalcars': rental_cars}
-	return jsonify(save_dbobject(conferenceattendee, ConferenceAttendee, criteria, response))
+	criteria = {'conferenceid': conferenceid, 'proposalid': proposalid, 'meetingdays': meeting_days, 'traveldays': travel_days, 'startdate': start_date, 'travelers': travelers, 'rentalcars': rental_cars}
+	save_response = save_dbobject(conferenceattendee, ConferenceAttendee, criteria, response)
+	if save_response['status'] == "Success":
+		proposal = Proposals.get_one(filters = [Proposals.proposalid == int(request.form['proposalid'])])
+		proposal.modified = datetime.now()
+		db.session.commit()
+	return jsonify(save_response)
 
 
 # CONFERENCE RATES
@@ -329,7 +341,14 @@ def save_conferencerate(conferencerateid):
 def delete_expense(expenseid):
 	expense = Expenses.get_one(filters = [Expenses.expenseid == expenseid])
 	response = {'status': 'Error', 'description': 'Expense', 'action': 'found'}
-	return jsonify(delete_dbobject(expense, response))
+
+	delete_response = delete_dbobject(expense, response)
+	if delete_response['status'] == "Success":
+		proposal = Proposals.get_one(filters = [Proposals.proposalid == int(request.form['proposalid'])])
+		proposal.modified = datetime.now()
+		db.session.commit()
+
+	return jsonify(delete_response)
 
 @app.route('/expenses/ajax/edit/<int:expenseid>')
 @login_required
@@ -360,7 +379,13 @@ def save_expense(expenseid):
 	except:
 		return jsonify(response)
 
-	return jsonify(save_dbobject(expense, Expenses, criteria, response))
+	save_response = save_dbobject(expense, Expenses, criteria, response)
+	if save_response['status'] == "Success":
+		proposal = Proposals.get_one(filters = [Proposals.proposalid == int(request.form['proposalid'])])
+		proposal.modified = datetime.now()
+		db.session.commit()
+
+	return jsonify(save_response)
 
 
 # EXPENSE TYPES
@@ -410,7 +435,13 @@ def save_expensetype(expensetypeid):
 def delete_fbmsaccount(fbmsid):
 	account = FBMSAccounts.get_one(filters = [FBMSAccounts.fbmsid == fbmsid])
 	response = {'status': 'Error', 'description': 'FBMS Account', 'action': 'found'}
-	return jsonify(delete_dbobject(account, response))
+
+	delete_response = delete_dbobject(account, response)
+	if delete_response['status'] == "Success":
+		proposal = Proposals.get_one(filters = [Proposals.proposalid == int(request.form['proposalid'])])
+		proposal.modified = datetime.now()
+		db.session.commit()
+	return jsonify(delete_response)
 
 @app.route('/fbmsaccounts/ajax/edit/<int:fbmsid>')
 @login_required
@@ -435,7 +466,13 @@ def save_fbmsaccounts(fbmsid):
 	except:
 		return jsonify(response)
 
-	return jsonify(save_dbobject(account, FBMSAccounts, criteria, response))
+	save_response = save_dbobject(account, FBMSAccounts, criteria, response)
+	if save_response['status'] == "Success":
+		proposal = Proposals.get_one(filters = [Proposals.proposalid == int(request.form['proposalid'])])
+		proposal.modified = datetime.now()
+		db.session.commit()
+
+	return jsonify(save_response)
 
 
 # FUNDING
@@ -445,7 +482,13 @@ def save_fbmsaccounts(fbmsid):
 def delete_funding(fundingid):
 	funding = Funding.get_one(filters = [Funding.fundingid == fundingid])
 	response = {'status': 'Error', 'description': 'Funding', 'action': 'found'}
-	return jsonify(delete_dbobject(funding, response))
+
+	delete_response = delete_dbobject(funding, response)
+	if delete_response['status'] == "Success":
+		proposal = Proposals.get_one(filters = [Proposals.proposalid == int(request.form['proposalid'])])
+		proposal.modified = datetime.now()
+		db.session.commit()
+	return jsonify(delete_response)
 
 @app.route('/funding/ajax/edit/<int:fundingid>')
 @login_required
@@ -501,7 +544,14 @@ def overhead():
 def delete_overhead(overheadid):
 	overhead = OverheadRates.get_one(filters = [OverheadRates.overheadid == overheadid])
 	response = {'status': 'Error', 'description': 'Overhead Rate', 'action': 'found'}
-	return jsonify(delete_dbobject(overhead, response))
+
+	delete_response = delete_dbobject(overhead, response)
+	if delete_response['status'] == "Success":
+		proposal = Proposals.get_one(filters = [Proposals.proposalid == int(request.form['proposalid'])])
+		proposal.modified = datetime.now()
+		db.session.commit()
+
+	return jsonify(delete_response)
 
 @app.route('/overhead/ajax/edit/<int:overheadid>')
 @login_required
@@ -537,7 +587,13 @@ def save_overhead(overheadid):
 	except:
 		return jsonify(response)
 
-	return jsonify(save_dbobject(overhead, OverheadRates, criteria, response))
+	save_response = save_dbobject(overhead, OverheadRates, criteria, response)
+	if save_response['status'] == "Success":
+		proposal = Proposals.get_one(filters = [Proposals.proposalid == int(request.form['proposalid'])])
+		proposal.modified = datetime.now()
+		db.session.commit()
+
+	return jsonify(save_response)
 
 # PEOPLE
 
@@ -676,7 +732,8 @@ def copy_proposal(proposalid):
 				'programid': proposal.programid, 'status': proposal.status,
 				'proposalnumber': proposal.proposalnumber, 'awardnumber': proposal.awardnumber,
 				'perfperiodstart': proposal.perfperiodstart,
-				'perfperiodend': proposal.perfperiodend}
+				'perfperiodend': proposal.perfperiodend,
+				'modified': datetime.now()}
 
 	save_dbobject(None, Proposals, proposal_attributes, response)
 	# need a way to get the proposal id back from this before anything else can be done
