@@ -7,6 +7,7 @@
          "{{ proposal.proposalstatus.statusname|stringformat }}",
          "{{ proposal.perfperiodstart|dateformat }}",
          "{{ proposal.perfperiodend|dateformat }}",
+         "{{ proposal.modified }}",
          {% if g.user.admin %}
             "<a href='/proposals/ajax/copy/{{ proposal.proposalid }}' id='copyButton'><img src='{{ url_for("static", filename="images/copy-32.png") }}' title='Copy' width='24'></a><a href='javascript:void(0)' onclick='deleteDialog(\"/proposals/ajax/delete/{{ proposal.proposalid }}\", $(\"#proposalsTable\"), \"{{ proposal.projectname|stringformat }}\")'><img src='{{ url_for("static", filename="images/trash-2-32.png") }}' title='Delete' width='24'></a>"]
          {% else %}

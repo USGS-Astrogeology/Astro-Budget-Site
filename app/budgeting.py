@@ -745,12 +745,10 @@ def copy_proposal(proposalid):
 		# if so, then need to have the time clock too, not just the date
 	# could we look at which one has the higher id? it seems to increment every time something is added?
 
-	new_proposal = Proposals.get_many(filters = [Proposals.projectname == "Copy of " + proposal.projectname])
+	new_proposal = Proposals.get_many(filters = [Proposals.projectname == "Copy of " + proposal.projectname],
+												 orders = [Proposals.modified.desc()])
 	objects_found = len(new_proposal)
-	if objects_found == 1:
-		new_proposal_id = new_proposal[0].proposalid
-	else:
-		return "more than one copy"
+	new_proposal_id = new_proposal[0].proposalid
 
 	fbms_response = {'status': 'Error', 'description': 'FBMS', 'action': 'copy'}
 	for fbms in fbmsaccounts:
