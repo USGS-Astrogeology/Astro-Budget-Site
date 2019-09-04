@@ -11,7 +11,7 @@
     {% endif %}
 
   {% for staff in task.staffing %}
-    {% if staff.peopleid != current_staff%}
+    {% if staff.peopleid != current_staff %}
       "Cost": "{{ cost_total|currencyformat }}"}, { "Task": "{{ task.taskname }}",
       "taskid": {{ task.taskid }}, 
       "Staffing": {{ staff.peopleid }},

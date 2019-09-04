@@ -129,7 +129,8 @@
       }
 
       function staffingSave() {
-        $.post("index.php", $("#staffingForm").serialize())
+		$.post(("staffing/ajax/save/" + $("staffingid").val()), $("#staffingForm").serialize())
+        //$.post("index.php", $("#staffingForm").serialize())
           .always (function() {
 
             loadStaffingTable(true);

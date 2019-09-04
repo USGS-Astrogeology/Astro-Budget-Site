@@ -955,6 +955,15 @@ def save_salary(salaryid):
 	return jsonify(save_dbobject(salary, Salaries, criteria, response))
 
 
+# STAFFING
+@app.route('/staffing/ajax/save/<int:staffingid>')
+@login_required
+def save_staffing(staffingid):
+	staffing = Staffing.get_one(filters = [Staffing.staffingid == staffingid])
+	response = {'status': 'Error', 'description': 'Staffing', 'action': 'found'}
+	
+	return ""
+
 
 # TASKS
 
@@ -978,6 +987,45 @@ def edit_task(taskid):
 def load_tasks(proposalid):
 	tasks = Tasks.get_many(filters = [Tasks.proposalid == proposalid])
 	return render_template('tasks-list-ajax.json', tasks = tasks)
+	
+@app.route('/tasks/ajax/save/<int:taskid>', methods = ['POST'])
+@login_required
+def save_task(taskid):
+	task = Tasks.get_one(filters = [Tasks.taskid == taskid])
+	response = {'status': 'Error', 'description': 'Task', 'action': 'found'}
+	
+	
+	# how do we get the staffing being edited?
+	# should this function call another function that handles the staffing save and is given a staffing id?
+	# could it be given the list of staffing id's and the form data somehow? and just save them all?
+	
+	# there is a staffing form too, so just use that and call two separate functions? see task-edit.html for forms
+	
+	# just do staffing save instead? and use that to get things like the task name and that stuff?
+	# in task edit there is a staffing save function
+	
+	#try:
+	#	criteria = {'taskname': request.form['taskname'], 
+	
+	return ""
+
+'''
+proposal = Proposals.get_one(filters = [Proposals.proposalid == proposalid])
+	response = {'status': 'Error', 'description': 'Proposal', 'action': 'found'}
+
+	try:
+		criteria = {'projectname': request.form['projectname'], 'peopleid': request.form['peopleid'],
+					'programid': request.form['programid'], 'status': request.form['status'],
+					'proposalnumber': request.form['proposalnumber'], 'awardnumber': request.form['awardnumber'],
+					'perfperiodstart': datetime.strptime(request.form['perfperiodstart'], '%m/%d/%Y'),
+					'perfperiodend': datetime.strptime(request.form['perfperiodend'], '%m/%d/%Y'),
+					'modified': datetime.now()}
+	except:
+		return jsonify(response)
+
+	return jsonify(save_dbobject(proposal, Proposals, criteria, response))
+'''
+	
 
 
 # Helpers ------------------>

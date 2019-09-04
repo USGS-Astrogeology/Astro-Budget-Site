@@ -339,7 +339,8 @@ function editTaskDialog (taskid, proposalid) {
 }*/
 
 function saveTask (proposalid) {
-  $.post("index.php", $("#taskForm").serialize())
+  //$.post("index.php", $("#taskForm").serialize())
+  $.post(("/tasks/ajax/save/" + $("#taskid").val()), $("taskForm").serialize())
     .always (function() {
 
       loadTasksTable(true, proposalid);
