@@ -962,7 +962,26 @@ def save_staffing(staffingid):
 	staffing = Staffing.get_one(filters = [Staffing.staffingid == staffingid])
 	response = {'status': 'Error', 'description': 'Staffing', 'action': 'found'}
 	
-	return ""
+	try:
+		criteria = {'peopleid': request.form['peopleid'], 'q1hours': request.form['q1hours'],
+					'q2hours': request.form['q2hours'], 'q3hours': request.form['q3hours'],
+					'q4hours': request.form['q4hours'], 'flexhours': request.form['flexhours'],
+					'fiscalyear': request.form['fiscalyear']}
+	except:
+		return jsonify(response)
+		
+	save_response = save_dbobject(staffing, Staffing, criteria, response)
+	if save_response['status'] == "Success":
+		proposal = Proposals.get_one(filters = [Proposals.proposalid == int(request.form['proposalid'])])
+		proposal.modified = datetime.now()
+		db.session.commit()
+		
+		
+	# need to edit the task name somehow
+	
+	
+	return jsonify(save_response)
+	
 
 
 # TASKS
@@ -993,6 +1012,9 @@ def load_tasks(proposalid):
 def save_task(taskid):
 	task = Tasks.get_one(filters = [Tasks.taskid == taskid])
 	response = {'status': 'Error', 'description': 'Task', 'action': 'found'}
+	
+	try:
+		criteria = {'taskname': request.form['taskname']}
 	
 	
 	# how do we get the staffing being edited?
