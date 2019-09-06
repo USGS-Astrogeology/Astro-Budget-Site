@@ -122,6 +122,7 @@ function loadTasksTable (reload, proposalid) {
       $task_res = $.ajax({
         type:'post',
         url: 'index.php?',
+        //url: 'tasks/ajax/save',
         data: {
           view: 'task-save',
           taskid: 'new',
@@ -211,6 +212,7 @@ function loadTasksTable (reload, proposalid) {
           $.ajax({
             type:'post',
             url: 'index.php?',
+            //url: ''
             success: function() {
               loadTasksTable(true, proposalid);
             },

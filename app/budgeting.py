@@ -728,12 +728,26 @@ def copy_proposal(proposalid):
 
 	response = {'status': 'Error', 'description': 'Proposal', 'action': 'found'}
 
-	proposal_attributes = {'projectname': "Copy of " + proposal.projectname, 'peopleid': proposal.peopleid,
+	existing_copies = Proposals.get_many(filters = [Proposals.projectname == "Copy of " + proposal.projectname],
+												 orders = [Proposals.modified.desc()])
+
+	copies_found = len(existing_copies)
+
+	if copies_found != 0:
+		proposal_attributes = {'projectname': "Copy of " + proposal.projectname + "(" + str(copies_found) + ")",
+				'peopleid': proposal.peopleid, 'programid': proposal.programid, 'status': proposal.status,
+				'proposalnumber': proposal.proposalnumber, 'awardnumber': proposal.awardnumber,
+				'perfperiodstart': proposal.perfperiodstart,
+				'perfperiodend': proposal.perfperiodend,
+				'modified': datetime.now()}
+	else:
+		proposal_attributes = {'projectname': "Copy of " + proposal.projectname, 'peopleid': proposal.peopleid,
 				'programid': proposal.programid, 'status': proposal.status,
 				'proposalnumber': proposal.proposalnumber, 'awardnumber': proposal.awardnumber,
 				'perfperiodstart': proposal.perfperiodstart,
 				'perfperiodend': proposal.perfperiodend,
 				'modified': datetime.now()}
+
 
 	save_dbobject(None, Proposals, proposal_attributes, response)
 	# need a way to get the proposal id back from this before anything else can be done
@@ -747,7 +761,6 @@ def copy_proposal(proposalid):
 
 	new_proposal = Proposals.get_many(filters = [Proposals.projectname == "Copy of " + proposal.projectname],
 												 orders = [Proposals.modified.desc()])
-	objects_found = len(new_proposal)
 	new_proposal_id = new_proposal[0].proposalid
 
 	fbms_response = {'status': 'Error', 'description': 'FBMS', 'action': 'copy'}
@@ -961,27 +974,24 @@ def save_salary(salaryid):
 def save_staffing(staffingid):
 	staffing = Staffing.get_one(filters = [Staffing.staffingid == staffingid])
 	response = {'status': 'Error', 'description': 'Staffing', 'action': 'found'}
-	
+
 	try:
-		criteria = {'peopleid': request.form['peopleid'], 'q1hours': request.form['q1hours'],
-					'q2hours': request.form['q2hours'], 'q3hours': request.form['q3hours'],
-					'q4hours': request.form['q4hours'], 'flexhours': request.form['flexhours'],
-					'fiscalyear': request.form['fiscalyear']}
+		criteria = {'taskid': request.form['taskid'], 'peopleid': request.form['peopleid'],
+					'q1hours': request.form['q1hours'],'q2hours': request.form['q2hours'],
+					'q3hours': request.form['q3hours'],'q4hours': request.form['q4hours'],
+					'flexhours': request.form['flexhours'],'fiscalyear': request.form['fiscalyear']}
 	except:
 		return jsonify(response)
-		
+
 	save_response = save_dbobject(staffing, Staffing, criteria, response)
 	if save_response['status'] == "Success":
-		proposal = Proposals.get_one(filters = [Proposals.proposalid == int(request.form['proposalid'])])
+		proposal = Proposals.get_one(filters = [Proposals.proposalid == staffing.task.proposalid])
 		proposal.modified = datetime.now()
 		db.session.commit()
-		
-		
-	# need to edit the task name somehow
-	
-	
-	return jsonify(save_response)
-	
+
+	return "staffing save"
+	#return jsonify(save_response)
+
 
 
 # TASKS
@@ -1006,48 +1016,25 @@ def edit_task(taskid):
 def load_tasks(proposalid):
 	tasks = Tasks.get_many(filters = [Tasks.proposalid == proposalid])
 	return render_template('tasks-list-ajax.json', tasks = tasks)
-	
+
 @app.route('/tasks/ajax/save/<int:taskid>', methods = ['POST'])
 @login_required
 def save_task(taskid):
 	task = Tasks.get_one(filters = [Tasks.taskid == taskid])
 	response = {'status': 'Error', 'description': 'Task', 'action': 'found'}
-	
-	try:
-		criteria = {'taskname': request.form['taskname']}
-	
-	
-	# how do we get the staffing being edited?
-	# should this function call another function that handles the staffing save and is given a staffing id?
-	# could it be given the list of staffing id's and the form data somehow? and just save them all?
-	
-	# there is a staffing form too, so just use that and call two separate functions? see task-edit.html for forms
-	
-	# just do staffing save instead? and use that to get things like the task name and that stuff?
-	# in task edit there is a staffing save function
-	
-	#try:
-	#	criteria = {'taskname': request.form['taskname'], 
-	
-	return ""
-
-'''
-proposal = Proposals.get_one(filters = [Proposals.proposalid == proposalid])
-	response = {'status': 'Error', 'description': 'Proposal', 'action': 'found'}
 
 	try:
-		criteria = {'projectname': request.form['projectname'], 'peopleid': request.form['peopleid'],
-					'programid': request.form['programid'], 'status': request.form['status'],
-					'proposalnumber': request.form['proposalnumber'], 'awardnumber': request.form['awardnumber'],
-					'perfperiodstart': datetime.strptime(request.form['perfperiodstart'], '%m/%d/%Y'),
-					'perfperiodend': datetime.strptime(request.form['perfperiodend'], '%m/%d/%Y'),
-					'modified': datetime.now()}
+		criteria = {'taskname': request.form['taskname'], 'proposalid': request.form['proposalid']}
 	except:
 		return jsonify(response)
 
-	return jsonify(save_dbobject(proposal, Proposals, criteria, response))
-'''
-	
+	save_response = save_dbobject(task, Tasks, criteria, response)
+	if save_response['status'] == "Success":
+		proposal = Proposals.get_one(filters = [Proposals.proposalid == int(request.form['proposalid'])])
+		proposal.modified = datetime.now()
+		db.session.commit()
+
+	return jsonify(save_response)
 
 
 # Helpers ------------------>
