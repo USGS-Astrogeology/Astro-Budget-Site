@@ -728,9 +728,13 @@ def copy_proposal(proposalid):
 
 	response = {'status': 'Error', 'description': 'Proposal', 'action': 'found'}
 
+	'''
 	existing_copies = Proposals.get_many(filters = [Proposals.projectname == "Copy of " + proposal.projectname],
 												 orders = [Proposals.modified.desc()])
-
+	'''
+	
+	#existing_copies = Proposals.query.filter(Proposals.projectname.contains("Copy of " + proposal.projectname)).all()
+	
 	copies_found = len(existing_copies)
 
 	if copies_found != 0:
@@ -969,9 +973,12 @@ def save_salary(salaryid):
 
 
 # STAFFING
-@app.route('/staffing/ajax/save/<int:staffingid>')
+#@app.route('/staffing/ajax/save/<int:staffingid>')
+@app.route('/staffing/ajax/save')
 @login_required
-def save_staffing(staffingid):
+#def save_staffing(staffingid):
+def save_staffing():
+	staffingid = request.data['staffingid']
 	staffing = Staffing.get_one(filters = [Staffing.staffingid == staffingid])
 	response = {'status': 'Error', 'description': 'Staffing', 'action': 'found'}
 
@@ -1017,20 +1024,23 @@ def load_tasks(proposalid):
 	tasks = Tasks.get_many(filters = [Tasks.proposalid == proposalid])
 	return render_template('tasks-list-ajax.json', tasks = tasks)
 
-@app.route('/tasks/ajax/save/<int:taskid>', methods = ['POST'])
+#@app.route('/tasks/ajax/save/<int:taskid>', methods = ['POST'])
+@app.route('/tasks/ajax/save', methods = ['POST'])
 @login_required
-def save_task(taskid):
+#def save_task(taskid):
+def save_task():
+	taskid = request.data['taskid']
 	task = Tasks.get_one(filters = [Tasks.taskid == taskid])
 	response = {'status': 'Error', 'description': 'Task', 'action': 'found'}
 
 	try:
-		criteria = {'taskname': request.form['taskname'], 'proposalid': request.form['proposalid']}
+		criteria = {'proposalid': request.data['proposalid'], 'taskname': request.data['taskname']}
 	except:
 		return jsonify(response)
 
 	save_response = save_dbobject(task, Tasks, criteria, response)
 	if save_response['status'] == "Success":
-		proposal = Proposals.get_one(filters = [Proposals.proposalid == int(request.form['proposalid'])])
+		proposal = Proposals.get_one(filters = [Proposals.proposalid == int(request.data['proposalid'])])
 		proposal.modified = datetime.now()
 		db.session.commit()
 

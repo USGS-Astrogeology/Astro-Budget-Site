@@ -119,15 +119,21 @@ function loadTasksTable (reload, proposalid) {
       $entry = args.item;
       $keys = Object.keys($entry);
 
+	  // task response?
+	  // initializes a new task
       $task_res = $.ajax({
-        type:'post',
-        url: 'index.php?',
-        //url: 'tasks/ajax/save',
+        //type:'post',
+		type: "POST",
+        //url: 'index.php?',
+        url: 'tasks/ajax/save',
+		// initializes a new task
+		// the data part is like a form? This is where elements are coming from?
+		// need to give staffing id somewhere
         data: {
-          view: 'task-save',
+          //view: 'task-save',
           taskid: 'new',
           proposalid: proposalid,
-          peopleid: $entry['Staffing'],
+          //peopleid: $entry['Staffing'],
           taskname: $entry['Task']
         },
         async: false,
@@ -138,14 +144,17 @@ function loadTasksTable (reload, proposalid) {
         if (key.includes("FY") && !key.includes("id")) {
           fiscalyear = "10/01/20" + (parseInt(key.substring(2, )) - 1);
 
+		  // saves new staffing?
           $.ajax({
-            type:'post',
-            url: 'index.php?',
+            //type:'post',
+			type: "POST",
+            //url: 'index.php?',
+			url: 'staffing/ajax/save',
             success: function() {
               loadTasksTable(true, proposalid);
             },
             data: {
-              view: 'staffing-save',
+              //view: 'staffing-save',
               taskid: $task_res.responseText,
               staffingid: 'new',
               staffingpeopleid: $entry['Staffing'],
@@ -163,6 +172,7 @@ function loadTasksTable (reload, proposalid) {
       $entry = args.item;
       $keys = Object.keys($entry);
 
+	  // saves an existing task
       $.ajax({
         type:'post',
         url: 'index.php?',
@@ -209,6 +219,7 @@ function loadTasksTable (reload, proposalid) {
             }
           }
 
+		  // reloads the table?
           $.ajax({
             type:'post',
             url: 'index.php?',
