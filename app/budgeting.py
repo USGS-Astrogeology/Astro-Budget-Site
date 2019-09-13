@@ -732,9 +732,9 @@ def copy_proposal(proposalid):
 	existing_copies = Proposals.get_many(filters = [Proposals.projectname == "Copy of " + proposal.projectname],
 												 orders = [Proposals.modified.desc()])
 	'''
-	
+
 	#existing_copies = Proposals.query.filter(Proposals.projectname.contains("Copy of " + proposal.projectname)).all()
-	
+
 	copies_found = len(existing_copies)
 
 	if copies_found != 0:
@@ -974,30 +974,38 @@ def save_salary(salaryid):
 
 # STAFFING
 #@app.route('/staffing/ajax/save/<int:staffingid>')
-@app.route('/staffing/ajax/save')
+@app.route('/staffing/ajax/save', methods = ['POST'])
 @login_required
 #def save_staffing(staffingid):
 def save_staffing():
-	staffingid = request.data['staffingid']
+	staffingid = request.form['staffingid']
 	staffing = Staffing.get_one(filters = [Staffing.staffingid == staffingid])
 	response = {'status': 'Error', 'description': 'Staffing', 'action': 'found'}
 
+	#return str(request.form)
+
+	criteria = {'taskid': int(request.form['taskid']), 'peopleid': int(request.form['staffingpeopleid']),
+				'flexhours': request.form['flexhours'],'fiscalyear': request.form['fiscalyear']}
+
+	'''
 	try:
 		criteria = {'taskid': request.form['taskid'], 'peopleid': request.form['peopleid'],
-					'q1hours': request.form['q1hours'],'q2hours': request.form['q2hours'],
-					'q3hours': request.form['q3hours'],'q4hours': request.form['q4hours'],
 					'flexhours': request.form['flexhours'],'fiscalyear': request.form['fiscalyear']}
 	except:
 		return jsonify(response)
+	'''
 
 	save_response = save_dbobject(staffing, Staffing, criteria, response)
+
+	# need to add stuff to find the new staffing id so it can filter
+
 	if save_response['status'] == "Success":
 		proposal = Proposals.get_one(filters = [Proposals.proposalid == staffing.task.proposalid])
 		proposal.modified = datetime.now()
 		db.session.commit()
 
-	return "staffing save"
-	#return jsonify(save_response)
+	#return "staffing save"
+	return jsonify(save_response)
 
 
 
@@ -1029,22 +1037,34 @@ def load_tasks(proposalid):
 @login_required
 #def save_task(taskid):
 def save_task():
-	taskid = request.data['taskid']
+
+	#return request.data;
+	#return str(request.form);
+
+	taskid = request.form['taskid']
 	task = Tasks.get_one(filters = [Tasks.taskid == taskid])
 	response = {'status': 'Error', 'description': 'Task', 'action': 'found'}
 
 	try:
-		criteria = {'proposalid': request.data['proposalid'], 'taskname': request.data['taskname']}
+		criteria = {'proposalid': request.form['proposalid'], 'taskname': request.form['taskname']}
 	except:
 		return jsonify(response)
 
 	save_response = save_dbobject(task, Tasks, criteria, response)
 	if save_response['status'] == "Success":
-		proposal = Proposals.get_one(filters = [Proposals.proposalid == int(request.data['proposalid'])])
+		proposal = Proposals.get_one(filters = [Proposals.proposalid == int(request.form['proposalid'])])
 		proposal.modified = datetime.now()
 		db.session.commit()
 
-	return jsonify(save_response)
+	if taskid == '0':
+		task = Tasks.get_one(filters = [Tasks.proposalid == int(request.form['proposalid']),
+							 			Tasks.taskname == request.form['taskname']])
+		return str(task.taskid)
+
+	return str(taskid)
+
+	#return jsonify(save_response)
+
 
 
 # Helpers ------------------>

@@ -123,15 +123,15 @@ function loadTasksTable (reload, proposalid) {
 	  // initializes a new task
       $task_res = $.ajax({
         //type:'post',
-		type: "POST",
+		    type: "POST",
         //url: 'index.php?',
-        url: 'tasks/ajax/save',
+        url: '/tasks/ajax/save',
 		// initializes a new task
 		// the data part is like a form? This is where elements are coming from?
 		// need to give staffing id somewhere
         data: {
           //view: 'task-save',
-          taskid: 'new',
+          taskid: '0',
           proposalid: proposalid,
           //peopleid: $entry['Staffing'],
           taskname: $entry['Task']
@@ -147,16 +147,16 @@ function loadTasksTable (reload, proposalid) {
 		  // saves new staffing?
           $.ajax({
             //type:'post',
-			type: "POST",
+			      type: "POST",
             //url: 'index.php?',
-			url: 'staffing/ajax/save',
+			      url: '/staffing/ajax/save',
             success: function() {
               loadTasksTable(true, proposalid);
             },
             data: {
               //view: 'staffing-save',
               taskid: $task_res.responseText,
-              staffingid: 'new',
+              staffingid: '0',
               staffingpeopleid: $entry['Staffing'],
               fiscalyear: fiscalyear,
               flexhours: $entry[key]
@@ -174,16 +174,16 @@ function loadTasksTable (reload, proposalid) {
 
 	  // saves an existing task
       $.ajax({
-        type:'post',
-        url: 'index.php?',
+        type:'POST',
+        url: '/tasks/ajax/save',
         success: function() {
           loadTasksTable(true, proposalid);
         },
         data: {
-          view: 'task-save',
+          //view: 'task-save',
           taskid: $entry['taskid'],
           proposalid: proposalid,
-          peopleid: $entry['Staffing'],
+          //peopleid: $entry['Staffing'],
           taskname: $entry['Task']
         },
         async: true,
