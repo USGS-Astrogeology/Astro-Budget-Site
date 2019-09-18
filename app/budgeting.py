@@ -973,19 +973,79 @@ def save_salary(salaryid):
 
 
 # STAFFING
+
+@app.route('/staffing/ajax/delete', methods = ['POST'])
+@login_required
+def delete_staffing():
+	# if there are no more staffing available, need to also delete the task
+	# would it be better to just add the id to the url??
+	
+	staffingid = int(request.form['staffingid'])
+	staffing = Staffing.get_one(filters = [Staffing.staffingid == staffingid])
+	taskid = staffing.taskid
+	task = Tasks.get_one(filters = [Tasks.taskid == taskid])
+	response = {'status': 'Error', 'description': 'Staffing', 'action': 'found'}
+	
+	delete_response = delete_dbobject(staffing, response)
+	
+	if delete_response['status'] == "Success":
+		# check to see if only one and if so, delete
+		current_staffing = task.staffing
+		staffing_length = len(current_staffing)
+		
+		if staffing_length == 0:
+			# delete task
+			
+			# also need to update the last updated category in proposals
+			#proposal = Proposals.get_one(filters = [Proposals.proposalid == task.proposalid])
+			
+			#proposal.modified = datetime.now()
+			#db.session.commit()
+			
+			return "no staffing left in task"
+	
+	return jsonify(delete_response)
+
+
 #@app.route('/staffing/ajax/save/<int:staffingid>')
 @app.route('/staffing/ajax/save', methods = ['POST'])
 @login_required
 #def save_staffing(staffingid):
 def save_staffing():
-	staffingid = request.form['staffingid']
+	staffingid = int(request.form['staffingid'])
 	staffing = Staffing.get_one(filters = [Staffing.staffingid == staffingid])
 	response = {'status': 'Error', 'description': 'Staffing', 'action': 'found'}
 
 	#return str(request.form)
+	
+	# the stuff in the nested if is needed, but I don't think we need the else with it because no matter what, as long
+	# as the template is changed and the addition is done there, then it will change it to be the flex hours column
+	# and set the quarter hours to 0 so there isn't any math confusion
+	'''
+	if staffing:
+		if int(request.form['flexhours']) != staffing.flexhours:			
+			criteria = {'taskid': int(request.form['taskid']), 'peopleid': int(request.form['staffingpeopleid']),
+						'flexhours': request.form['flexhours'],'fiscalyear': request.form['fiscalyear'], 
+						'q1hours': 0, 'q2hours': 0, 'q3hours': 0, 'q4hours': 0}
+		else:
+			return "same value"
+			#q1_hours = staffing.q1hours
+			#q2_hours = staffing.q2hours
+			#q3_hours = staffing.q3hours
+			#q4_hours = staffing.q4hours
+			#flex_hours = staffing.flex_hours
+			#criteria = {'taskid': int(request.form['taskid']), 'peopleid': int(request.form['staffingpeopleid']),
+						'fiscalyear': request.form['fiscalyear']}
+	else:	
+		criteria = {'taskid': int(request.form['taskid']), 'peopleid': int(request.form['staffingpeopleid']),
+					'flexhours': request.form['flexhours'],'fiscalyear': request.form['fiscalyear']}
+	'''
 
-	criteria = {'taskid': int(request.form['taskid']), 'peopleid': int(request.form['staffingpeopleid']),
-				'flexhours': request.form['flexhours'],'fiscalyear': request.form['fiscalyear']}
+	try:
+		criteria = {'taskid': int(request.form['taskid']), 'peopleid': int(request.form['staffingpeopleid']),
+					'flexhours': request.form['flexhours'],'fiscalyear': request.form['fiscalyear']}
+	except:
+		return jsonify(response)
 
 	'''
 	try:
@@ -997,10 +1057,15 @@ def save_staffing():
 
 	save_response = save_dbobject(staffing, Staffing, criteria, response)
 
-	# need to add stuff to find the new staffing id so it can filter
-
 	if save_response['status'] == "Success":
-		proposal = Proposals.get_one(filters = [Proposals.proposalid == staffing.task.proposalid])
+		if not staffing:
+			new_staffing = Staffing.get_one(filters = [Staffing.taskid == int(request.form['taskid']), Staffing.peopleid == int(request.form['staffingpeopleid']),
+											Staffing.fiscalyear == request.form['fiscalyear'])
+										
+			proposal = Proposals.get_one(filters = [Proposals.proposalid == new_staffing.task.proposalid])
+		else:
+			proposal = Proposals.get_one(filters = [Proposals.proposalid == staffing.task.proposalid])
+			
 		proposal.modified = datetime.now()
 		db.session.commit()
 
@@ -1041,7 +1106,7 @@ def save_task():
 	#return request.data;
 	#return str(request.form);
 
-	taskid = request.form['taskid']
+	taskid = int(request.form['taskid'])
 	task = Tasks.get_one(filters = [Tasks.taskid == taskid])
 	response = {'status': 'Error', 'description': 'Task', 'action': 'found'}
 
