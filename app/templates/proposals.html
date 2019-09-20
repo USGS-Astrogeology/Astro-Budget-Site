@@ -5,7 +5,7 @@
 
 {% block body %}
   {{ super() }}
-    <a href='javascript:void(0)' onClick="editDialog('/proposals/ajax/edit/0', null, $('#proposalsTable'))" class="button new">New Project</a>
+    <a href='javascript:void(0)' onClick="editDialog('/proposals/ajax/edit/0', $('#proposalsTable'))" class="button new">New Project</a>
     <div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
     <div id="proposalsTableDiv">
       <table id="proposalsTable" class="display" cellspacing="0" width="100%">

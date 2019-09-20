@@ -104,13 +104,19 @@ db.init_app(app)
 def check_login():
 	if cas.username:
 		g.user = People.get_one(filters = [People.username == cas.username])
-		session.permanent = True
+	session.permanent = True
 
 @app.route('/')
 @login_required
 def home():
 	return render_template('default.html')
 
+@app.route('/abudget/<int:proposalid>')
+@login_required
+def abudget(proposalid):
+	proposal = Proposals.get_one(filters = [Proposals.proposalid == proposalid])
+	return render_template('proposal-costs-ajax.json', proposal = proposal)
+	
 
 # CONFERENCES
 
@@ -817,6 +823,19 @@ def copy_proposal(proposalid):
 
 	return "copy"
 
+@app.route('/proposals/ajax/costs/<int:proposalid>')
+@login_required
+def proposal_costs(proposalid):
+	proposal = Proposals.get_one(filters = [Proposals.proposalid == proposalid])
+	return render_template('proposal-costs-ajax.json', proposal = proposal)
+
+@app.route('/proposals/ajax/cost-titles/<int:proposalid>')
+@login_required
+def proposal_costtitles(proposalid):
+	costs = "one cost"
+	return render_template('proposal-cost-titles-ajax.json', costs = costs)
+
+
 @app.route('/proposals/ajax/delete/<int:proposalid>', methods = ['POST'])
 @login_required
 def delete_proposal(proposalid):
@@ -862,6 +881,7 @@ def save_proposal(proposalid):
 		return jsonify(response)
 
 	return jsonify(save_dbobject(proposal, Proposals, criteria, response))
+
 
 @app.route('/proposal-basis/<int:proposalid>')
 @login_required
@@ -1168,6 +1188,9 @@ def delete_dbobject(obj, response):
 		return response
 	response['status'] = 'Success'
 	return response
+
+def summarize_costs():
+	return True
 
 # -------------------------->
 

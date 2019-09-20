@@ -11,6 +11,11 @@
   <h1>Welcome to the proposal budget web system</h1>
   <h3>The following budget graphs are for projects that have been Submitted, Selected, or are Active</h3>
   <div id="graphs" class="container"></div>
+  {% for task in proposal.tasks %}
+    {% for staffing in task.staffing %}
+      <div>{{ staffing.staffcosts|currencyformat }}</div>
+    {% endfor %}
+  {% endfor %}
 {% endblock %}
 
 {% block javascript %}

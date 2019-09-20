@@ -119,26 +119,21 @@ function submitAction(ajax, table, dialog) {
 }
 
 function updateDropdown (id) {
-  var newDate = $("#" + id).datepicker("getDate");
+  let newDate = $("#" + id).datepicker("getDate");
 
-  //console.log ("datepicker returned " + newDate);
   if (newDate == null) {
-    //console.log ("newDate is NULL!!!!!");
     newDate = new Date();
     $("#" + id).val((newDate.getMonth() + 1) + '/' + newDate.getDate() + '/' +  newDate.getFullYear());
   }
 
-  var month = newDate.getMonth() + 1;
-  var year  = newDate.getFullYear();
-
-  var fyYear = year - 2000;
+  let month = newDate.getMonth() + 1;
+  let year  = newDate.getFullYear();
+  let fyYear = year - 2000;
   if (month >= 10) {
     fyYear += 1;
   }
-
-  var FYDate = '10/01/20' + (fyYear - 1);
-  var hid = '#' + id + 'dd';
-
+  let FYDate = '10/01/20' + (fyYear - 1);
+  let hid = '#' + id + 'dd';
   $(hid).val(FYDate);
 }
 
@@ -146,14 +141,13 @@ function updateCalendar (id) {
   var hid = '#' + id;
   var idname = hid + 'dd';
   var newDate = $(idname).val();
-
   $(hid).val (newDate);
 }
 
 function figureCosts(proposalid) {
   $('#budgetDashboard').html('');
   deleteProjectBudgetDashboard('#budgetDashboard');
-  $.getJSON( "index.php?view=proposal-cost-titles-json&proposalid=" + proposalid, function( data ) {
+  $.getJSON( `/proposals/ajax/cost-title/${proposalid }`, function( data ) {
     var items = [];
     $.each( data.data[0], function( key, val ) {
       $.each( val, function( title, mesg ) {
@@ -164,7 +158,7 @@ function figureCosts(proposalid) {
   $('#fbmsTitle').html('FBMS Accounts');
 
   // Dashboard
-  $.getJSON( "index.php?view=proposal-costs-json&proposalid=" + proposalid, function( data ) {
+  $.getJSON( `/proposals/ajax/costs/${proposalid}`, function( data ) {
     projectBudgetDashboard('#budgetDashboard',data.data[0].budget);
     projectBudgetTable('#budgetTable', data.data[0].budget);
   });

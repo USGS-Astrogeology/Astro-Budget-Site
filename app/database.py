@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Sequence, Boolean
 from sqlalchemy.orm import relationship
@@ -25,7 +25,37 @@ class Base(db.Model):
   def get_all(cls, orders=[]):
       return cls.query.order_by(*orders).all()
 
-class People(Base):
+
+class DatedBase(Base):
+  __abstract__ = True
+
+  @classmethod
+  def get_effective(cls, entries, fy):
+    all_effective = []
+
+    try:
+      for entry in entries:
+        if cls.to_fy(entry.effectivedate) == fy:
+          all_effective.append(entry)
+    except:
+      return None
+
+    return all_effective[-1]
+
+  @classmethod
+  def to_fy(cls, date):
+    year_string = ''
+    try:
+      if date.month >= 10 and date.day >= 1:
+        year_string = "FY" + str(date.year+1).replace("20", "", 1)
+      else:
+        year_string = "FY" + str(date.year).replace("20", "", 1)
+    except:
+      return ''
+    return year_string
+
+
+class People(DatedBase):
   __tablename__ = 'people'
 
   peopleid       = Column(Integer, Sequence('people_peopleid_seq'), primary_key=True)
@@ -34,13 +64,17 @@ class People(Base):
   admin          = Column(Boolean)
   row_preference = Column(Integer)
   salaries       = relationship('Salaries', backref='person', order_by="asc(Salaries.effectivedate)")
-  proposals      = relationship('Proposals', backref='person')
-  staffing       = relationship('Staffing', backref='person')
+  proposals      = relationship('Proposals', backref='person', cascade='all,delete')
+  staffing       = relationship('Staffing', backref='person', cascade='all,delete')
+
+  @hybrid_method
+  def salary(self, fy):
+    return self.get_effective(self.salaries, fy)
 
   def __repr__(self):
     return "<People(name='%s', username='%s')>" % (self.name, self.username)
 
-class Salaries(Base):
+class Salaries(DatedBase):
   __tablename__ = 'salaries'
 
   salaryid      = Column(Integer, Sequence('salaries_salaryid_seq'), primary_key=True)
@@ -80,7 +114,7 @@ class FundingPrograms(Base):
   pocemail    = Column(String(128))
   startdate   = Column(DateTime(timezone=False))
   enddate     = Column(DateTime(timezone=False))
-  proposals   = relationship('Proposals', backref='fundingprogram')
+  proposals   = relationship('Proposals', backref='fundingprogram', cascade='all,delete')
 
   def __repr__(self):
     return "<Funding Program(name='%s', agency='%s')>" % (self.programname, self.agency)
@@ -104,6 +138,28 @@ class Proposals(Base):
   funding             = relationship('Funding', backref='proposal', cascade="all,delete")
   overheadrates       = relationship('OverheadRates', backref='proposal', cascade="all,delete")
   modified            = Column(DateTime(timezone=False))
+
+  @hybrid_property
+  def years(self):
+    startyear = self.perfperiodstart.year
+    startyear = startyear if self.perfperiodstart.month < 10 and self.perfperiodstart.day < 1 else startyear + 1
+    endyear = self.perfperiodend.year
+    endyear = endyear if self.perfperiodstart.month < 10 and self.perfperiodstart.day < 1 else startyear + 1
+
+    years = []
+    currentyear = startyear
+    while currentyear <= endyear:
+        years.append(currentyear)
+        currentyear += 1
+    return years
+
+  @hybrid_property
+  def people(self):
+    people = []
+    for task in self.tasks:
+      for staffing in tasks.staffing:
+        if staffing.person not in people: people.append(staffing.person)
+    return people
 
   def __repr__(self):
     return "<Proposals(project='%s', proposalnumber='%s', awardnumber='%s')>" % (self.projectname, self.proposalnumber, self.awardnumber)
@@ -129,7 +185,7 @@ class Conferences(Base):
   def __repr__(self):
     return "<Conference(meeting='%s', location='%s')>" % (self.meeting, self.location)
 
-class ConferenceRates(Base):
+class ConferenceRates(DatedBase):
   __tablename__ = 'conferencerates'
 
   conferencerateid = Column(Integer, Sequence('conferencerates_conferencerateid_seq'), primary_key=True)
@@ -147,7 +203,7 @@ class ConferenceRates(Base):
   def __repr__(self):
     return "<ConferenceRates(perdiem='%d', registration='%s')>" % (self.perdiem, self.registration)
 
-class ConferenceAttendee(Base):
+class ConferenceAttendee(DatedBase):
   __tablename__ = 'conferenceattendee'
 
   conferenceattendeeid = Column(Integer, Sequence('conferenceattendee_conferenceattendeeid_seq'), primary_key=True)
@@ -170,10 +226,18 @@ class Tasks(Base):
   taskname   = Column(String(1024))
   staffing   = relationship('Staffing', backref='task')
 
+  @hybrid_property
+  def people(self):
+    return {staffing.person for staffing in self.staffing}
+
+  @hybrid_property
+  def taskhours(self):
+    return sum(staffing.taskhours for staffing in self.staffing)
+
   def __repr__(self):
     return "<Tasks(taskname='%s')>" % (self.taskname)
 
-class Staffing(Base):
+class Staffing(DatedBase):
   __tablename__ = 'staffing'
 
   staffingid = Column(BIGINT, Sequence('staffing_staffingid_seq'), primary_key=True)
@@ -185,6 +249,17 @@ class Staffing(Base):
   q4hours    = Column(REAL)
   flexhours  = Column(REAL)
   fiscalyear = Column(DateTime(timezone=False))
+
+  @hybrid_property
+  def taskhours(self):
+    return self.q1hours + self.q2hours + self.q3hours + self.q4hours + self.flexhours
+
+  @hybrid_property
+  def staffcosts(self):
+    fy = self.to_fy(self.fiscalyear)
+    salary = self.person.salary(fy)
+    lafhours = round(self.taskhours * salary.laf, 4)
+    return (salary.estsalary * lafhours) + (salary.estbenefits * lafhours)
 
   def __repr__(self):
     return "<Staffing(FY='%s', q1='%d', q2='%d', q3='%d', q4='%d', flex='%d')>" % (self.fiscalyear, self.q1hours, self.q2hours,
@@ -200,7 +275,7 @@ class ExpenseTypes(Base):
   def __repr__(self):
     return "<ExpenseTypes(description='%s')>" % (self.description)
 
-class Expenses(Base):
+class Expenses(DatedBase):
   __tablename__ = 'expenses'
 
   expenseid     = Column(BIGINT, Sequence('expenses_expenseid_seq'), primary_key=True)
@@ -213,7 +288,7 @@ class Expenses(Base):
   def __repr__(self):
     return "<Expenses(description='%s')>" % (self.description)
 
-class OverheadRates(Base):
+class OverheadRates(DatedBase):
     __tablename__='overheadrates'
 
     overheadid      = Column(Integer, Sequence('overheadrates_overheadid_seq'), primary_key=True)
