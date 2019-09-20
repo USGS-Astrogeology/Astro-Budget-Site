@@ -1060,7 +1060,7 @@ def save_staffing():
 	if save_response['status'] == "Success":
 		if not staffing:
 			new_staffing = Staffing.get_one(filters = [Staffing.taskid == int(request.form['taskid']), Staffing.peopleid == int(request.form['staffingpeopleid']),
-											Staffing.fiscalyear == request.form['fiscalyear'])
+											Staffing.fiscalyear == request.form['fiscalyear']])
 										
 			proposal = Proposals.get_one(filters = [Proposals.proposalid == new_staffing.task.proposalid])
 		else:
