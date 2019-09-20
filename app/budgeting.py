@@ -116,7 +116,7 @@ def home():
 def abudget(proposalid):
 	proposal = Proposals.get_one(filters = [Proposals.proposalid == proposalid])
 	return render_template('proposal-costs-ajax.json', proposal = proposal)
-	
+
 
 # CONFERENCES
 
@@ -734,17 +734,17 @@ def copy_proposal(proposalid):
 
 	response = {'status': 'Error', 'description': 'Proposal', 'action': 'found'}
 
-	'''
-	existing_copies = Proposals.get_many(filters = [Proposals.projectname == "Copy of " + proposal.projectname],
-												 orders = [Proposals.modified.desc()])
-	'''
 
-	#existing_copies = Proposals.query.filter(Proposals.projectname.contains("Copy of " + proposal.projectname)).all()
+	#existing_copies = Proposals.get_many(filters = [Proposals.projectname == "Copy of " + proposal.projectname],
+	#											 orders = [Proposals.modified.desc()])
+
+
+	existing_copies = Proposals.query.filter(Proposals.projectname.contains("Copy of " + proposal.projectname)).all()
 
 	copies_found = len(existing_copies)
 
 	if copies_found != 0:
-		proposal_attributes = {'projectname': "Copy of " + proposal.projectname + "(" + str(copies_found) + ")",
+		proposal_attributes = {'projectname': "Copy of " + proposal.projectname + "(" + str(copies_found + 1) + ")",
 				'peopleid': proposal.peopleid, 'programid': proposal.programid, 'status': proposal.status,
 				'proposalnumber': proposal.proposalnumber, 'awardnumber': proposal.awardnumber,
 				'perfperiodstart': proposal.perfperiodstart,
@@ -760,17 +760,9 @@ def copy_proposal(proposalid):
 
 
 	save_dbobject(None, Proposals, proposal_attributes, response)
-	# need a way to get the proposal id back from this before anything else can be done
-	# could I pass another parameter to the function that returns the object id? is it possible
-	# for it to even get the object id if has been passed to the database?
-	# use sqlalchemy to get the new id
-	# what if there's more than one copy?
-	# is there a way to sort by date created?/date modified?
-		# if so, then need to have the time clock too, not just the date
-	# could we look at which one has the higher id? it seems to increment every time something is added?
 
-	new_proposal = Proposals.get_many(filters = [Proposals.projectname == "Copy of " + proposal.projectname],
-												 orders = [Proposals.modified.desc()])
+	new_proposal = Proposals.get_many(filters = [Proposals.projectname == "Copy of " + proposal.projectname + "(" + str(copies_found + 1) + ")"],
+									  orders = [Proposals.modified.desc()])
 	new_proposal_id = new_proposal[0].proposalid
 
 	fbms_response = {'status': 'Error', 'description': 'FBMS', 'action': 'copy'}
@@ -820,8 +812,7 @@ def copy_proposal(proposalid):
 
 	# need to load the proposal page when it is made
 
-
-	return "copy"
+	return view_proposal(new_proposal_id)
 
 @app.route('/proposals/ajax/costs/<int:proposalid>')
 @login_required
@@ -999,31 +990,31 @@ def save_salary(salaryid):
 def delete_staffing():
 	# if there are no more staffing available, need to also delete the task
 	# would it be better to just add the id to the url??
-	
+
 	staffingid = int(request.form['staffingid'])
 	staffing = Staffing.get_one(filters = [Staffing.staffingid == staffingid])
 	taskid = staffing.taskid
 	task = Tasks.get_one(filters = [Tasks.taskid == taskid])
 	response = {'status': 'Error', 'description': 'Staffing', 'action': 'found'}
-	
-	delete_response = delete_dbobject(staffing, response)
-	
+
+	#delete_response = delete_dbobject(staffing, response)
+
 	if delete_response['status'] == "Success":
 		# check to see if only one and if so, delete
 		current_staffing = task.staffing
 		staffing_length = len(current_staffing)
-		
+
 		if staffing_length == 0:
 			# delete task
-			
+
 			# also need to update the last updated category in proposals
 			#proposal = Proposals.get_one(filters = [Proposals.proposalid == task.proposalid])
-			
+
 			#proposal.modified = datetime.now()
 			#db.session.commit()
-			
+
 			return "no staffing left in task"
-	
+
 	return jsonify(delete_response)
 
 
@@ -1037,15 +1028,15 @@ def save_staffing():
 	response = {'status': 'Error', 'description': 'Staffing', 'action': 'found'}
 
 	#return str(request.form)
-	
+
 	# the stuff in the nested if is needed, but I don't think we need the else with it because no matter what, as long
 	# as the template is changed and the addition is done there, then it will change it to be the flex hours column
 	# and set the quarter hours to 0 so there isn't any math confusion
 	'''
 	if staffing:
-		if int(request.form['flexhours']) != staffing.flexhours:			
+		if int(request.form['flexhours']) != staffing.flexhours:
 			criteria = {'taskid': int(request.form['taskid']), 'peopleid': int(request.form['staffingpeopleid']),
-						'flexhours': request.form['flexhours'],'fiscalyear': request.form['fiscalyear'], 
+						'flexhours': request.form['flexhours'],'fiscalyear': request.form['fiscalyear'],
 						'q1hours': 0, 'q2hours': 0, 'q3hours': 0, 'q4hours': 0}
 		else:
 			return "same value"
@@ -1056,14 +1047,15 @@ def save_staffing():
 			#flex_hours = staffing.flex_hours
 			#criteria = {'taskid': int(request.form['taskid']), 'peopleid': int(request.form['staffingpeopleid']),
 						'fiscalyear': request.form['fiscalyear']}
-	else:	
+	else:
 		criteria = {'taskid': int(request.form['taskid']), 'peopleid': int(request.form['staffingpeopleid']),
 					'flexhours': request.form['flexhours'],'fiscalyear': request.form['fiscalyear']}
 	'''
 
 	try:
 		criteria = {'taskid': int(request.form['taskid']), 'peopleid': int(request.form['staffingpeopleid']),
-					'flexhours': request.form['flexhours'],'fiscalyear': request.form['fiscalyear']}
+					'flexhours': request.form['flexhours'],'fiscalyear': request.form['fiscalyear'],
+					'q1hours': 0, 'q2hours': 0, 'q3hours': 0, 'q4hours': 0}
 	except:
 		return jsonify(response)
 
@@ -1080,12 +1072,12 @@ def save_staffing():
 	if save_response['status'] == "Success":
 		if not staffing:
 			new_staffing = Staffing.get_one(filters = [Staffing.taskid == int(request.form['taskid']), Staffing.peopleid == int(request.form['staffingpeopleid']),
-											Staffing.fiscalyear == request.form['fiscalyear']])
-										
+													   Staffing.fiscalyear == request.form['fiscalyear']])
+
 			proposal = Proposals.get_one(filters = [Proposals.proposalid == new_staffing.task.proposalid])
 		else:
 			proposal = Proposals.get_one(filters = [Proposals.proposalid == staffing.task.proposalid])
-			
+
 		proposal.modified = datetime.now()
 		db.session.commit()
 
@@ -1131,7 +1123,7 @@ def save_task():
 	response = {'status': 'Error', 'description': 'Task', 'action': 'found'}
 
 	try:
-		criteria = {'proposalid': request.form['proposalid'], 'taskname': request.form['taskname']}
+		criteria = {'proposalid': int(request.form['proposalid']), 'taskname': request.form['taskname']}
 	except:
 		return jsonify(response)
 
@@ -1141,7 +1133,7 @@ def save_task():
 		proposal.modified = datetime.now()
 		db.session.commit()
 
-	if taskid == '0':
+	if taskid == 0:
 		task = Tasks.get_one(filters = [Tasks.proposalid == int(request.form['proposalid']),
 							 			Tasks.taskname == request.form['taskname']])
 		return str(task.taskid)

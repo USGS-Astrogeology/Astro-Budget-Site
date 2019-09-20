@@ -1,8 +1,6 @@
 {"draw":0,"recordsTotal":{{ tasks|length }},"recordsFiltered":{{ tasks|length }},"data":[
 {% for task in tasks %}
   {% if task.staffing %}
-    {% set current_staff = task.staffing[0].peopleid %}
-    {% set cost_total = 0 %}
     { "Task": "{{ task.taskname|stringformat }}", "taskid": {{ task.taskid }},
       "Staffing":
       {% if task.staffing %}
@@ -12,21 +10,18 @@
       {% endif %}
 
     {% for staff in task.staffing %}
-      {% if staff.peopleid != current_staff %}
         "Cost": "{{ cost_total|currencyformat }}"}, { "Task": "{{ task.taskname }}",
         "taskid": {{ task.taskid }},
         "Staffing": {{ staff.peopleid }},
-        {% set current_staff = staff.peopleid %}
-        {% set cost_total = 0 %}
-      {% endif %}
-      "{{ staff.fiscalyear }}staffingid": {{ staff.staffingid }},
-      "{{ staff.fiscalyear }}": {{ staff.q1hours + staff.q2hours + staff.q3hours + staff.q4hours + staff.flexhours }},
-      {% if staff.person.salaries|geteffective %}
-        {% set salary = staff.person.salaries|geteffective %}
-        {% set cost_total = cost_total + ((salary.estsalary * salary.laf) + (salary.estbenefits * salary.laf)) %}
-      {% endif %}
+      "{{ staff.fiscalyear|fyformat }}staffingid": {{ staff.staffingid }},
+      {% if staff.q1hours %} {% set q1 = staff.q1hours %} {% else %} {% set q1 = 0 %} {% endif %}
+      {% if staff.q2hours %} {% set q2 = staff.q2hours %} {% else %} {% set q2 = 0 %} {% endif %}
+      {% if staff.q3hours %} {% set q3 = staff.q3hours %} {% else %} {% set q3 = 0 %} {% endif %}
+      {% if staff.q4hours %} {% set q4 = staff.q4hours %} {% else %} {% set q4 = 0 %} {% endif %}
+      {% if staff.flexhours %} {% set flexhours = staff.flexhours %} {% else %} {% set flexhours = 0 %} {% endif %}
+      "{{ staff.fiscalyear|fyformat }}": {{ staff.taskhours }},
       {% if loop.last %}
-        "Cost": "{{ cost_total|currencyformat }}"}
+        "Cost": "{{ staff.staffcosts|currencyformat }}"}
       {% endif %}
     {% endfor %}{% if not loop.last %},{% endif %}
   {% endif %}
