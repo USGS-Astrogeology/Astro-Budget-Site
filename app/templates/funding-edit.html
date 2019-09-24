@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Editing Funding</title>
+    </head>
+    <body>
+    <div id="fundingeditdiv">
+       <form id="fundingForm" action="" method="POST">
+            <input type="hidden" autofocus/>
+            <input type="hidden" id="proposalid" name="proposalid" value="{{ funding.proposalid }}"/>
+            <input type="hidden" id="fundingid" name="fundingid" value="{{ funding.fundingid }}"/>
+
+            <table>
+            <tr><th>Fiscal Year</th>
+            <td><input type="text" name="fiscalyear" id="fiscalyear" size="16"
+                value="{{ funding.fiscalyear | fydateformat }}" onchange="updateDropdown('fiscalyear');"/>
+                {% with dropdown_name = 'fiscalyear',
+                        dropdown_id = 'fiscalyear',
+                        selected_fy = 'test' %}
+                {% include 'fiscalyear-dropdown.html' %}
+                {% endwith %}
+                </td></tr>
+            <tr><th>New Funding</th>
+            <td><input type="text" name="newfunding" id="newfunding" size="16" value="{{ funding.newfunding | currencyformat }}"/></td></tr>
+            <tr><th>Carryover</th>
+            <td><input type="text" name="carryover" id="carryover" size="16" value="{{ funding.carryover | currencyformat }}"/></td></tr>
+       </form>
+    </div>
+
+    <script type="text/javascript">
+
+      $(document).ready(function() {
+        $("#fiscalyear").datepicker();
+        updateDropdown('fiscalyear');
+      });
+
+    </script>
+    </body>
+</html>

@@ -1,0 +1,30 @@
+{% extends 'page_template.html' %}
+{% set active_page = 'expensetypes' %}
+
+{% block head %}{{ super() }}<title>Expense Categories</title>{% endblock %}
+
+{% block body %}
+  {{ super() }}
+      {% if g.user.admin %}
+        <a href='javascript:void(0)' onClick="editDialog('/expensetypes/ajax/edit/0', $('#expensetypesTable'))" class='button new'>New Expense Category</a>
+      {% endif %}
+    </div>
+  </div>
+  <div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
+  <div id="expensetypesTableDiv">
+    <table id="expensetypesTable" class="display" cellspacing="0" width="100%">
+      <thead><tr><th>Description</th><th>&nbsp;</tr></thead>
+    </table>
+  </div>
+{% endblock %}
+
+{% block javascript %}
+  {{ super() }}
+  <script>
+    $(document).ready(function() {
+      $(".button").button();
+      loadTable('/expensetypes/ajax/list', false, $('#expensetypesTable'));
+    });
+  </script>
+{% endblock %}
+

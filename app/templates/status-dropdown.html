@@ -1,0 +1,6 @@
+<select name='{{ dropdown_name }}' id='{{ dropdown_id }}'>
+{% for status in statuses %}
+  <option value='{{ status.status }}' {% if status.status == selected_status %} selected {% endif %}>
+    {{ status.statusname }}</option>
+{% endfor %}
+</select>

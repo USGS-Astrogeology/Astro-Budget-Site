@@ -1,0 +1,24 @@
+{% extends 'page_template.html' %}
+{% set active_page = "people" %}
+
+{% block head %}{{ super() }}<title>People</title>{% endblock %}
+
+{% block body %}
+  {{ super() }}
+  <a href='javascript:void(0)' onClick="editDialog('/people/ajax/new/0', $('#peopleTable'))" class="button new">New Person</a>
+  <div id="peopleTableDiv">
+    <table id="peopleTable" class="display" cellspacing="0" width="100%">
+      <thead><tr><th>Name</th><th>Title</th><th>Pay Plan</th><th>Username</th></tr></thead>
+    </table>
+  </div>
+{% endblock %}
+
+{% block javascript %}
+  {{ super() }}
+  <script>
+    $(document).ready(function() {
+      $(".button").button();
+      loadTable('/people/ajax/list', false, $('#peopleTable'));
+    });
+  </script>
+{% endblock %}

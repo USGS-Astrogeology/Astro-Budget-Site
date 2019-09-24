@@ -1,0 +1,29 @@
+{% extends 'page_template.html' %}
+{% set active_page = 'conferences' %}
+
+{% block head %}{{ super() }}<title>Conferences/Travel</title>{% endblock %}
+
+{% block body %}
+  {{ super() }}
+    {% if g.user.admin %}
+      <a href='javascript:void(0)' onClick="editDialog('/conferences/ajax/new/0', $('#conferencesTable'))" class='button new'>New Conference/Meeting/Travel</a>
+    {% endif %}
+    <div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
+    <div id="conferencesTableDiv">
+      <table id="conferencesTable" class="display" cellspacing="0" width="100%">
+        <thead><tr><th>Meeting</th><th>Location</th><th>Per Diem</th><th>Lodging</th><th>Registration</th>
+                    <th>Ground Transport</th><th>Airfare</th><th>&nbsp;</th></tr></thead>
+      </table>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+  {{ super() }}
+  <script>
+    $(document).ready(function() {
+      $(".button").button();
+      loadTable('/conferences/ajax/list', false, $('#conferencesTable'));
+    });
+  </script>
+{% endblock %}
+

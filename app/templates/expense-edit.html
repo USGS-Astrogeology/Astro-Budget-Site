@@ -1,0 +1,33 @@
+<div>
+  <div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
+  <div id="displayTitle" data-content="{{ expense.description if expense else 'Create Expense' }}"></div> 
+  <form id="expenseForm" action="" method="POST">
+      <input type="hidden" autofocus />
+      <input type="hidden" id="expenseid" name="expenseid" value="{{ expense.expenseid if expense else 0 }}" />
+      <table><tr><th>Description</th>
+      <td><input type="text" name="description" id="description" value="{{ expense.description }}" size="40"/></td></tr>
+      <tr><th>Expense Type</th>
+        <td>
+          {% with dropdown_name = 'expensetypeid', dropdown_id = 'expensetypedropdown', selected_expensetypeid = expense.expensetypeid %}
+            {% include 'expensetypes-dropdown.html' %}
+          {% endwith %}
+        </td>
+      </tr>
+      <tr><th>Amount</th>
+      <td><input type="text" name="amount" id="amount" size="12" value="{{ expense.amount|currencyformat }}"/></td></tr>
+      <tr><th>Fiscal Year</th>
+        <td><input type="text" name="fiscalyear" id="fiscalyear" size="12" value="{{ expense.fiscalyear|dateformat }}"
+                    onchange="updateDropdown('fiscalyear');"/>
+          {% with dropdown_name = 'fiscalyear', dropdown_id = 'fiscalyear', selected_fy = expense.fiscalyear %}
+            {% include 'fiscalyear-dropdown.html' %}
+          {% endwith %}
+      </table>
+  </form>
+</div>
+
+<script>
+  $(document).ready(function() {
+    $("#fiscalyear").datepicker();
+    updateDropdown('fiscalyear');
+  });
+</script>

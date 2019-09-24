@@ -1,0 +1,27 @@
+{% extends 'page_template.html' %}
+{% set active_page = 'overhead' %}
+
+{% block head %}{{ super() }}<title>Overhead Rates</title>{% endblock %}
+
+{% block body %}
+  {{ super() }}
+  {% if g.user.admin %}
+    <a href='javascript:void(0)' onClick="editDialog('/overhead/ajax/edit/0', $('#overheadTable'))" class="button new">New Overhead Rate</a>
+  {% endif %}
+  <div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
+  <div id="overheadTableDiv">
+      <table id='overheadTable' class='display' cellspacing='0' width='100%'>
+        <thead><tr><th>Rate</th><th>Description</th><th>Fiscal Year</th><th>&nbsp</th></tr>
+      </table>
+  </div>
+{% endblock %}
+
+{% block javascript %}
+  {{ super() }}
+  <script>
+    $(document).ready(function() {
+      $(".button").button();
+      loadTable('/overhead/ajax/list', false, $('#overheadTable'));
+    });
+  </script>
+{% endblock %}

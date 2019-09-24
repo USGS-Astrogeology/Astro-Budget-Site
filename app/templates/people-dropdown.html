@@ -1,0 +1,14 @@
+<select name='{{ dropdown_name }}' id='{{ dropdown_id }}'>
+{% if search %}<option value='ALL'>ALL People</option>{% endif %}
+  {% for person in people %}
+    {% if person.salaries[0] %}
+      <option value='{{ person.peopleid }}' {% if person.peopleid == selected_peopleid %} selected {% endif %}>
+      {% if person.salaries[0].title|lower != 'no longer here' %}
+        {{ person.name }} {{ person.salaries[0].payplan }} {{ person.salaries[0].title }}
+      {% else %}
+        {{ person.name }} N/A
+      {% endif %}
+      </option>
+    {% endif %}
+  {% endfor %}
+</select>

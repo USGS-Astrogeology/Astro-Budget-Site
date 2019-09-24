@@ -1,0 +1,30 @@
+
+  <div>
+    <div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
+    <div id="displayTitle" data-content="{{ overheadrate.description }}"></div> 
+    <form id="overheadForm" action="" method="POST">
+      <input type="hidden" autofocus />
+      <input type="hidden" id="proposalid" name="proposalid" value="{{ overheadrate.proposalid }}"/>
+      <input type="hidden" id="overheadid" name="overheadid" value="{{ overheadrate.overheadid }}"/>
+      <table><tr><th>Overhead Rate</th>
+      <td><input type="text" name="rate" id=rate" value="{{ overheadrate.rate }}" size="10"/></td></tr>
+      <tr><th>Description</th>
+      <td><input type="text" name="description" id="description" value="{{ overheadrate.description }}" size="32"/></td></tr>
+      <tr><th>Effective Date</th>
+      <td><input type="text" name="effectivedate" id="effectivedate" value="{{ overheadrate.effectivedate|dateformat }}" size="12"
+            onchange="updateDropdown('effectivedate');"/>
+            {% with dropdown_name = 'effectivedate', dropdown_id = 'effectivedate', selected_fy = overheadrate.effectivedate %}
+            {% include 'fiscalyear-dropdown.html' %}
+            {% endwith %}
+      </td></tr>
+      </table>
+    </form>
+  <div>
+
+  <script>
+    $(document).ready(function() {
+      $("#effectivedate").datepicker();
+      updateDropdown ('effectivedate');
+    });
+  </script>
+

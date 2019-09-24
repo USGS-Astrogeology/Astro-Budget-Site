@@ -1,0 +1,8 @@
+
+{"draw":0,"recordsTotal":{{ 1 }},"recordsFiltered":{{ 1 }},"data":[
+  {"project":"{{ proposal.projectname }}", "status":"{{  proposal.proposalstatus.statusname }}", "budget":[
+  {% for fy in proposal.years %}
+        {"fy": "{{ fy }}", "costs": {"expenses": 1, "staffing": 1, "travel": 1, "overhead": 1, "equipment": 1}, "funding": 200 }
+    {% if loop.last != true %}, {% endif %}
+  {% endfor %}]}]
+}

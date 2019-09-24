@@ -1,0 +1,41 @@
+<div>  
+  <div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
+  <div id="displayTitle" data-content="Create Conference/Meeting/Travel"></div> 
+  <form id="conferenceForm" action="" method="POST">
+    <input type="hidden" autofocus />
+    <input type="hidden" id="conferenceid" name="conferenceid" value="0" />
+    <input type="hidden" id="conferencerateid" name="conferencerateid" value="0" />
+    {% set conferencerate = {} %}
+    <table>
+      <tr><th align="left">Conference/Meeting/Travel</th></tr>
+      <tr><td><input type="text" name="meeting" id="meeting" value="" size="40" required/></td></tr>
+    <table>
+    <table>
+      <tr><th>Per Diem</th><td><input type="text" id="perdiem" name="perdiem" size="12" value="{{ conferencerate.perdiem|currencyformat }}"/></td>
+          <th>Registration</th><td><input type="text" id="registration" name="registration" size="12" value="{{ conferencerate.registration|currencyformat }}"/></td></tr>
+      <tr><th>Lodging</th><td><input type="text" id="lodging" name="lodging" size="12" value="{{ conferencerate.lodging|currencyformat }}"/></td>
+          <th>&nbsp;</th><td>&nbsp;</td></tr>
+      <tr><th>Ground Transport</th><td><input type="text" id="groundtransport" name="groundtransport" size="12" value="{{ conferencerate.groundtransport|currencyformat }}"/></td>
+          <th>Airfare</th><td><input type="text" id="airfare" name="airfare" size="12" value="{{ conferencerate.airfare|currencyformat }}"/></td></tr>
+      <tr><th>City</th><td><input type="text" id="city" name="city" size="30" value="{{ conferencerate.city }}"/></td>
+          <th>State</th><td><input type="text" id="state" name="state" size="12" value="{{ conferencerate.state }}"/></td></tr>
+      <tr><th>Country</th><td><input type="text" id="country" name="country" size="20" value="{{ conferencerate.country }}"/></td>
+          <th>Effective Date</th><td><input type="text" id="effectivedate" name="effectivedate" size="12" value="{{ conferencerate.effectivedate|dateformat }}"
+              onchange="updateDropdown('effectivedate');"/>
+              {% with dropdown_name = 'effectivedate',
+                      dropdown_id = 'effectivedate',
+                      selected_fy = '' %}
+                {% include 'fiscalyear-dropdown.html' %}
+              {% endwith %}
+              </td></tr>
+    </table>
+  </form>
+</div>
+
+<script>
+  $(document).ready(function() {
+    $("#effectivedate").datepicker();
+    //$("#rateSaveButton").button();
+    updateDropdown('effectivedate');
+  });
+</script>

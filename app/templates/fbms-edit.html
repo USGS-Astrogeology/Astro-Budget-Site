@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Editing {{ fbmsaccount.accountno }}</title>
+        <script src="{{ url_for('static', filename='js/budgeting.js') }}"></script>
+    </head>
+    <body>
+    <div id="fbmseditdiv">
+       <form id="fbmsForm" action="" method="POST">
+            <input type="hidden" autofocus />
+            <input type="hidden" id="proposalid" name="proposalid" value="{{ fbmsaccount.proposalid }}"/>
+            <input type="hidden" id="fbmsid" name="fbmsid" value="{{ fbmsaccount.fbmsid }}"/>
+            <table><tr><th>Account No.</th>
+            <td><input type="text" name="accountno" id="accountno" value="{{ fbmsaccount.accountno }}" size="24"/></td></tr>
+            </table>
+       </form>
+    </div>
+    </body>
+</html>

@@ -1,0 +1,14 @@
+{"draw":0,"recordsTotal":{{ staffing|length }},"recordsFiltered":{{ staffing|length }},"data":[
+    {% for task in staffing %}
+       [{{ task.staffingid }}, 
+        {{ task.taskid }}, 
+        {{ task.peopleid }}, 
+        "{{ task.fiscalyear|fydateformat }}", 
+        {{ task.q1hours }}, 
+        {{ task.q2hours }}, 
+        {{ task.q3hours }}, 
+        {{ task.q4hours }}, 
+        {{ task.flexhours }}]
+        {% if loop.last != true %},{% endif %}
+    {% endfor %}
+]}

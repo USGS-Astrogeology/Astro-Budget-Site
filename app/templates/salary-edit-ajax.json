@@ -1,0 +1,16 @@
+{"draw":0,"recordsTotal":{{ salaries|length }},"recordsFiltered":{{ salaries|length }},"data":[
+    {% for salary in salaries %}
+        [{{ salary.salaryid }}, 
+         {{ salary.peopleid }}, 
+         "{{ salary.effectivedate|dateformat }}", 
+         "{{ salary.payplan }}", 
+         "{{ salary.title }}", 
+         "{{ salary.appttype }}", 
+         {{ salary.authhours }}, 
+         "{{ salary.estsalary|currencyformat }}", 
+         "{{ salary.estbenefits|currencyformat }}", 
+         "{{ salary.leavecategory }}", 
+         "{{ salary.laf }}"]
+         {% if loop.last != true %},{% endif %}
+    {% endfor %}
+]}

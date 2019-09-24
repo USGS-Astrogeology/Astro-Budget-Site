@@ -1,0 +1,60 @@
+
+<div>
+  <div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
+  <div id="displayTitle" data-content="{{ person.name }}"></div> 
+  <div id="peopleTabs">
+    <ul>
+      <li><a href="#salaryTab">Salaries</a></li>
+      <li><a href="#staffingTab">Staffing</a></li>
+      <li><a href="#profileTab">Profile</a></li>
+    </ul>
+
+    <!-- salary tab -->
+    <div id="salaryTab" class="tab">
+      <div><a href='javascript:void(0)' onClick="editDialog('/salaries/ajax/edit/0', $('#salaryTable'))" class="button new">New Salary</a></div>
+      <div id="salaryTableDiv">
+        <table id="salaryTable" class="display" cellspacing="0" width="100%">
+          <thead><tr><th>ID</th><th>Effective Date</th><th>Pay Plan</th><th>Title</th>
+                     <th>Appt Type</th><th>Auth Hours</th><th>Est<br/>Salary</th>
+                     <th>Est Benefits</th><th>Leave Cat</th><th>LAF</th><th>&nbsp;</th></tr></thead>
+        </table>
+      </div>
+    </div>
+
+    <!-- staffing tab -->
+    <div id="staffingTab" class="tab">
+      <table id="staffingTable" class="display" cellspacing="0" width="100%">
+        <thead><tr><th>Project</th><th>Task</th><th>Fiscal</th><th>Hours</th></tr></thead>
+      </table>
+    </div>
+
+    <!-- settings tab -->
+    <div id="profileTab" class="tab">
+    {% if g.user.admin %}
+      <form id="peopleForm" action="" method="POST">
+        <input type="hidden" autofocus />
+        <input type="hidden" id="peopleid" name="peopleid" value="{{ person.peopleid }}"/>
+        <table><tr><th>Name</th><td><input type="text" name="name" id="name" value="{{ person.name }}" size="40"/></td></tr>
+              <tr><th>Username</th><td><input type="text" name="username" id="username" value="{{ person.username }}" size="40"/></td></tr>
+              <tr><th>Administrator</th><td><input type="checkbox" name="admin" id="admin" value="t" {% if person.admin %} checked {% endif %}/></td></tr>
+        </table>
+      </form>
+    {% else %}
+      <table><tr><th>Name:</th><td>{{ person.name }}</td></tr>
+            <tr><th>Username:</th><td>{{ person.username }}</td></tr>
+            <tr><th>Administrator:</th><td>{{ person.admin }}</td></tr>
+      </table>
+    {% endif %}
+    </div>
+  </div>
+<div>
+
+
+<script>
+  $(document).ready(function() {
+    $('#peopleTabs').tabs();
+    $('.button').button();
+    loadTable('/salaries/ajax/list/{{ person.peopleid }}', false, $('#salaryTable'));
+    loadTable('/people/ajax/task/{{ person.peopleid }}', false, $('#staffingTable'));
+  });
+</script>

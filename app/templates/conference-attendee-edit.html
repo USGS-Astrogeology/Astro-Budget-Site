@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Editing Conference Attendee</title>
+    </head>
+    <body>
+
+    <div id="lookuplinks">
+      <a href="http://www.gsa.gov/portal/content/104877" id="gsabutton" target='lookup'
+      class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button">
+      <span class="ui-button-text">US Per Diem</span></a>
+
+      <a href="https://aoprals.state.gov/web920/per_diem.asp" id="sdbutton" target='lookup'
+      class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button">
+      <span class="ui-button-text">Intl Per Diem</span></a>
+      <a href="https://cge.concursolutions.com/" id="cgebutton" target='lookup'
+      class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button">
+      <span class="ui-button-text">CGE Flight Lookup</span></a>
+      <p/>
+    </div>
+    <div id="conferenceattendeeeditdiv">
+       <form id="conferenceAttendeeForm" action="" method="POST">
+            <input type="hidden" autofocus />
+            <input type="hidden" id="travelid" name="travelid"
+              {% if not conferenceattendee %} value="new"/>
+              {% else %} value="{{ conferenceattendee.travelid }}"/>
+              {% endif %}
+
+            <input type="hidden" id="proposalid" name="proposalid" value="{{ proposalid }}"/>
+            <table><tr><th>Meeting/Conference/Training</th>
+            <td colspan="3">
+              {% with dropdown_name = 'conferenceid', dropdown_id = 'conferenceiddropdown', selected_conferenceid = conferenceattendee.conferenceid %}
+                {% include 'conferences-dropdown.html' %}
+              {% endwith %}
+              {% if selected_conferenceid %}
+                {% set conference = true %}
+              {% else %}
+                {% set conference = false %}
+              {% endif %}
+
+            </td></tr>
+            <tr><th>Meeting</th><td colspan="3">
+            <input type="text" name="meeting" id="meeting" size=48
+            {% if conferenceattendee %} value="{{ conferenceattendee.conference.meeting }}"
+            {% else %} value="" {% endif %}/></td></tr>
+            <tr><th>Meeting Days</th>
+            <td><input type="text" name="meetingdays" id="meetingdays" size="4" value="{{ conferenceattendee.meetingdays}}"/></td>
+            <th>Travel Days</th>
+            <td><input type="text" name="traveldays" id="traveldays" size="4" value="{{ conferenceattendee.traveldays}}"/></td></tr>
+            <tr><th>Travelers</th>
+            <td><input type="text" name="travelers" id="travelers" size="4" value="{{ conferenceattendee.travelers}}"/></td>
+            <th>Trip Date</th>
+            <td><input type="text" name="startdate" id="tripstartdate" size="12" value="{{ conferenceattendee.startdate|dateformat }}"
+                        onchange="updateDropdown('startdate')"/>
+              {% with dropdown_name = 'startdate', dropdown_id = 'tripstartdate', selected_fy = conferenceattendee.startdate %}
+                {% include 'fiscalyear-dropdown.html' %}
+              {% endwith %}
+            </td></tr>
+            <tr><th>How Many Rental Cars</th>
+            {% if conferenceattendee %}
+            {% set conferencerate = conferenceattendee.conference.conferencerates|geteffective %}
+            <td><input type="text" name="rentalcars" id="rentalcars" size="12" value="{{ conferenceattendee.rentalcars }}"/></td>
+            <th>Ground Transport</th><td><input type="text" name="groundtransport" id="groundtransport" size="9" value="{{ conferencerate.groundtransport|floatformat }}"/></td></tr>
+            <tr><th>Airfare</th><td><input type="text" name="airfare" id="airfare" size="10" value="{{ conferencerate.airfare|floatformat }}"/></td>
+            <th>Lodging</th><td><input type="text" name="lodging" id="lodging" size="9" value="{{ conferencerate.lodging|floatformat }}"/></td></tr>
+            <tr><th colspan=3>Other per Traveler Costs such as CGE booking</th><td><input type="text" name="other" id="other" size="8" value="--"/></td>
+            <tr><th>Per Diem</th><td><input type="text" name="perdiem" id="perdiem" size="8" value="{{ conferencerate.perdiem|floatformat }}"/></td>
+            <th>Registration</th><td><input type="text" name="registration" id="registration" size="8" value="{{ conferencerate.registration|floatformat }}"/></td></tr>
+            <tr><th>City, State</th><td><input type="text" name="city" id="city" size="20" value="{{ conferencerate.city }}"/>,
+            <input type="text" name="state" id="state" size="3" value="{{ conferencerate.state }}"/></td>
+            <th>Country</th><td><input type="text" name="country" id="country" size="20" value="{{ conferencerate.country }}"/></td></tr>
+            {% else %}
+            <td><input type="text" name="rentalcars" id="rentalcars" size="12" value="{{ conferenceattendee.rentalcars }}"/></td>
+            <th>Ground Transport</th><td><input type="text" name="groundtransport" id="groundtransport" size="9" value=""/></td></tr>
+            <tr><th>Airfare</th><td><input type="text" name="airfare" id="airfare" size="10" value=""/></td>
+            <th>Lodging</th><td><input type="text" name="lodging" id="lodging" size="9" value=""/></td></tr>
+            <tr><th colspan=3>Other per Traveler Costs such as CGE booking</th><td><input type="text" name="other" id="other" size="8" value="--"/></td>
+            <tr><th>Per Diem</th><td><input type="text" name="perdiem" id="perdiem" size="8" value=""/></td>
+            <th>Registration</th><td><input type="text" name="registration" id="registration" size="8" value=""/></td></tr>
+            <tr><th>City, State</th><td><input type="text" name="city" id="city" size="20" value=""/>,
+            <input type="text" name="state" id="state" size="3" value=""/></td>
+            <th>Country</th><td><input type="text" name="country" id="country" size="20" value=""/></td></tr>
+            {% endif %}
+           </table>
+       </form>
+    </div>
+
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $("#tripstartdate").datepicker();
+        updateDropdown('tripstartdate');
+      });
+    </script>
+    </body>
+</html>

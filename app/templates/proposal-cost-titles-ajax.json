@@ -1,0 +1,5 @@
+{"draw":0,"recordsTotal":{{ 2 }},"recordsFiltered":{{ 2 }},"data":[
+  {% for cost in costs %}
+    [{"#proposalTitle":"{{ 'TEXT' }}", "#tasksTitle":"{{ 'TEXT' }}","#conferencesTitle":"{{ 'TEXT' }}", "#expensesTitle":"{{ 'TEXT' }}", "#overheadTitle":"{{ 'TEXT' }}", "#fundingTitle":"{{ 'TEXT' }}"}]{% if loop.last != true %},{% endif %}
+  {% endfor %}
+]}

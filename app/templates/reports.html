@@ -1,0 +1,43 @@
+{% extends 'page_template.html' %}
+{% set active_page = 'reports' %}
+
+{% block head %}{{ super() }}<title>Budget Reports</title>{% endblock %}
+
+{% block body %}
+  {{ super() }}
+  <div id="title">
+    <h1>Budget Reports</h1>
+  </div>
+  <div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
+  <form id="reportForm" action="" method="POST">
+    <table id='reportFormTable' class='display' cellspacing='0' width='100%'>
+      <tr><th>CSV Download File Name</th><td>
+      <input type="text" id="reportfile" name="reportfile" size="32" value="{{ reportfile }}"/></td></tr>
+      <tr><th>Project Name Match (use '%' as wildcard)</th><td><input type="text" id="match" name="match" size="64"/></td></tr>
+      <tr><th>Status Codes to include</th><td>{% include 'status-checkbox.html' %}</td></tr>
+      <tr><th>Start Date</th><td><input type="text" name="startdate" id="startdate" value="{{ startdate }}" size="24"/></td></tr>
+      <tr><th>End Date</th><td><input type="text" name="enddate" id="enddate" value="{{ enddate }}" size="24"/></td></tr>
+      <tr><th>Report Type</th><td><input type="radio" name="view" value="tasks-list-csv" checked/>Staffing
+              <input type="radio" name="view" value="budgets-list-csv"/>Costs</td></tr>
+      <tr><th>Program</th><td>
+        {% with dropdown_name = 'programid',
+                search = 1,
+                dropdown_id = 'programiddropdown',
+                selected_programid = 0 %}
+            {% include 'programs-dropdown.html' %}
+        {% endwith %}
+        </td></tr>
+      <tr><th>Person <span style="font-weight:normal;">(staffing only)</span></th><td>
+        {% with dropdown_name = 'peopleid',
+                search = 1,
+                dropdown_id = 'peopledropdown',
+                selected_peopleid = 0 %}
+            {% include 'people-dropdown.html'  %}
+        {% endwith %}
+        </td></tr>
+      <tr><th>Authorized Hours<br/><span style="font-weight:normal;">(for Current & Pending<br/>use 1545 hours)</span></th><td>
+          <input type="text" name="authhours" value="" size=8/></td>
+      <tr style="height:80px;"><th><input type="submit" class="ui-state-default ui-button ui-widget ui-corner-all" value="Run Report"/></th><td></td>
+    </table>
+  </form>
+{% endblock %}

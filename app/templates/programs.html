@@ -1,0 +1,27 @@
+{% extends 'page_template.html' %}
+{% set active_page = 'programs' %}
+
+{% block head %}{{ super() }}<title>Funding Programs</title>{% endblock %}
+
+{% block body %}
+  {{ super() }}
+    {% if g.user.admin %}
+      <a href='javascript:void(0)' onClick="editDialog('/programs/ajax/edit/0', $('#programsTable'))" class="button new">New Funding Program</a>
+    {% endif %}
+    <div class="alert ui-corner-all ui-state-highlight" style="display: none;"></div>
+    <div id="programsTableDiv">
+    <table id="programsTable" class="display" cellspacing="0" width="100%">
+      <thead><tr><th>Name</th><th>Agency</th><th>POC</th><th>POC E-Mail</th><th>Start</th><th>End</th><th>&nbsp;</th></tr></thead>
+    </table>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+  {{ super() }}
+  <script>
+    $(document).ready(function() {
+      $(".button").button();
+      loadTable('/programs/ajax/list', false, $('#programsTable'));
+    });
+  </script>
+{% endblock %}
