@@ -780,12 +780,28 @@ def copy_proposal(proposalid):
 
 		save_dbobject(None, ConferenceAttendee, conference_attributes, conference_response)
 
-	#task_response = {'status': 'Error', 'description': 'Tasks', 'action': 'copy'}
-	# need to figure out how to copy the staffing and get the staffing id back for tasks
-	'''
+
 	for task in tasks:
-		task_attributes = {}
-	'''
+		task_response = {'status': 'Error', 'description': 'Tasks', 'action': 'copy'}
+		task_attributes = {'proposalid': new_proposal_id, 'taskname': task.taskname}
+		
+		save_dbobject(None, Tasks, task_attributes, task_response)
+		
+		if task_response['status'] == "Success":
+			staffing = task.staffing
+			
+			new_task = Tasks.get_one(filters = [Tasks.proposalid == new_proposal_id, Tasks.taskname == task.taskname])
+			new_task_id = new_task.taskid
+		
+			for staff in staffing:
+				staff_response = {'status': 'Error', 'desciption': 'Staffing', 'action': 'copy'}
+				staff_attributes = {'taskid': new_task_id, 'peopleid': staff.peopleid, 'q1hours': staff.q1hours,
+									'q2hours': staff.q2hours, 'q3hours': staff.q3hours, 'q4hours': staff.q4hours,
+									'flexhours': staff.flexhours, 'fiscalyear': staff.fiscalyear}
+									
+				save_dbobject(None, Staffing, staff_attributes, staff_response)
+				
+	
 
 	expense_response = {'status': 'Error', 'description': 'Expenses', 'action': 'copy'}
 	for expense in expenses:
