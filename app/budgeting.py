@@ -785,9 +785,9 @@ def copy_proposal(proposalid):
 		task_response = {'status': 'Error', 'description': 'Tasks', 'action': 'copy'}
 		task_attributes = {'proposalid': new_proposal_id, 'taskname': task.taskname}
 		
-		save_dbobject(None, Tasks, task_attributes, task_response)
+		task_save_response = save_dbobject(None, Tasks, task_attributes, task_response)
 		
-		if task_response['status'] == "Success":
+		if task_save_response['status'] == "Success":
 			staffing = task.staffing
 			
 			new_task = Tasks.get_one(filters = [Tasks.proposalid == new_proposal_id, Tasks.taskname == task.taskname])
@@ -824,9 +824,6 @@ def copy_proposal(proposalid):
 
 		save_dbobject(None, OverheadRates, overhead_attributes, overhead_response)
 
-	#save_dbobject(obj, dbclass, attributes, response)
-
-	# need to load the proposal page when it is made
 
 	return view_proposal(new_proposal_id)
 
@@ -1004,32 +1001,30 @@ def save_salary(salaryid):
 @app.route('/staffing/ajax/delete', methods = ['POST'])
 @login_required
 def delete_staffing():
-	# if there are no more staffing available, need to also delete the task
-	# would it be better to just add the id to the url??
+	# if there is not any more staffing available, need to also delete the task
 
 	staffingid = int(request.form['staffingid'])
 	staffing = Staffing.get_one(filters = [Staffing.staffingid == staffingid])
 	taskid = staffing.taskid
 	task = Tasks.get_one(filters = [Tasks.taskid == taskid])
 	response = {'status': 'Error', 'description': 'Staffing', 'action': 'found'}
+	proposal = Proposals.get_one(filters = [Proposals.proposalid == task.proposalid])
 
-	#delete_response = delete_dbobject(staffing, response)
+	delete_response = delete_dbobject(staffing, response)
 
 	if delete_response['status'] == "Success":
 		# check to see if only one and if so, delete
 		current_staffing = task.staffing
 		staffing_length = len(current_staffing)
 
+		'''
 		if staffing_length == 0:
 			# delete task
-
-			# also need to update the last updated category in proposals
-			#proposal = Proposals.get_one(filters = [Proposals.proposalid == task.proposalid])
-
-			#proposal.modified = datetime.now()
-			#db.session.commit()
-
 			return "no staffing left in task"
+		'''
+			
+		proposal.modified = datetime.now()
+		db.session.commit()
 
 	return jsonify(delete_response)
 
@@ -1045,43 +1040,12 @@ def save_staffing():
 
 	#return str(request.form)
 
-	# the stuff in the nested if is needed, but I don't think we need the else with it because no matter what, as long
-	# as the template is changed and the addition is done there, then it will change it to be the flex hours column
-	# and set the quarter hours to 0 so there isn't any math confusion
-	'''
-	if staffing:
-		if int(request.form['flexhours']) != staffing.flexhours:
-			criteria = {'taskid': int(request.form['taskid']), 'peopleid': int(request.form['staffingpeopleid']),
-						'flexhours': request.form['flexhours'],'fiscalyear': request.form['fiscalyear'],
-						'q1hours': 0, 'q2hours': 0, 'q3hours': 0, 'q4hours': 0}
-		else:
-			return "same value"
-			#q1_hours = staffing.q1hours
-			#q2_hours = staffing.q2hours
-			#q3_hours = staffing.q3hours
-			#q4_hours = staffing.q4hours
-			#flex_hours = staffing.flex_hours
-			#criteria = {'taskid': int(request.form['taskid']), 'peopleid': int(request.form['staffingpeopleid']),
-						'fiscalyear': request.form['fiscalyear']}
-	else:
-		criteria = {'taskid': int(request.form['taskid']), 'peopleid': int(request.form['staffingpeopleid']),
-					'flexhours': request.form['flexhours'],'fiscalyear': request.form['fiscalyear']}
-	'''
-
 	try:
 		criteria = {'taskid': int(request.form['taskid']), 'peopleid': int(request.form['staffingpeopleid']),
 					'flexhours': request.form['flexhours'],'fiscalyear': request.form['fiscalyear'],
 					'q1hours': 0, 'q2hours': 0, 'q3hours': 0, 'q4hours': 0}
 	except:
 		return jsonify(response)
-
-	'''
-	try:
-		criteria = {'taskid': request.form['taskid'], 'peopleid': request.form['peopleid'],
-					'flexhours': request.form['flexhours'],'fiscalyear': request.form['fiscalyear']}
-	except:
-		return jsonify(response)
-	'''
 
 	save_response = save_dbobject(staffing, Staffing, criteria, response)
 
