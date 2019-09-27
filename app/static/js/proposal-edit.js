@@ -238,16 +238,24 @@ function loadTasksTable (reload, proposalid) {
     onItemDeleted: function(args) {
       $entry = args.item;
       $keys = Object.keys($entry);
+      console.log($entry[$keys[3]]);
 
       $.ajax({
-        type:'post',
-        url: 'index.php?',
+        type:'POST',
+        //url: 'index.php?',
+        url: '/staffing/ajax/delete',
         success: function() {
           loadTasksTable(true, proposalid);
         },
         data: {
-          view: 'task-delete',
-          taskid: $entry['taskid'],
+          //view: 'task-delete',
+          //taskid: $entry['taskid'],
+          //staffingid: $entry['staffingid'],
+          //staffingid: staffingid,
+          //keys: $keys,
+          //staffingid: $entry[key + 'staffingid'],
+          //entry: $entry,
+          staffingid: $entry[$keys[3]],
           proposalid: proposalid
         },
         async: true,

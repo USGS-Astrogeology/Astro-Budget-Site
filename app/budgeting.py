@@ -109,7 +109,8 @@ def check_login():
 @app.route('/')
 @login_required
 def home():
-	return render_template('default.html')
+	#return render_template('default.html')
+	return proposals()
 
 @app.route('/abudget/<int:proposalid>')
 @login_required
@@ -784,24 +785,24 @@ def copy_proposal(proposalid):
 	for task in tasks:
 		task_response = {'status': 'Error', 'description': 'Tasks', 'action': 'copy'}
 		task_attributes = {'proposalid': new_proposal_id, 'taskname': task.taskname}
-		
+
 		task_save_response = save_dbobject(None, Tasks, task_attributes, task_response)
-		
+
 		if task_save_response['status'] == "Success":
 			staffing = task.staffing
-			
+
 			new_task = Tasks.get_one(filters = [Tasks.proposalid == new_proposal_id, Tasks.taskname == task.taskname])
 			new_task_id = new_task.taskid
-		
+
 			for staff in staffing:
 				staff_response = {'status': 'Error', 'desciption': 'Staffing', 'action': 'copy'}
 				staff_attributes = {'taskid': new_task_id, 'peopleid': staff.peopleid, 'q1hours': staff.q1hours,
 									'q2hours': staff.q2hours, 'q3hours': staff.q3hours, 'q4hours': staff.q4hours,
 									'flexhours': staff.flexhours, 'fiscalyear': staff.fiscalyear}
-									
+
 				save_dbobject(None, Staffing, staff_attributes, staff_response)
-				
-	
+
+
 
 	expense_response = {'status': 'Error', 'description': 'Expenses', 'action': 'copy'}
 	for expense in expenses:
@@ -1003,12 +1004,21 @@ def save_salary(salaryid):
 def delete_staffing():
 	# if there is not any more staffing available, need to also delete the task
 
+	#return str(request.form)
+
 	staffingid = int(request.form['staffingid'])
+	print(staffingid)
 	staffing = Staffing.get_one(filters = [Staffing.staffingid == staffingid])
+	'''
 	taskid = staffing.taskid
 	task = Tasks.get_one(filters = [Tasks.taskid == taskid])
-	response = {'status': 'Error', 'description': 'Staffing', 'action': 'found'}
 	proposal = Proposals.get_one(filters = [Proposals.proposalid == task.proposalid])
+	'''
+
+	response = {'status': 'Error', 'description': 'Staffing', 'action': 'found'}
+
+	proposalid = int(request.form['proposalid'])
+	proposal = Proposals.get_one(filters = [Proposals.proposalid == proposalid])
 
 	delete_response = delete_dbobject(staffing, response)
 
@@ -1022,7 +1032,7 @@ def delete_staffing():
 			# delete task
 			return "no staffing left in task"
 		'''
-			
+
 		proposal.modified = datetime.now()
 		db.session.commit()
 
