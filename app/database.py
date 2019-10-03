@@ -43,6 +43,18 @@ class DatedBase(Base):
     return all_effective[-1]
 
   @classmethod
+  def geteffective(cls, list, cutoff_date = date.today()):
+  	effective_item = None
+  	if cutoff_date != date.today():
+  		cutoff_date = cutoff_date
+        #datetime.strptime(cutoff_date, '%Y/%m/%d')
+
+  	for item in list:
+  		if item.effectivedate.date() <= cutoff_date.date():
+  			effective_item = item
+  	return effective_item
+
+  @classmethod
   def to_fy(cls, date):
     year_string = ''
     try:
@@ -67,9 +79,15 @@ class People(DatedBase):
   proposals      = relationship('Proposals', backref='person', cascade='all,delete')
   staffing       = relationship('Staffing', backref='person', cascade='all,delete')
 
+  '''
   @hybrid_method
   def salary(self, fy):
     return self.get_effective(self.salaries, fy)
+  '''
+
+  @hybrid_method
+  def salary(self, date):
+      return self.geteffective(self.salaries, date)
 
   def __repr__(self):
     return "<People(name='%s', username='%s')>" % (self.name, self.username)
@@ -257,7 +275,8 @@ class Staffing(DatedBase):
   @hybrid_property
   def staffcosts(self):
     fy = self.to_fy(self.fiscalyear)
-    salary = self.person.salary(fy)
+    #salary = self.person.salary(fy)
+    salary = self.person.salary(self.fiscalyear)
     lafhours = round(self.taskhours * salary.laf, 4)
     return (salary.estsalary * lafhours) + (salary.estbenefits * lafhours)
 
